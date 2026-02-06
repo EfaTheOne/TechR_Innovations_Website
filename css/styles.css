@@ -144,8 +144,34 @@ nav {
 }
 
 .business-card .icon {
-    font-size: 3rem;
+    font-size: 1.5rem;
+    font-weight: bold;
     margin-bottom: 1rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    color: #fff;
+}
+
+.icon-techack {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.icon-techbox {
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+}
+
+.icon-studytech {
+    background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
+}
+
+.icon-rithm {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 .business-card h3 {
@@ -226,8 +252,18 @@ nav {
 }
 
 .feature-item .icon {
-    font-size: 2.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
     margin-bottom: 1rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    color: #fff;
 }
 
 .feature-item h3 {
@@ -276,6 +312,32 @@ nav {
     justify-content: center;
     color: #fff;
     font-size: 4rem;
+    font-weight: bold;
+}
+
+.about-image span {
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+.about-image-home {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.about-image-techack {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.about-image-techbox {
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+}
+
+.about-image-studytech {
+    background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
+}
+
+.about-image-rithm {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 /* Footer */

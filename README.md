@@ -1,22 +1,22 @@
 # TechR Innovations Website
 
-A multi-business technology company website featuring four specialized brands:
+A multi-brand company website featuring four specialized product lines:
 
-## Businesses
+## Brands
 
-- **Techack** - Advanced cybersecurity solutions including ethical hacking, penetration testing, and security consulting
-- **TechBox** - Complete technology packages with hardware, software, and cloud solutions for businesses
-- **StudyTech** - Educational technology platform offering online courses, certifications, and skill enhancement programs
-- **Rithm** - Creative technology for music and entertainment, including audio production and streaming solutions
+- **Techack** - Professional cybersecurity pentesting devices for security professionals
+- **TechBox** - STEM subscription boxes that teach kids electronics and coding
+- **StudyTech** - AI-powered portable learning device for studying on the go
+- **Rithm** - Premium triathlon recovery apparel designed for comfort
 
 ## Structure
 
 ```
 ├── index.html          # Main landing page
-├── techack.html        # Techack cybersecurity page
-├── techbox.html        # TechBox technology solutions page
-├── studytech.html      # StudyTech educational platform page
-├── rithm.html          # Rithm music & entertainment page
+├── techack.html        # Techack pentesting devices page
+├── techbox.html        # TechBox STEM learning kits page
+├── studytech.html      # StudyTech AI learning device page
+├── rithm.html          # Rithm recovery apparel page
 ├── css/
 │   └── styles.css      # Main stylesheet
 └── js/
