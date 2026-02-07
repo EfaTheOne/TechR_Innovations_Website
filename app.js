@@ -321,13 +321,221 @@ window.Store = Store;
 const Admin = {
     filterSearch: '',
     filterCategory: '',
+    filterStatus: '',
+    filterPriceMin: '',
+    filterPriceMax: '',
     siteSettings: {
         title: 'TechR Innovations',
         description: 'Pioneering the intersection of cybersecurity, advanced education, and clothing.',
         email: 'contact@techr.com'
     },
+    activeTab: 'overview',
+    selectedProducts: [],
+    sortBy: 'name',
+    sortDir: 'asc',
+    activityLog: [],
+    adminNotes: {},
+    adminTheme: 'dark',
+    showNotifications: false,
+    notifications: [],
+    sessionStart: null,
+    viewMode: 'grid',
 
     pendingImages: [],
+
+    logActivity: (action) => {
+        Admin.activityLog.unshift({ action, timestamp: new Date().toLocaleString() });
+        if (Admin.activityLog.length > 100) Admin.activityLog.pop();
+        Admin.addNotification(action);
+    },
+
+    addNotification: (message) => {
+        Admin.notifications.unshift({ message, timestamp: new Date().toLocaleString(), id: Date.now() });
+        if (Admin.notifications.length > 50) Admin.notifications.pop();
+    },
+
+    clearNotifications: () => {
+        Admin.notifications = [];
+    },
+
+    exportCSV: () => {
+        const products = Store.products;
+        if (products.length === 0) { Toast.error('No products to export'); return; }
+        const headers = ['ID', 'Name', 'Price', 'Category', 'Status', 'Description', 'Image'];
+        const rows = products.map(p => [
+            p.id,
+            '"' + (p.name || '').replace(/"/g, '""') + '"',
+            p.price,
+            p.category,
+            p.status || 'active',
+            '"' + (p.desc || '').replace(/"/g, '""') + '"',
+            p.image
+        ]);
+        const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'techr_products.csv'; a.click();
+        URL.revokeObjectURL(url);
+        Admin.logActivity('Exported products to CSV');
+        Toast.success('CSV exported successfully');
+    },
+
+    exportJSON: () => {
+        const products = Store.products;
+        if (products.length === 0) { Toast.error('No products to export'); return; }
+        const json = JSON.stringify(products, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'techr_products.json'; a.click();
+        URL.revokeObjectURL(url);
+        Admin.logActivity('Exported products to JSON');
+        Toast.success('JSON exported successfully');
+    },
+
+    importJSON: (file) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (!Array.isArray(imported)) { Toast.error('Invalid JSON format: expected an array'); return; }
+                let count = 0;
+                imported.forEach(p => {
+                    if (p.name && p.price != null && p.category) {
+                        p.id = Date.now() + Math.floor(Math.random() * 10000) + count;
+                        if (!p.status) p.status = 'active';
+                        Store.products.push(p);
+                        count++;
+                    }
+                });
+                Store.persistProducts();
+                Admin.logActivity('Imported ' + count + ' products from JSON');
+                Toast.success('Imported ' + count + ' products');
+                Router.handleRoute();
+            } catch (err) {
+                Toast.error('Failed to parse JSON: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    },
+
+    duplicateProduct: (id) => {
+        const product = Store.products.find(p => p.id === id);
+        if (!product) return;
+        const clone = JSON.parse(JSON.stringify(product));
+        clone.id = Date.now() + Math.floor(Math.random() * 1000);
+        clone.name = product.name + ' (Copy)';
+        Store.products.push(clone);
+        Store.persistProducts();
+        Admin.logActivity('Duplicated product: ' + product.name);
+        Toast.success('Product duplicated');
+        Router.handleRoute();
+    },
+
+    bulkDelete: () => {
+        if (Admin.selectedProducts.length === 0) { Toast.error('No products selected'); return; }
+        if (!confirm('Delete ' + Admin.selectedProducts.length + ' selected products?')) return;
+        const count = Admin.selectedProducts.length;
+        Store.products = Store.products.filter(p => !Admin.selectedProducts.includes(p.id));
+        Store.persistProducts();
+        Admin.logActivity('Bulk deleted ' + count + ' products');
+        Admin.selectedProducts = [];
+        Toast.success(count + ' products deleted');
+        Router.handleRoute();
+    },
+
+    toggleProductSelection: (id) => {
+        const idx = Admin.selectedProducts.indexOf(id);
+        if (idx === -1) Admin.selectedProducts.push(id);
+        else Admin.selectedProducts.splice(idx, 1);
+    },
+
+    selectAllProducts: () => {
+        Admin.selectedProducts = Store.products.map(p => p.id);
+    },
+
+    deselectAllProducts: () => {
+        Admin.selectedProducts = [];
+    },
+
+    toggleAdminTheme: () => {
+        Admin.adminTheme = Admin.adminTheme === 'dark' ? 'light' : 'dark';
+        Admin.logActivity('Switched admin theme to ' + Admin.adminTheme);
+        Router.handleRoute();
+    },
+
+    toggleViewMode: () => {
+        Admin.viewMode = Admin.viewMode === 'grid' ? 'list' : 'grid';
+    },
+
+    quickEditPrice: (id) => {
+        const product = Store.products.find(p => p.id === id);
+        if (!product) return;
+        const newPrice = prompt('Enter new price for "' + product.name + '":', product.price);
+        if (newPrice === null) return;
+        const parsed = parseFloat(newPrice);
+        if (isNaN(parsed) || parsed < 0) { Toast.error('Invalid price'); return; }
+        product.price = parsed;
+        Store.persistProducts();
+        Admin.logActivity('Quick-edited price of ' + product.name + ' to $' + parsed.toFixed(2));
+        Toast.success('Price updated to $' + parsed.toFixed(2));
+        Router.handleRoute();
+    },
+
+    addNote: (id) => {
+        const product = Store.products.find(p => p.id === id);
+        if (!product) return;
+        const existing = Admin.adminNotes[id] || '';
+        const note = prompt('Note for "' + product.name + '":', existing);
+        if (note === null) return;
+        if (note.trim()) {
+            Admin.adminNotes[id] = note.trim();
+            Admin.logActivity('Added note to ' + product.name);
+        } else {
+            delete Admin.adminNotes[id];
+        }
+        Toast.success('Note saved');
+        Router.handleRoute();
+    },
+
+    addCategory: () => {
+        const name = prompt('Enter new category name:');
+        if (!name || !name.trim()) return;
+        const catKey = name.trim().toLowerCase().replace(/\s+/g, '');
+        const exists = Store.products.some(p => p.category === catKey);
+        if (exists) { Toast.error('Category already exists'); return; }
+        Admin.logActivity('Added new category: ' + name.trim());
+        Toast.success('Category "' + name.trim() + '" ready. Add products with this category.');
+    },
+
+    setSortBy: (field) => {
+        if (Admin.sortBy === field) {
+            Admin.sortDir = Admin.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            Admin.sortBy = field;
+            Admin.sortDir = 'asc';
+        }
+    },
+
+    getSessionDuration: () => {
+        if (!Admin.sessionStart) return '0m';
+        const diff = Math.floor((Date.now() - Admin.sessionStart) / 1000);
+        const h = Math.floor(diff / 3600);
+        const m = Math.floor((diff % 3600) / 60);
+        const s = diff % 60;
+        if (h > 0) return h + 'h ' + m + 'm';
+        if (m > 0) return m + 'm ' + s + 's';
+        return s + 's';
+    },
+
+    getGreeting: () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good Morning';
+        if (hour < 17) return 'Good Afternoon';
+        return 'Good Evening';
+    },
 
     previewImage: (url) => {
         const preview = document.getElementById('image-preview');
@@ -465,6 +673,8 @@ const Admin = {
             }
             Admin.closeModal();
             const modeLabel = usedSupabase ? ' (synced to cloud)' : ' (saved locally)';
+            const actionMsg = editId ? 'Product updated: ' + productData.name : 'Product added: ' + productData.name;
+            Admin.logActivity(actionMsg);
             Toast.success((editId ? 'Product updated!' : 'Product added!') + modeLabel);
             Router.handleRoute();
         } catch(e) {
@@ -474,6 +684,8 @@ const Admin = {
 
     deleteProduct: async (id) => {
         if (!confirm('Delete this product?')) return;
+        const product = Store.products.find(p => p.id === id);
+        const productName = product ? product.name : 'Unknown';
         try {
             if (supabase && Store.syncMode === 'supabase') {
                 const { error } = await supabase.from('products').delete().eq('id', id);
@@ -484,6 +696,7 @@ const Admin = {
                 Store.persistProducts();
                 Store.lastSynced = new Date();
             }
+            Admin.logActivity('Deleted product: ' + productName);
             Toast.success('Product deleted');
             Router.handleRoute();
         } catch(e) {
@@ -595,7 +808,7 @@ const Router = {
             </div>
             
             <div class="container" style="padding-bottom: 4rem;">
-                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">Our Divisions</h2>
+                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">Our Businesses</h2>
                 <div class="grid-3">
                     <a href="#techack" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
@@ -648,7 +861,7 @@ const Router = {
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-techack">Security Division</span>
+                        <span class="badge badge-techack">Cybersecurity</span>
                         <h1 style="color: var(--color-techack);">Techack</h1>
                         <p>Enterprise-grade penetration testing and security assessment hardware for professionals.</p>
                     </div>
@@ -680,7 +893,7 @@ const Router = {
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-techbox">Education Division</span>
+                        <span class="badge badge-techbox">STEM Education</span>
                         <h1 style="color: var(--color-techbox);">TechBox</h1>
                         <p>Comprehensive STEM education kits designed for learners of all ages.</p>
                     </div>
@@ -712,7 +925,7 @@ const Router = {
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-rithim">Clothing Line</span>
+                        <span class="badge badge-rithim">Fashion & Apparel</span>
                         <h1 style="color: var(--color-rithim);">Rithim</h1>
                         <p>Premium apparel designed for style, comfort, and everyday confidence.</p>
                     </div>
@@ -744,7 +957,7 @@ const Router = {
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-studytech">AI Division</span>
+                        <span class="badge badge-studytech">AI & EdTech</span>
                         <h1 style="color: var(--color-studytech);">StudyTech</h1>
                         <p>AI-powered personalized learning that adapts to every student.</p>
                     </div>
@@ -836,148 +1049,516 @@ const Router = {
 
         // ADMIN DASHBOARD
         'dashboard': () => {
+            if (!Admin.sessionStart) Admin.sessionStart = Date.now();
             const allProducts = Store.products;
             const searchTerm = (Admin.filterSearch || '').toLowerCase();
             const filterCat = Admin.filterCategory || '';
-            const products = allProducts.filter(p => {
+            const filterStatus = Admin.filterStatus || '';
+            const filterPriceMin = Admin.filterPriceMin !== '' ? parseFloat(Admin.filterPriceMin) : null;
+            const filterPriceMax = Admin.filterPriceMax !== '' ? parseFloat(Admin.filterPriceMax) : null;
+            let products = allProducts.filter(p => {
                 const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm) || p.category.toLowerCase().includes(searchTerm);
                 const matchesCat = !filterCat || p.category === filterCat;
-                return matchesSearch && matchesCat;
+                const matchesStatus = !filterStatus || (p.status || 'active') === filterStatus;
+                const matchesPriceMin = filterPriceMin === null || p.price >= filterPriceMin;
+                const matchesPriceMax = filterPriceMax === null || p.price <= filterPriceMax;
+                return matchesSearch && matchesCat && matchesStatus && matchesPriceMin && matchesPriceMax;
             });
+
+            // Sort products
+            products = [...products].sort((a, b) => {
+                let cmp = 0;
+                switch (Admin.sortBy) {
+                    case 'name': cmp = a.name.localeCompare(b.name); break;
+                    case 'price-asc': cmp = a.price - b.price; break;
+                    case 'price-desc': cmp = b.price - a.price; break;
+                    case 'category': cmp = a.category.localeCompare(b.category); break;
+                    case 'status': cmp = (a.status || 'active').localeCompare(b.status || 'active'); break;
+                    case 'newest': cmp = b.id - a.id; break;
+                    default: cmp = a.name.localeCompare(b.name);
+                }
+                return Admin.sortDir === 'desc' ? -cmp : cmp;
+            });
+
             const categories = [...new Set(allProducts.map(p => p.category))];
             const avgPrice = allProducts.length > 0 ? (allProducts.reduce((s, p) => s + p.price, 0) / allProducts.length).toFixed(2) : '0.00';
+            const totalRevenue = allProducts.reduce((s, p) => s + p.price, 0).toFixed(2);
+            const activeCount = allProducts.filter(p => (p.status || 'active') === 'active').length;
+            const lowStockCount = 0;
             const syncIcon = Store.syncMode === 'supabase' ? 'cloud' : 'hard-drive';
             const syncLabel = Store.syncMode === 'supabase' ? 'Cloud Synced' : 'Local Storage';
             const syncColor = Store.syncMode === 'supabase' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
             const lastSync = Store.lastSynced ? Store.lastSynced.toLocaleTimeString() : 'Never';
+            const tab = Admin.activeTab || 'overview';
+            const themeClass = Admin.adminTheme === 'light' ? 'admin-theme-light' : '';
 
-            return `
-                <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
-                    <div class="dashboard-header reveal">
-                        <div>
-                            <h1 style="font-size: 2.5rem;">Admin Dashboard</h1>
-                            <p>Manage products and inventory</p>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-                            <button class="btn btn-primary" data-action="add-product">
-                                <i data-lucide="plus" style="width: 18px; height: 18px;"></i> Add Product
-                            </button>
-                            <button class="btn btn-secondary" data-action="refresh-products">
-                                <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i> Refresh
-                            </button>
-                            <button class="btn btn-secondary" data-action="logout">
-                                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Sign Out
-                            </button>
-                        </div>
-                    </div>
+            // Category stats for analytics
+            const catCounts = {};
+            const catRevenue = {};
+            allProducts.forEach(p => {
+                catCounts[p.category] = (catCounts[p.category] || 0) + 1;
+                catRevenue[p.category] = (catRevenue[p.category] || 0) + p.price;
+            });
+            const maxCatCount = Math.max(...Object.values(catCounts), 1);
+            const maxCatRevenue = Math.max(...Object.values(catRevenue), 1);
 
-                    <!-- Sync Status Banner -->
-                    <div class="admin-sync-banner reveal" style="background: ${syncColor}; color: white; padding: 0.75rem 1.25rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="${syncIcon}" style="width: 18px; height: 18px;"></i>
-                            <strong>${syncLabel}</strong>
-                            <span style="opacity: 0.85; font-size: 0.85rem;">&mdash; Last synced: ${lastSync}</span>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            ${Store.syncMode === 'local' ? '<button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 0.8rem; padding: 0.35rem 0.75rem;" data-action="reset-defaults">Reset to Defaults</button>' : ''}
-                        </div>
-                    </div>
+            // Price distribution
+            const priceRanges = { '$0-50': 0, '$50-100': 0, '$100-250': 0, '$250-500': 0, '$500+': 0 };
+            allProducts.forEach(p => {
+                if (p.price < 50) priceRanges['$0-50']++;
+                else if (p.price < 100) priceRanges['$50-100']++;
+                else if (p.price < 250) priceRanges['$100-250']++;
+                else if (p.price < 500) priceRanges['$250-500']++;
+                else priceRanges['$500+']++;
+            });
+            const maxPriceRange = Math.max(...Object.values(priceRanges), 1);
 
-                    <div class="admin-stats reveal">
-                        <div class="admin-stat-card">
+            // Sample messages
+            const sampleMessages = [
+                { name: 'Alex Johnson', email: 'alex@example.com', message: 'Interested in bulk pricing for TechBox Classroom kits for our school district.', date: '2025-01-15' },
+                { name: 'Sarah Chen', email: 'sarah.c@example.com', message: 'The Techack1 Pro is incredible! Any plans for a wireless-only version?', date: '2025-01-14' },
+                { name: 'Mike Rivera', email: 'mike.r@example.com', message: 'When will new Rithim hoodie colors be available?', date: '2025-01-13' }
+            ];
+
+            const renderOverviewTab = () => `
+                <div class="admin-stats-enhanced">
+                    <div class="admin-stat-card-enhanced">
+                        <div class="admin-stat-icon blue"><i data-lucide="package" style="width:24px;height:24px;"></i></div>
+                        <div class="admin-stat-details">
                             <div class="admin-stat-value">${allProducts.length}</div>
                             <div class="admin-stat-label">Total Products</div>
                         </div>
-                        <div class="admin-stat-card">
-                            <div class="admin-stat-value">${categories.length}</div>
-                            <div class="admin-stat-label">Categories</div>
-                        </div>
-                        <div class="admin-stat-card">
-                            <div class="admin-stat-value">$${allProducts.reduce((sum, p) => sum + p.price, 0).toFixed(0)}</div>
-                            <div class="admin-stat-label">Total Inventory Value</div>
-                        </div>
-                        <div class="admin-stat-card">
-                            <div class="admin-stat-value">$${avgPrice}</div>
-                            <div class="admin-stat-label">Avg. Price</div>
+                    </div>
+                    <div class="admin-stat-card-enhanced">
+                        <div class="admin-stat-icon green"><i data-lucide="dollar-sign" style="width:24px;height:24px;"></i></div>
+                        <div class="admin-stat-details">
+                            <div class="admin-stat-value">$${totalRevenue}</div>
+                            <div class="admin-stat-label">Total Revenue</div>
                         </div>
                     </div>
+                    <div class="admin-stat-card-enhanced">
+                        <div class="admin-stat-icon orange"><i data-lucide="shopping-cart" style="width:24px;height:24px;"></i></div>
+                        <div class="admin-stat-details">
+                            <div class="admin-stat-value">0</div>
+                            <div class="admin-stat-label">Orders Today</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card-enhanced">
+                        <div class="admin-stat-icon purple"><i data-lucide="check-circle" style="width:24px;height:24px;"></i></div>
+                        <div class="admin-stat-details">
+                            <div class="admin-stat-value">${activeCount}</div>
+                            <div class="admin-stat-label">Active Products</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card-enhanced">
+                        <div class="admin-stat-icon red"><i data-lucide="alert-triangle" style="width:24px;height:24px;"></i></div>
+                        <div class="admin-stat-details">
+                            <div class="admin-stat-value">${lowStockCount}</div>
+                            <div class="admin-stat-label">Low Stock Items</div>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="admin-search-bar reveal">
-                        <input type="text" id="admin-search" placeholder="Search products by name or category..." value="${Admin.filterSearch || ''}">
+                <div class="admin-quick-actions">
+                    <button class="btn btn-primary btn-sm" data-action="add-product"><i data-lucide="plus" style="width:16px;height:16px;"></i> Add Product</button>
+                    <button class="btn btn-secondary btn-sm" data-action="export-csv"><i data-lucide="download" style="width:16px;height:16px;"></i> Export CSV</button>
+                    <button class="btn btn-secondary btn-sm" data-action="export-json"><i data-lucide="file-json" style="width:16px;height:16px;"></i> Export JSON</button>
+                    <label class="btn btn-secondary btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:0.35rem;">
+                        <i data-lucide="upload" style="width:16px;height:16px;"></i> Import JSON
+                        <input type="file" id="import-json-file" accept=".json" style="display:none;">
+                    </label>
+                    <button class="btn btn-secondary btn-sm" data-action="refresh-products"><i data-lucide="refresh-cw" style="width:16px;height:16px;"></i> Refresh All</button>
+                    <button class="btn btn-secondary btn-sm" data-action="toggle-admin-theme"><i data-lucide="${Admin.adminTheme === 'dark' ? 'sun' : 'moon'}" style="width:16px;height:16px;"></i> Toggle Theme</button>
+                </div>
+
+                <!-- Sync Status Banner -->
+                <div class="admin-sync-banner" style="background:${syncColor};color:white;padding:0.75rem 1.25rem;border-radius:12px;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <i data-lucide="${syncIcon}" style="width:18px;height:18px;"></i>
+                        <strong>${syncLabel}</strong>
+                        <span style="opacity:0.85;font-size:0.85rem;">&mdash; Last synced: ${lastSync}</span>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;">
+                        ${Store.syncMode === 'local' ? '<button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);font-size:0.8rem;padding:0.35rem 0.75rem;" data-action="reset-defaults">Reset to Defaults</button>' : ''}
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:1rem;">Recent Activity</h3>
+                <div class="activity-log">
+                    ${Admin.activityLog.length === 0 ? '<p style="color:var(--text-secondary);padding:1rem;">No activity recorded yet.</p>' :
+                    Admin.activityLog.slice(0, 5).map(a => `
+                        <div class="activity-item">
+                            <div class="activity-dot"></div>
+                            <div class="activity-text">${a.action}</div>
+                            <div class="activity-time">${a.timestamp}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            const renderProductCard = (p) => {
+                const isSelected = Admin.selectedProducts.includes(p.id);
+                const status = p.status || 'active';
+                const hasNote = Admin.adminNotes[p.id];
+                return `
+                    <div class="admin-product-card" style="${isSelected ? 'border-color:var(--accent);' : ''}">
+                        <div style="position:absolute;top:0.75rem;left:0.75rem;z-index:2;display:flex;align-items:center;gap:0.5rem;">
+                            <input type="checkbox" class="admin-checkbox" data-action="toggle-select" data-product-id="${p.id}" ${isSelected ? 'checked' : ''}>
+                            <span class="drag-handle" title="Drag to reorder">⠿</span>
+                        </div>
+                        <img src="${p.image}" alt="${p.name}" class="admin-product-img">
+                        <div class="admin-product-info">
+                            <h3>${p.name}</h3>
+                            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                                <span class="badge badge-${p.category}" style="font-size:0.75rem;padding:0.25rem 0.75rem;">${p.category}</span>
+                                <span class="status-badge status-${status}">${status}</span>
+                                ${hasNote ? '<span class="product-note-indicator" title="' + Admin.adminNotes[p.id].replace(/"/g, '&quot;') + '">📝 Note</span>' : ''}
+                            </div>
+                            <p class="admin-product-desc">${p.desc}</p>
+                            <p class="admin-product-price" data-action="quick-edit-price" data-product-id="${p.id}" style="cursor:pointer;" title="Click to quick-edit price">$${p.price.toFixed(2)}</p>
+                        </div>
+                        <div class="admin-product-actions-enhanced">
+                            <button class="btn btn-secondary btn-sm" data-action="edit-product" data-product-id="${p.id}">
+                                <i data-lucide="edit-2" style="width:14px;height:14px;"></i> Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" data-action="duplicate-product" data-product-id="${p.id}">
+                                <i data-lucide="copy" style="width:14px;height:14px;"></i> Duplicate
+                            </button>
+                            <button class="btn btn-secondary btn-sm" data-action="add-note" data-product-id="${p.id}">
+                                <i data-lucide="sticky-note" style="width:14px;height:14px;"></i> Note
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="delete-product" data-product-id="${p.id}">
+                                <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const renderProductListItem = (p) => {
+                const isSelected = Admin.selectedProducts.includes(p.id);
+                const status = p.status || 'active';
+                return `
+                    <div class="admin-product-list-item">
+                        <input type="checkbox" class="admin-checkbox" data-action="toggle-select" data-product-id="${p.id}" ${isSelected ? 'checked' : ''}>
+                        <img src="${p.image}" alt="${p.name}">
+                        <div>
+                            <strong>${p.name}</strong>
+                            ${Admin.adminNotes[p.id] ? '<span class="product-note-indicator">📝</span>' : ''}
+                        </div>
+                        <span class="list-category" style="text-transform:capitalize;color:var(--text-secondary);font-size:0.85rem;">${p.category}</span>
+                        <span class="list-status"><span class="status-badge status-${status}">${status}</span></span>
+                        <span data-action="quick-edit-price" data-product-id="${p.id}" style="cursor:pointer;color:var(--accent);font-weight:600;" title="Click to edit">$${p.price.toFixed(2)}</span>
+                        <div style="display:flex;gap:0.35rem;">
+                            <button class="btn btn-secondary btn-sm" data-action="edit-product" data-product-id="${p.id}" title="Edit"><i data-lucide="edit-2" style="width:14px;height:14px;"></i></button>
+                            <button class="btn btn-secondary btn-sm" data-action="duplicate-product" data-product-id="${p.id}" title="Duplicate"><i data-lucide="copy" style="width:14px;height:14px;"></i></button>
+                            <button class="btn btn-danger btn-sm" data-action="delete-product" data-product-id="${p.id}" title="Delete"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const renderProductsTab = () => `
+                <div class="filter-panel">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="admin-search" placeholder="Search products..." value="${Admin.filterSearch || ''}">
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
                         <select id="admin-category-filter">
                             <option value="">All Categories</option>
-                            ${categories.map(c => `<option value="${c}" ${filterCat === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            ${categories.map(c => '<option value="' + c + '" ' + (filterCat === c ? 'selected' : '') + '>' + c + '</option>').join('')}
                         </select>
                     </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="admin-status-filter">
+                            <option value="">All Statuses</option>
+                            <option value="active" ${filterStatus === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="draft" ${filterStatus === 'draft' ? 'selected' : ''}>Draft</option>
+                            <option value="archived" ${filterStatus === 'archived' ? 'selected' : ''}>Archived</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Min Price ($)</label>
+                        <input type="number" id="admin-price-min" placeholder="0" min="0" step="0.01" value="${Admin.filterPriceMin}">
+                    </div>
+                    <div class="filter-group">
+                        <label>Max Price ($)</label>
+                        <input type="number" id="admin-price-max" placeholder="Any" min="0" step="0.01" value="${Admin.filterPriceMax}">
+                    </div>
+                </div>
 
-                    ${products.length === 0 ? `
-                        <div class="card reveal" style="text-align: center; padding: 3rem 2rem;">
-                            <i data-lucide="package-x" style="width: 48px; height: 48px; color: var(--text-secondary); margin-bottom: 1rem;"></i>
-                            <h3 style="margin-bottom: 0.5rem;">No Products Found</h3>
-                            <p style="color: var(--text-secondary);">${searchTerm || filterCat ? 'Try adjusting your search or filter.' : 'Add your first product to get started.'}</p>
-                        </div>
-                    ` : `
-                        <div class="admin-products-grid reveal">
-                            ${products.map(p => `
-                                <div class="admin-product-card">
-                                    <img src="${p.image}" alt="${p.name}" class="admin-product-img">
-                                    <div class="admin-product-info">
-                                        <h3>${p.name}</h3>
-                                        <span class="badge badge-${p.category}" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">${p.category}</span>
-                                        <p class="admin-product-desc">${p.desc}</p>
-                                        <p class="admin-product-price">$${p.price.toFixed(2)}</p>
-                                    </div>
-                                    <div class="admin-product-actions">
-                                        <button class="btn btn-secondary btn-sm" data-action="edit-product" data-product-id="${p.id}">
-                                            <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" data-action="delete-product" data-product-id="${p.id}">
-                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
-                                        </button>
+                <div class="admin-controls-bar">
+                    <div class="admin-controls-left">
+                        <button class="btn btn-primary btn-sm" data-action="add-product"><i data-lucide="plus" style="width:16px;height:16px;"></i> Add Product</button>
+                        <button class="btn btn-secondary btn-sm" data-action="select-all"><i data-lucide="check-square" style="width:16px;height:16px;"></i> Select All</button>
+                        <button class="btn btn-secondary btn-sm" data-action="deselect-all"><i data-lucide="square" style="width:16px;height:16px;"></i> Deselect</button>
+                        ${Admin.selectedProducts.length > 0 ? '<button class="btn btn-danger btn-sm" data-action="bulk-delete"><i data-lucide="trash-2" style="width:16px;height:16px;"></i> Delete Selected (' + Admin.selectedProducts.length + ')</button>' : ''}
+                        <select class="sort-select" id="admin-sort">
+                            <option value="name" ${Admin.sortBy === 'name' ? 'selected' : ''}>Sort: Name</option>
+                            <option value="price-asc" ${Admin.sortBy === 'price-asc' ? 'selected' : ''}>Sort: Price (Low-High)</option>
+                            <option value="price-desc" ${Admin.sortBy === 'price-desc' ? 'selected' : ''}>Sort: Price (High-Low)</option>
+                            <option value="category" ${Admin.sortBy === 'category' ? 'selected' : ''}>Sort: Category</option>
+                            <option value="status" ${Admin.sortBy === 'status' ? 'selected' : ''}>Sort: Status</option>
+                            <option value="newest" ${Admin.sortBy === 'newest' ? 'selected' : ''}>Sort: Newest</option>
+                        </select>
+                    </div>
+                    <div class="admin-controls-right">
+                        <button class="view-toggle-btn ${Admin.viewMode === 'grid' ? 'active' : ''}" data-action="toggle-view-mode" title="Toggle view">
+                            <i data-lucide="${Admin.viewMode === 'grid' ? 'grid' : 'list'}" style="width:18px;height:18px;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">Showing ${products.length} of ${allProducts.length} products</p>
+
+                ${products.length === 0 ? `
+                    <div class="card" style="text-align:center;padding:3rem 2rem;">
+                        <i data-lucide="package-x" style="width:48px;height:48px;color:var(--text-secondary);margin-bottom:1rem;"></i>
+                        <h3 style="margin-bottom:0.5rem;">No Products Found</h3>
+                        <p style="color:var(--text-secondary);">${searchTerm || filterCat || filterStatus ? 'Try adjusting your filters.' : 'Add your first product to get started.'}</p>
+                    </div>
+                ` : Admin.viewMode === 'grid' ? `
+                    <div class="admin-products-grid">
+                        ${products.map(p => renderProductCard(p)).join('')}
+                    </div>
+                ` : `
+                    <div class="admin-products-list">
+                        ${products.map(p => renderProductListItem(p)).join('')}
+                    </div>
+                `}
+            `;
+
+            const renderAnalyticsTab = () => `
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3><i data-lucide="bar-chart-3" style="width:20px;height:20px;"></i> Products per Category</h3>
+                        <div class="chart-bar-container">
+                            ${Object.entries(catCounts).map(([cat, count]) => `
+                                <div class="chart-bar-row">
+                                    <div class="chart-bar-label">${cat}</div>
+                                    <div class="chart-bar-track">
+                                        <div class="chart-bar-fill" style="width:${(count / maxCatCount * 100).toFixed(0)}%;background:var(--accent);">${count}</div>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
-                    `}
+                    </div>
+                    <div class="analytics-card">
+                        <h3><i data-lucide="dollar-sign" style="width:20px;height:20px;"></i> Revenue by Category</h3>
+                        <div class="chart-bar-container">
+                            ${Object.entries(catRevenue).map(([cat, rev]) => `
+                                <div class="chart-bar-row">
+                                    <div class="chart-bar-label">${cat}</div>
+                                    <div class="chart-bar-track">
+                                        <div class="chart-bar-fill" style="width:${(rev / maxCatRevenue * 100).toFixed(0)}%;background:var(--success);">$${rev.toFixed(0)}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="analytics-card">
+                        <h3><i data-lucide="trending-up" style="width:20px;height:20px;"></i> Price Distribution</h3>
+                        <div class="chart-bar-container">
+                            ${Object.entries(priceRanges).map(([range, count]) => `
+                                <div class="chart-bar-row">
+                                    <div class="chart-bar-label">${range}</div>
+                                    <div class="chart-bar-track">
+                                        <div class="chart-bar-fill" style="width:${(count / maxPriceRange * 100).toFixed(0)}%;background:var(--color-techbox);">${count}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="analytics-card">
+                        <h3><i data-lucide="pie-chart" style="width:20px;height:20px;"></i> Summary</h3>
+                        <div style="display:flex;flex-direction:column;gap:1rem;">
+                            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Total Products</span><strong>${allProducts.length}</strong></div>
+                            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Total Revenue</span><strong>$${totalRevenue}</strong></div>
+                            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Average Price</span><strong>$${avgPrice}</strong></div>
+                            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Categories</span><strong>${categories.length}</strong></div>
+                            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Active Products</span><strong>${activeCount}</strong></div>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-                    <hr class="admin-section-divider">
+            const renderMessagesTab = () => `
+                <h3 style="margin-bottom:1.5rem;"><i data-lucide="mail" style="width:20px;height:20px;"></i> Customer Messages</h3>
+                <div class="messages-list">
+                    ${sampleMessages.map(m => `
+                        <div class="message-card">
+                            <div class="message-header">
+                                <span class="message-sender">${m.name}</span>
+                                <span class="message-date">${m.date}</span>
+                            </div>
+                            <div class="message-email">${m.email}</div>
+                            <div class="message-body">${m.message}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
 
-                    <div class="admin-settings-section reveal">
-                        <h2><i data-lucide="settings" style="width: 24px; height: 24px;"></i> Site Settings</h2>
-                        <div class="settings-form">
-                            <div class="form-group">
-                                <label for="site-title">Site Title</label>
-                                <input type="text" id="site-title" value="${Admin.siteSettings.title}">
+            const renderActivityTab = () => `
+                <h3 style="margin-bottom:1.5rem;"><i data-lucide="clock" style="width:20px;height:20px;"></i> Activity Log</h3>
+                <div class="activity-log">
+                    ${Admin.activityLog.length === 0 ? '<p style="color:var(--text-secondary);padding:2rem;text-align:center;">No activity recorded yet. Actions like adding, editing, or deleting products will appear here.</p>' :
+                    Admin.activityLog.map(a => `
+                        <div class="activity-item">
+                            <div class="activity-dot"></div>
+                            <div class="activity-text">${a.action}</div>
+                            <div class="activity-time">${a.timestamp}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            const renderSettingsTab = () => `
+                <div class="admin-settings-section">
+                    <h2><i data-lucide="settings" style="width:24px;height:24px;"></i> Site Settings</h2>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="site-title">Site Title</label>
+                            <input type="text" id="site-title" value="${Admin.siteSettings.title}">
+                        </div>
+                        <div class="form-group">
+                            <label for="site-desc">Site Description</label>
+                            <textarea id="site-desc" rows="2">${Admin.siteSettings.description}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="site-email">Contact Email</label>
+                            <input type="email" id="site-email" value="${Admin.siteSettings.email}">
+                        </div>
+                        <button class="btn btn-primary" data-action="save-settings">
+                            <i data-lucide="save" style="width:16px;height:16px;"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="admin-section-divider">
+
+                <div class="admin-settings-section">
+                    <h2><i data-lucide="folder" style="width:24px;height:24px;"></i> Category Management</h2>
+                    <div class="category-list" style="margin-bottom:1rem;">
+                        ${categories.map(c => `
+                            <div class="category-item">
+                                <span class="cat-name">${c}</span>
+                                <span class="cat-count">${catCounts[c] || 0} product${(catCounts[c] || 0) !== 1 ? 's' : ''}</span>
                             </div>
-                            <div class="form-group">
-                                <label for="site-desc">Site Description</label>
-                                <textarea id="site-desc" rows="2">${Admin.siteSettings.description}</textarea>
+                        `).join('')}
+                    </div>
+                    <button class="btn btn-secondary btn-sm" data-action="add-category"><i data-lucide="plus" style="width:16px;height:16px;"></i> Add Category</button>
+                </div>
+
+                <hr class="admin-section-divider">
+
+                <div class="admin-settings-section">
+                    <h2><i data-lucide="palette" style="width:24px;height:24px;"></i> Appearance</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:1rem;">Current theme: <strong>${Admin.adminTheme}</strong></p>
+                    <button class="btn btn-secondary" data-action="toggle-admin-theme">
+                        <i data-lucide="${Admin.adminTheme === 'dark' ? 'sun' : 'moon'}" style="width:16px;height:16px;"></i> Switch to ${Admin.adminTheme === 'dark' ? 'Light' : 'Dark'} Theme
+                    </button>
+                </div>
+
+                <hr class="admin-section-divider">
+
+                <div class="admin-settings-section">
+                    <h2><i data-lucide="download" style="width:24px;height:24px;"></i> Data Management</h2>
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
+                        <button class="btn btn-secondary" data-action="export-csv"><i data-lucide="download" style="width:16px;height:16px;"></i> Export CSV</button>
+                        <button class="btn btn-secondary" data-action="export-json"><i data-lucide="file-json" style="width:16px;height:16px;"></i> Export JSON</button>
+                        <label class="btn btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:0.35rem;">
+                            <i data-lucide="upload" style="width:16px;height:16px;"></i> Import JSON
+                            <input type="file" id="import-json-file" accept=".json" style="display:none;">
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="admin-section-divider">
+
+                <div class="admin-settings-section">
+                    <h2><i data-lucide="keyboard" style="width:24px;height:24px;"></i> Keyboard Shortcuts</h2>
+                    <div class="shortcuts-grid">
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Ctrl+N</span>
+                            <span class="shortcut-desc">New product</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Escape</span>
+                            <span class="shortcut-desc">Close modal</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            let tabContent = '';
+            switch (tab) {
+                case 'overview': tabContent = renderOverviewTab(); break;
+                case 'products': tabContent = renderProductsTab(); break;
+                case 'analytics': tabContent = renderAnalyticsTab(); break;
+                case 'messages': tabContent = renderMessagesTab(); break;
+                case 'activity': tabContent = renderActivityTab(); break;
+                case 'settings': tabContent = renderSettingsTab(); break;
+                default: tabContent = renderOverviewTab();
+            }
+
+            return `
+                <div class="container ${themeClass}" style="padding-top:calc(var(--header-height) + 3rem);padding-bottom:4rem;">
+                    <div class="admin-welcome reveal">
+                        <div>
+                            <h1>${Admin.getGreeting()}, Admin</h1>
+                            <p style="color:var(--text-secondary);margin:0;">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        </div>
+                        <div class="session-info">
+                            <span><i data-lucide="clock" style="width:14px;height:14px;"></i> Session: ${Admin.getSessionDuration()}</span>
+                            <div style="position:relative;">
+                                <button class="notification-bell" data-action="toggle-notifications">
+                                    <i data-lucide="bell" style="width:18px;height:18px;"></i>
+                                    ${Admin.notifications.length > 0 ? '<span class="notification-count">' + Math.min(Admin.notifications.length, 99) + '</span>' : ''}
+                                </button>
+                                ${Admin.showNotifications ? `
+                                    <div class="notification-dropdown">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border-glass);margin-bottom:0.25rem;">
+                                            <strong style="font-size:0.9rem;">Notifications</strong>
+                                            ${Admin.notifications.length > 0 ? '<button class="btn btn-sm" style="font-size:0.75rem;padding:0.2rem 0.5rem;" data-action="clear-notifications">Clear All</button>' : ''}
+                                        </div>
+                                        ${Admin.notifications.length === 0 ? '<p style="padding:1rem;text-align:center;color:var(--text-secondary);font-size:0.85rem;">No notifications</p>' :
+                                        Admin.notifications.slice(0, 10).map(n => `
+                                            <div class="notification-item">
+                                                <div>${n.message}</div>
+                                                <div class="notif-time">${n.timestamp}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
                             </div>
-                            <div class="form-group">
-                                <label for="site-email">Contact Email</label>
-                                <input type="email" id="site-email" value="${Admin.siteSettings.email}">
-                            </div>
-                            <button class="btn btn-primary" data-action="save-settings">
-                                <i data-lucide="save" style="width: 16px; height: 16px;"></i> Save Settings
-                            </button>
+                            <button class="btn btn-secondary btn-sm" data-action="logout"><i data-lucide="log-out" style="width:16px;height:16px;"></i> Sign Out</button>
                         </div>
                     </div>
 
-                    <hr class="admin-section-divider">
+                    <div class="admin-tabs reveal">
+                        <button class="admin-tab ${tab === 'overview' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="overview"><i data-lucide="layout-dashboard" style="width:16px;height:16px;"></i> Overview</button>
+                        <button class="admin-tab ${tab === 'products' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="products"><i data-lucide="package" style="width:16px;height:16px;"></i> Products</button>
+                        <button class="admin-tab ${tab === 'analytics' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="analytics"><i data-lucide="bar-chart-3" style="width:16px;height:16px;"></i> Analytics</button>
+                        <button class="admin-tab ${tab === 'messages' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="messages"><i data-lucide="mail" style="width:16px;height:16px;"></i> Messages</button>
+                        <button class="admin-tab ${tab === 'activity' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="activity"><i data-lucide="clock" style="width:16px;height:16px;"></i> Activity</button>
+                        <button class="admin-tab ${tab === 'settings' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="settings"><i data-lucide="settings" style="width:16px;height:16px;"></i> Settings</button>
+                    </div>
 
-                    <div class="admin-settings-section reveal">
-                        <h2><i data-lucide="package" style="width: 24px; height: 24px;"></i> Orders <span class="coming-soon-badge">Coming Soon</span></h2>
-                        <p style="color: var(--text-secondary);">Order management and tracking will be available in a future update.</p>
+                    <div class="reveal">
+                        ${tabContent}
                     </div>
                 </div>
 
                 <!-- Product Modal -->
-                <div id="product-modal" class="modal-overlay" style="display: none;">
+                <div id="product-modal" class="modal-overlay" style="display:none;">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h2 id="modal-title">Add Product</h2>
                             <button class="modal-close" data-action="close-modal">
-                                <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                                <i data-lucide="x" style="width:24px;height:24px;"></i>
                             </button>
                         </div>
                         <form id="product-form">
@@ -986,7 +1567,7 @@ const Router = {
                                 <label for="product-name">Product Name</label>
                                 <input type="text" id="product-name" placeholder="Product name" required>
                             </div>
-                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                                 <div class="form-group">
                                     <label for="product-price">Price ($)</label>
                                     <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00" required>
@@ -1004,25 +1585,25 @@ const Router = {
                             <div class="form-group">
                                 <label>Main Product Image</label>
                                 <div class="image-upload-area">
-                                    <div class="upload-options" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                        <label for="product-image-file" class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;">
-                                            <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Upload Photo
+                                    <div class="upload-options" style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+                                        <label for="product-image-file" class="btn btn-secondary btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:0.25rem;">
+                                            <i data-lucide="upload" style="width:14px;height:14px;"></i> Upload Photo
                                         </label>
-                                        <input type="file" id="product-image-file" accept="image/*" style="display: none;">
-                                        <span style="color: var(--text-secondary); font-size: 0.85rem; align-self: center;">or paste URL below</span>
+                                        <input type="file" id="product-image-file" accept="image/*" style="display:none;">
+                                        <span style="color:var(--text-secondary);font-size:0.85rem;align-self:center;">or paste URL below</span>
                                     </div>
                                     <input type="text" id="product-image" placeholder="https://images.unsplash.com/... or upload above" required>
-                                    <img id="image-preview" class="image-preview" style="display: none;">
+                                    <img id="image-preview" class="image-preview" style="display:none;">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label>Additional Photos</label>
                                 <div class="image-upload-area">
-                                    <label for="product-additional-images" class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem;">
-                                        <i data-lucide="images" style="width: 14px; height: 14px;"></i> Add More Photos
+                                    <label for="product-additional-images" class="btn btn-secondary btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:0.25rem;margin-bottom:0.5rem;">
+                                        <i data-lucide="images" style="width:14px;height:14px;"></i> Add More Photos
                                     </label>
-                                    <input type="file" id="product-additional-images" accept="image/*" multiple style="display: none;">
-                                    <div id="additional-images-preview" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;"></div>
+                                    <input type="file" id="product-additional-images" accept="image/*" multiple style="display:none;">
+                                    <div id="additional-images-preview" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;"></div>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -1033,8 +1614,8 @@ const Router = {
                                 <label for="product-desc">Description</label>
                                 <textarea id="product-desc" rows="3" placeholder="Product description..." required></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                <i data-lucide="save" style="width: 18px; height: 18px;"></i> Save Product
+                            <button type="submit" class="btn btn-primary" style="width:100%;">
+                                <i data-lucide="save" style="width:18px;height:18px;"></i> Save Product
                             </button>
                         </form>
                     </div>
@@ -1279,7 +1860,7 @@ const Router = {
                     <p>
                         TechR Innovations was born from a passion for hands-on technology and the belief that innovation should be accessible to everyone. 
                         What started as personal hardware hacking projects — building custom macropads, NFC hacking cards, and penetration testing 
-                        devices — evolved into a full-fledged company spanning four distinct divisions. Ryan's journey from building his first 
+                        devices — evolved into a full-fledged company spanning four distinct businesses. Ryan's journey from building his first 
                         Tech_Pad to creating the Techack1 Pro pentesting framework is the foundation of everything TechR stands for: curiosity, 
                         craftsmanship, and relentless innovation.
                     </p>
@@ -1296,7 +1877,7 @@ const Router = {
                 </div>
 
                 <div class="about-divisions-grid reveal">
-                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">Our Divisions</h2>
+                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">Our Businesses</h2>
                     <div class="about-division-card" style="border-color: var(--color-techack);">
                         <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
                         <h3 style="color: var(--color-techack);">Techack</h3>
@@ -1343,7 +1924,7 @@ const Router = {
 
                 <div class="cta-section reveal" style="margin-top: 2rem;">
                     <h2>Ready to Explore?</h2>
-                    <p>Check out our divisions and discover what TechR has to offer.</p>
+                    <p>Check out our businesses and discover what TechR has to offer.</p>
                     <a href="#techack" class="btn btn-primary btn-lg">Browse Products</a>
                 </div>
             </div>
@@ -1569,15 +2150,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'close-modal':
                     Admin.closeModal();
                     break;
-                case 'save-settings':
+                case 'save-settings': {
                     const titleEl = document.getElementById('site-title');
                     const descEl = document.getElementById('site-desc');
                     const emailEl = document.getElementById('site-email');
                     if (titleEl) Admin.siteSettings.title = titleEl.value;
                     if (descEl) Admin.siteSettings.description = descEl.value;
                     if (emailEl) Admin.siteSettings.email = emailEl.value;
+                    Admin.logActivity('Updated site settings');
                     Toast.success('Site settings saved!');
                     break;
+                }
                 case 'reset-defaults':
                     if (confirm('Reset all products to the original 12 defaults? This will remove any products you have added or changes you have made.')) {
                         Store.resetToDefaults();
@@ -1590,7 +2173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'update-qty':
                     Store.updateQuantity(parseFloat(actionBtn.dataset.cartId), parseInt(actionBtn.dataset.delta));
                     break;
-                case 'switch-image':
+                case 'switch-image': {
                     const imgSrc = actionBtn.dataset.imgSrc;
                     const mainImg = document.getElementById('product-main-img');
                     if (mainImg && imgSrc) {
@@ -1598,6 +2181,59 @@ document.addEventListener('DOMContentLoaded', async () => {
                         document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
                         actionBtn.classList.add('active');
                     }
+                    break;
+                }
+                case 'switch-admin-tab':
+                    Admin.activeTab = actionBtn.dataset.tab;
+                    Router.handleRoute();
+                    break;
+                case 'export-csv':
+                    Admin.exportCSV();
+                    break;
+                case 'export-json':
+                    Admin.exportJSON();
+                    break;
+                case 'duplicate-product':
+                    Admin.duplicateProduct(parseInt(actionBtn.dataset.productId));
+                    break;
+                case 'bulk-delete':
+                    Admin.bulkDelete();
+                    break;
+                case 'toggle-select':
+                    Admin.toggleProductSelection(parseInt(actionBtn.dataset.productId));
+                    Router.handleRoute();
+                    break;
+                case 'select-all':
+                    Admin.selectAllProducts();
+                    Router.handleRoute();
+                    break;
+                case 'deselect-all':
+                    Admin.deselectAllProducts();
+                    Router.handleRoute();
+                    break;
+                case 'toggle-admin-theme':
+                    Admin.toggleAdminTheme();
+                    break;
+                case 'toggle-view-mode':
+                    Admin.toggleViewMode();
+                    Router.handleRoute();
+                    break;
+                case 'quick-edit-price':
+                    Admin.quickEditPrice(parseInt(actionBtn.dataset.productId));
+                    break;
+                case 'add-note':
+                    Admin.addNote(parseInt(actionBtn.dataset.productId));
+                    break;
+                case 'add-category':
+                    Admin.addCategory();
+                    break;
+                case 'toggle-notifications':
+                    Admin.showNotifications = !Admin.showNotifications;
+                    Router.handleRoute();
+                    break;
+                case 'clear-notifications':
+                    Admin.clearNotifications();
+                    Router.handleRoute();
                     break;
             }
             return;
@@ -1661,6 +2297,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             Admin.filterSearch = e.target.value;
             Router.handleRoute();
         }
+        if (e.target.id === 'admin-price-min') {
+            Admin.filterPriceMin = e.target.value;
+            Router.handleRoute();
+        }
+        if (e.target.id === 'admin-price-max') {
+            Admin.filterPriceMax = e.target.value;
+            Router.handleRoute();
+        }
         if (e.target.id === 'product-image') {
             Admin.previewImage(e.target.value);
         }
@@ -1670,6 +2314,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target.id === 'admin-category-filter') {
             Admin.filterCategory = e.target.value;
             Router.handleRoute();
+        }
+        if (e.target.id === 'admin-status-filter') {
+            Admin.filterStatus = e.target.value;
+            Router.handleRoute();
+        }
+        if (e.target.id === 'admin-sort') {
+            Admin.sortBy = e.target.value;
+            Router.handleRoute();
+        }
+        if (e.target.id === 'import-json-file') {
+            if (e.target.files.length > 0) Admin.importJSON(e.target.files[0]);
         }
         if (e.target.id === 'product-image-file') {
             Admin.handleFileUpload(e.target.files);
@@ -1699,6 +2354,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
     
+    // Keyboard shortcuts for admin dashboard
+    document.addEventListener('keydown', (e) => {
+        if (window.location.hash === '#dashboard') {
+            if (e.ctrlKey && e.key === 'n') { e.preventDefault(); Admin.showAddModal(); }
+            if (e.key === 'Escape') { Admin.closeModal(); }
+        }
+    });
+
     console.log("[TechR] Application initialized");
 });
 
