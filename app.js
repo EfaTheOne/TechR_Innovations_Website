@@ -134,8 +134,8 @@ let firebaseDb;
 let firebaseStorage;
 let firebaseAuth;
 try {
-    if (window.firebase && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('YOUR_')) {
-        firebase.initializeApp(FIREBASE_CONFIG);
+    if (window.firebase && firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('YOUR_')) {
+        firebase.initializeApp(firebaseConfig);
         firebaseDb = firebase.firestore();
         firebaseStorage = firebase.storage();
         firebaseAuth = firebase.auth();
@@ -1257,7 +1257,25 @@ const Router = {
         `,
 
         // ADMIN DASHBOARD
-        'dashboard': () => {
+        'dashboard': async () => {
+            // Authentication guard: verify user is logged in
+            let isAuthenticated = false;
+            try {
+                if (supabase) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session) isAuthenticated = true;
+                }
+                if (!isAuthenticated && firebaseAuth && firebaseAuth.currentUser) {
+                    isAuthenticated = true;
+                }
+            } catch (e) {
+                console.warn('[TechR] Auth check failed:', e);
+            }
+            if (!isAuthenticated) {
+                Toast.error('Please log in to access the dashboard');
+                window.location.hash = '#admin';
+                return '';
+            }
             if (!Admin.sessionStart) Admin.sessionStart = Date.now();
             const allProducts = Store.products;
             const searchTerm = (Admin.filterSearch || '').toLowerCase();
