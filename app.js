@@ -426,7 +426,7 @@ const Components = {
             </div>
             <div class="cart-item-actions" style="display: flex; align-items: center; gap: 1rem;">
                 <div class="qty-controls">
-                    <button onclick="Store.updateQuantity(${item.cartId}, -1)" title="Decrease quantity">\u2212</button>
+                    <button onclick="Store.updateQuantity(${item.cartId}, -1)" title="Decrease quantity" aria-label="Decrease quantity">\u2212</button>
                     <span>${item.quantity || 1}</span>
                     <button onclick="Store.updateQuantity(${item.cartId}, 1)" title="Increase quantity">+</button>
                 </div>
@@ -803,15 +803,15 @@ const Router = {
                         <div class="settings-form">
                             <div class="form-group">
                                 <label for="site-title">Site Title</label>
-                                <input type="text" id="site-title" value="TechR Innovations" onchange="Admin.siteSettings.title = this.value;">
+                                <input type="text" id="site-title" value="${Admin.siteSettings.title}" onchange="Admin.siteSettings.title = this.value;">
                             </div>
                             <div class="form-group">
                                 <label for="site-desc">Site Description</label>
-                                <textarea id="site-desc" rows="2" onchange="Admin.siteSettings.description = this.value;">Pioneering the intersection of cybersecurity, advanced education, and clothing.</textarea>
+                                <textarea id="site-desc" rows="2" onchange="Admin.siteSettings.description = this.value;">${Admin.siteSettings.description}</textarea>
                             </div>
                             <div class="form-group">
                                 <label for="site-email">Contact Email</label>
-                                <input type="email" id="site-email" value="contact@techr.com" onchange="Admin.siteSettings.email = this.value;">
+                                <input type="email" id="site-email" value="${Admin.siteSettings.email}" onchange="Admin.siteSettings.email = this.value;">
                             </div>
                             <button class="btn btn-primary" onclick="Toast.success('Site settings saved!');">
                                 <i data-lucide="save" style="width: 16px; height: 16px;"></i> Save Settings
