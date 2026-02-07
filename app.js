@@ -8,6 +8,25 @@ const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 
 // =====================================================
+// FIREBASE CONFIGURATION
+// Replace the placeholder values below with your Firebase project config.
+// To get these values:
+//   1. Go to https://console.firebase.google.com
+//   2. Select your project → Project Settings (gear icon)
+//   3. Scroll to "Your apps" → select your web app
+//   4. Copy the config values shown there
+// For full setup instructions, see FIREBASE_SETUP.md
+// =====================================================
+const FIREBASE_CONFIG = {
+    apiKey: "YOUR_FIREBASE_API_KEY_HERE",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// =====================================================
 // STRIPE CONFIGURATION
 // Replace the value below with your Stripe Publishable Key.
 // Find it at: https://dashboard.stripe.com/apikeys
@@ -110,21 +129,66 @@ try {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
 }
 
+// --- FIREBASE INIT ---
+let firebaseDb;
+let firebaseStorage;
+let firebaseAuth;
+try {
+    if (window.firebase && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('YOUR_')) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        firebaseDb = firebase.firestore();
+        firebaseStorage = firebase.storage();
+        firebaseAuth = firebase.auth();
+        console.log("[TechR] Firebase Online");
+    }
+} catch (e) {
+    console.warn("[TechR] Firebase Init Failed");
+}
+
 // --- REAL-TIME SYNC ---
 function initRealtimeSync() {
-    if (!supabase) return;
-    try {
-        supabase.channel('products-changes')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
-                console.log('[TechR] Real-time update received');
-                await Store.fetchProducts();
-                Router.handleRoute();
-                Toast.info('Products updated in real-time');
-            })
-            .subscribe();
-        console.log('[TechR] Real-time sync enabled');
-    } catch(e) {
-        console.warn('[TechR] Real-time sync unavailable');
+    // Supabase real-time sync
+    if (supabase) {
+        try {
+            supabase.channel('products-changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
+                    console.log('[TechR] Real-time update received (Supabase)');
+                    await Store.fetchProducts();
+                    Router.handleRoute();
+                    Toast.info('Products updated in real-time');
+                })
+                .subscribe();
+            console.log('[TechR] Supabase real-time sync enabled');
+        } catch(e) {
+            console.warn('[TechR] Supabase real-time sync unavailable');
+        }
+    }
+
+    // Firebase real-time sync (fallback or alongside)
+    if (firebaseDb) {
+        try {
+            firebaseDb.collection('products').onSnapshot((snapshot) => {
+                if (snapshot.metadata.hasPendingWrites) return;
+                // Only use Firebase data if not actively using Supabase
+                if (Store.syncMode === 'supabase') return;
+                const products = [];
+                snapshot.forEach(doc => {
+                    products.push({ id: doc.id, ...doc.data() });
+                });
+                if (products.length > 0) {
+                    Store.products = products;
+                    Store.syncMode = 'firebase';
+                    Store.lastSynced = new Date();
+                    Router.handleRoute();
+                    console.log('[TechR] Real-time update received (Firebase)');
+                }
+            }, (error) => {
+                console.warn('[TechR] Firebase real-time sync error:', error);
+            });
+            console.log('[TechR] Firebase real-time sync enabled');
+        } catch(e) {
+            console.warn('[TechR] Firebase real-time sync unavailable');
+        }
     }
 }
 
@@ -155,7 +219,7 @@ const DEFAULT_PRODUCTS = [
 const Store = {
     products: [],
     cart: [],
-    syncMode: 'local', // 'supabase' or 'local'
+    syncMode: 'local', // 'supabase', 'firebase', or 'local'
     lastSynced: null,
 
     init: async () => {
@@ -171,6 +235,7 @@ const Store = {
     },
 
     fetchProducts: async () => {
+        // Try Supabase first
         try {
             if (supabase) {
                 const { data, error } = await supabase.from('products').select('*');
@@ -182,7 +247,26 @@ const Store = {
                 }
             }
         } catch (e) { 
-            console.warn("[TechR] Database unavailable, using local storage");
+            console.warn("[TechR] Supabase unavailable, trying Firebase");
+        }
+
+        // Try Firebase as fallback
+        try {
+            if (firebaseDb) {
+                const snapshot = await firebaseDb.collection('products').get();
+                if (!snapshot.empty) {
+                    const data = [];
+                    snapshot.forEach(doc => {
+                        data.push({ id: doc.id, ...doc.data() });
+                    });
+                    Store.products = data;
+                    Store.syncMode = 'firebase';
+                    Store.lastSynced = new Date();
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("[TechR] Firebase unavailable, using local storage");
         }
 
         // Try loading from localStorage first (persisted local edits)
@@ -205,9 +289,8 @@ const Store = {
     },
 
     persistProducts: () => {
-        if (Store.syncMode === 'local') {
-            localStorage.setItem('techr_products_v1', JSON.stringify(Store.products));
-        }
+        // Always persist to localStorage as a backup
+        localStorage.setItem('techr_products_v1', JSON.stringify(Store.products));
     },
 
     resetToDefaults: () => {
@@ -317,6 +400,13 @@ function toggleMobileMenu() {
 window.toggleMobileMenu = toggleMobileMenu;
 window.Store = Store;
 
+// --- STORAGE FILENAME HELPER ---
+function generateStoragePath(originalName) {
+    const parts = originalName.split('.');
+    const ext = (parts.length > 1 ? parts.pop() : 'img').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    return `products/${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
+}
+
 // --- ADMIN PRODUCT MANAGEMENT ---
 const Admin = {
     filterSearch: '',
@@ -397,20 +487,35 @@ const Admin = {
     importJSON: (file) => {
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const imported = JSON.parse(e.target.result);
                 if (!Array.isArray(imported)) { Toast.error('Invalid JSON format: expected an array'); return; }
                 let count = 0;
-                imported.forEach(p => {
-                    if (p.name && p.price != null && p.category) {
-                        p.id = Date.now() + Math.floor(Math.random() * 10000) + count;
-                        if (!p.status) p.status = 'active';
-                        Store.products.push(p);
-                        count++;
-                    }
-                });
-                Store.persistProducts();
+                if (firebaseDb && Store.syncMode === 'firebase') {
+                    const batch = firebaseDb.batch();
+                    imported.forEach(p => {
+                        if (p.name && p.price != null && p.category) {
+                            if (!p.status) p.status = 'active';
+                            const docRef = firebaseDb.collection('products').doc();
+                            const { id, ...productData } = p;
+                            batch.set(docRef, productData);
+                            count++;
+                        }
+                    });
+                    await batch.commit();
+                    await Store.fetchProducts();
+                } else {
+                    imported.forEach(p => {
+                        if (p.name && p.price != null && p.category) {
+                            p.id = Date.now() + Math.floor(Math.random() * 10000) + count;
+                            if (!p.status) p.status = 'active';
+                            Store.products.push(p);
+                            count++;
+                        }
+                    });
+                    Store.persistProducts();
+                }
                 Admin.logActivity('Imported ' + count + ' products from JSON');
                 Toast.success('Imported ' + count + ' products');
                 Router.handleRoute();
@@ -421,29 +526,52 @@ const Admin = {
         reader.readAsText(file);
     },
 
-    duplicateProduct: (id) => {
+    duplicateProduct: async (id) => {
         const product = Store.products.find(p => p.id === id);
         if (!product) return;
         const clone = JSON.parse(JSON.stringify(product));
-        clone.id = Date.now() + Math.floor(Math.random() * 1000);
         clone.name = product.name + ' (Copy)';
-        Store.products.push(clone);
-        Store.persistProducts();
-        Admin.logActivity('Duplicated product: ' + product.name);
-        Toast.success('Product duplicated');
-        Router.handleRoute();
+        try {
+            if (firebaseDb && Store.syncMode === 'firebase') {
+                delete clone.id;
+                await firebaseDb.collection('products').add(clone);
+                await Store.fetchProducts();
+            } else {
+                clone.id = Date.now() + Math.floor(Math.random() * 1000);
+                Store.products.push(clone);
+                Store.persistProducts();
+            }
+            Admin.logActivity('Duplicated product: ' + product.name);
+            Toast.success('Product duplicated');
+            Router.handleRoute();
+        } catch(e) {
+            Toast.error('Duplicate failed: ' + e.message);
+        }
     },
 
-    bulkDelete: () => {
+    bulkDelete: async () => {
         if (Admin.selectedProducts.length === 0) { Toast.error('No products selected'); return; }
         if (!confirm('Delete ' + Admin.selectedProducts.length + ' selected products?')) return;
         const count = Admin.selectedProducts.length;
-        Store.products = Store.products.filter(p => !Admin.selectedProducts.includes(p.id));
-        Store.persistProducts();
-        Admin.logActivity('Bulk deleted ' + count + ' products');
-        Admin.selectedProducts = [];
-        Toast.success(count + ' products deleted');
-        Router.handleRoute();
+        try {
+            if (firebaseDb && Store.syncMode === 'firebase') {
+                const batch = firebaseDb.batch();
+                Admin.selectedProducts.forEach(id => {
+                    batch.delete(firebaseDb.collection('products').doc(String(id)));
+                });
+                await batch.commit();
+                await Store.fetchProducts();
+            } else {
+                Store.products = Store.products.filter(p => !Admin.selectedProducts.includes(p.id));
+                Store.persistProducts();
+            }
+            Admin.logActivity('Bulk deleted ' + count + ' products');
+            Admin.selectedProducts = [];
+            Toast.success(count + ' products deleted');
+            Router.handleRoute();
+        } catch(e) {
+            Toast.error('Bulk delete failed: ' + e.message);
+        }
     },
 
     toggleProductSelection: (id) => {
@@ -470,7 +598,7 @@ const Admin = {
         Admin.viewMode = Admin.viewMode === 'grid' ? 'list' : 'grid';
     },
 
-    quickEditPrice: (id) => {
+    quickEditPrice: async (id) => {
         const product = Store.products.find(p => p.id === id);
         if (!product) return;
         const newPrice = prompt('Enter new price for "' + product.name + '":', product.price);
@@ -478,10 +606,17 @@ const Admin = {
         const parsed = parseFloat(newPrice);
         if (isNaN(parsed) || parsed < 0) { Toast.error('Invalid price'); return; }
         product.price = parsed;
-        Store.persistProducts();
-        Admin.logActivity('Quick-edited price of ' + product.name + ' to $' + parsed.toFixed(2));
-        Toast.success('Price updated to $' + parsed.toFixed(2));
-        Router.handleRoute();
+        try {
+            if (firebaseDb && Store.syncMode === 'firebase') {
+                await firebaseDb.collection('products').doc(String(id)).update({ price: parsed });
+            }
+            Store.persistProducts();
+            Admin.logActivity('Quick-edited price of ' + product.name + ' to $' + parsed.toFixed(2));
+            Toast.success('Price updated to $' + parsed.toFixed(2));
+            Router.handleRoute();
+        } catch(e) {
+            Toast.error('Price update failed: ' + e.message);
+        }
     },
 
     addNote: (id) => {
@@ -559,15 +694,48 @@ const Admin = {
             Toast.error('Image must be under 5MB');
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const dataUrl = e.target.result;
-            const urlInput = document.getElementById('product-image');
-            if (urlInput) urlInput.value = dataUrl;
-            Admin.previewImage(dataUrl);
-            Toast.success('Image uploaded successfully');
-        };
-        reader.readAsDataURL(file);
+
+        if (firebaseStorage) {
+            // Upload to Firebase Storage for cross-device sync
+            const fileName = generateStoragePath(file.name);
+            const storageRef = firebaseStorage.ref(fileName);
+            const uploadTask = storageRef.put(file);
+            Toast.info('Uploading image...');
+            uploadTask.on('state_changed',
+                null,
+                (error) => {
+                    console.error('[TechR] Firebase upload failed, falling back to base64:', error);
+                    // Fallback to base64 if Firebase Storage fails
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const dataUrl = e.target.result;
+                        const urlInput = document.getElementById('product-image');
+                        if (urlInput) urlInput.value = dataUrl;
+                        Admin.previewImage(dataUrl);
+                        Toast.success('Image saved locally');
+                    };
+                    reader.readAsDataURL(file);
+                },
+                async () => {
+                    const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                    const urlInput = document.getElementById('product-image');
+                    if (urlInput) urlInput.value = downloadURL;
+                    Admin.previewImage(downloadURL);
+                    Toast.success('Image uploaded to cloud');
+                }
+            );
+        } else {
+            // Fallback: base64 for local-only mode
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUrl = e.target.result;
+                const urlInput = document.getElementById('product-image');
+                if (urlInput) urlInput.value = dataUrl;
+                Admin.previewImage(dataUrl);
+                Toast.success('Image uploaded successfully');
+            };
+            reader.readAsDataURL(file);
+        }
     },
 
     handleAdditionalImages: (files) => {
@@ -576,12 +744,36 @@ const Admin = {
         Array.from(files).forEach(file => {
             if (!file.type.startsWith('image/')) return;
             if (file.size > 5 * 1024 * 1024) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                Admin.pendingImages.push(e.target.result);
-                Admin.renderAdditionalPreviews();
-            };
-            reader.readAsDataURL(file);
+
+            if (firebaseStorage) {
+                const fileName = generateStoragePath(file.name);
+                const storageRef = firebaseStorage.ref(fileName);
+                const uploadTask = storageRef.put(file);
+                uploadTask.on('state_changed',
+                    null,
+                    (error) => {
+                        console.error('[TechR] Additional image upload failed, falling back to base64:', error);
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            Admin.pendingImages.push(e.target.result);
+                            Admin.renderAdditionalPreviews();
+                        };
+                        reader.readAsDataURL(file);
+                    },
+                    async () => {
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        Admin.pendingImages.push(downloadURL);
+                        Admin.renderAdditionalPreviews();
+                    }
+                );
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    Admin.pendingImages.push(e.target.result);
+                    Admin.renderAdditionalPreviews();
+                };
+                reader.readAsDataURL(file);
+            }
         });
     },
 
@@ -648,7 +840,10 @@ const Admin = {
         };
 
         try {
-            let usedSupabase = false;
+            let usedCloud = false;
+            let cloudLabel = '';
+
+            // Try Supabase first
             if (supabase && Store.syncMode === 'supabase') {
                 if (editId) {
                     const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
@@ -657,7 +852,18 @@ const Admin = {
                     const { error } = await supabase.from('products').insert([productData]);
                     if (error) throw error;
                 }
-                usedSupabase = true;
+                usedCloud = true;
+                cloudLabel = 'Supabase';
+                await Store.fetchProducts();
+            // Try Firebase as fallback
+            } else if (firebaseDb && Store.syncMode === 'firebase') {
+                if (editId) {
+                    await firebaseDb.collection('products').doc(String(editId)).update(productData);
+                } else {
+                    await firebaseDb.collection('products').add(productData);
+                }
+                usedCloud = true;
+                cloudLabel = 'Firebase';
                 await Store.fetchProducts();
             } else {
                 // Local storage mode
@@ -672,7 +878,7 @@ const Admin = {
                 Store.lastSynced = new Date();
             }
             Admin.closeModal();
-            const modeLabel = usedSupabase ? ' (synced to cloud)' : ' (saved locally)';
+            const modeLabel = usedCloud ? ` (synced to ${cloudLabel})` : ' (saved locally)';
             const actionMsg = editId ? 'Product updated: ' + productData.name : 'Product added: ' + productData.name;
             Admin.logActivity(actionMsg);
             Toast.success((editId ? 'Product updated!' : 'Product added!') + modeLabel);
@@ -691,6 +897,9 @@ const Admin = {
                 const { error } = await supabase.from('products').delete().eq('id', id);
                 if (error) throw error;
                 await Store.fetchProducts();
+            } else if (firebaseDb && Store.syncMode === 'firebase') {
+                await firebaseDb.collection('products').doc(String(id)).delete();
+                await Store.fetchProducts();
             } else {
                 Store.products = Store.products.filter(p => p.id !== id);
                 Store.persistProducts();
@@ -708,7 +917,7 @@ const Admin = {
         Toast.info('Refreshing products...');
         await Store.fetchProducts();
         Store.lastSynced = new Date();
-        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'supabase' ? 'Cloud' : 'Local'));
+        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'supabase' ? 'Supabase Cloud' : Store.syncMode === 'firebase' ? 'Firebase Cloud' : 'Local'));
         Router.handleRoute();
     }
 };
@@ -1085,9 +1294,9 @@ const Router = {
             const totalRevenue = allProducts.reduce((s, p) => s + p.price, 0).toFixed(2);
             const activeCount = allProducts.filter(p => (p.status || 'active') === 'active').length;
             const lowStockCount = 0;
-            const syncIcon = Store.syncMode === 'supabase' ? 'cloud' : 'hard-drive';
-            const syncLabel = Store.syncMode === 'supabase' ? 'Cloud Synced' : 'Local Storage';
-            const syncColor = Store.syncMode === 'supabase' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
+            const syncIcon = Store.syncMode !== 'local' ? 'cloud' : 'hard-drive';
+            const syncLabel = Store.syncMode === 'supabase' ? 'Supabase Cloud' : Store.syncMode === 'firebase' ? 'Firebase Cloud' : 'Local Storage';
+            const syncColor = Store.syncMode !== 'local' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
             const lastSync = Store.lastSynced ? Store.lastSynced.toLocaleTimeString() : 'Never';
             const tab = Admin.activeTab || 'overview';
             const themeClass = Admin.adminTheme === 'light' ? 'admin-theme-light' : '';
@@ -2004,16 +2213,32 @@ const Router = {
         const password = document.getElementById('password')?.value;
         if (!email || !password) { Toast.error('Please enter email and password'); return; }
         try {
-            if (!supabase) { Toast.error('Database connection unavailable'); return; }
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) { Toast.error(error.message); return; }
-            Toast.success('Welcome back!');
-            window.location.hash = '#dashboard';
+            // Try Supabase auth first
+            if (supabase) {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (!error) {
+                    Toast.success('Welcome back!');
+                    window.location.hash = '#dashboard';
+                    return;
+                }
+                console.warn('[TechR] Supabase auth failed, trying Firebase');
+            }
+            // Try Firebase auth as fallback
+            if (firebaseAuth) {
+                const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                if (userCredential.user) {
+                    Toast.success('Welcome back!');
+                    window.location.hash = '#dashboard';
+                    return;
+                }
+            }
+            Toast.error('Database connection unavailable');
         } catch(e) { Toast.error('Login failed: ' + e.message); }
     },
 
     handleLogout: async () => {
-        if (supabase) { await supabase.auth.signOut(); }
+        if (supabase) { try { await supabase.auth.signOut(); } catch(e) {} }
+        if (firebaseAuth) { try { await firebaseAuth.signOut(); } catch(e) {} }
         Toast.info('Signed out');
         window.location.hash = '#admin';
     },
