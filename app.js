@@ -171,9 +171,9 @@ const Store = {
             { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
             
             // Rithim Products
-            { id: 7, name: "Rithim Band", price: 199.99, image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80", category: "rithim", desc: "Clinical-grade biosensor wristband for 24/7 recovery monitoring." },
-            { id: 8, name: "Rithim Pro Patch", price: 89.99, image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80", category: "rithim", desc: "Disposable medical-grade monitoring patch (pack of 10) for intensive recovery tracking." },
-            { id: 9, name: "Rithim Hub", price: 299.99, image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", category: "rithim", desc: "Central monitoring station for healthcare providers and recovery facilities." },
+            { id: 7, name: "Rithim Classic Tee", price: 34.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", category: "rithim", desc: "Premium cotton crew neck tee with embroidered Rithim logo. Available in all sizes." },
+            { id: 8, name: "Rithim Hoodie", price: 64.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", category: "rithim", desc: "Heavyweight fleece hoodie with kangaroo pocket and Rithim branding. Perfect for everyday wear." },
+            { id: 9, name: "Rithim Joggers", price: 49.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Soft cotton blend." },
 
             // StudyTech Products
             { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
@@ -189,7 +189,12 @@ const Store = {
     addToCart: (id) => {
         const product = Store.products.find(p => p.id === id);
         if (product) {
-            Store.cart.push({...product, cartId: Date.now() + Math.random()});
+            const existing = Store.cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                Store.cart.push({...product, quantity: 1, cartId: Date.now() + Math.random()});
+            }
             Store.persist();
             Store.updateCartUI();
             
@@ -216,6 +221,19 @@ const Store = {
         Router.handleRoute();
     },
 
+    updateQuantity: (cartId, delta) => {
+        const item = Store.cart.find(i => i.cartId === cartId);
+        if (item) {
+            item.quantity = (item.quantity || 1) + delta;
+            if (item.quantity <= 0) {
+                Store.cart = Store.cart.filter(i => i.cartId !== cartId);
+            }
+        }
+        Store.persist();
+        Store.updateCartUI();
+        Router.handleRoute();
+    },
+
     clearCart: () => {
         Store.cart = [];
         Store.persist();
@@ -223,7 +241,7 @@ const Store = {
     },
 
     getCartTotal: () => {
-        return Store.cart.reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2);
+        return Store.cart.reduce((sum, item) => sum + parseFloat(item.price) * (item.quantity || 1), 0).toFixed(2);
     },
 
     persist: () => {
@@ -233,10 +251,11 @@ const Store = {
     updateCartUI: () => {
         const badge = document.getElementById('cart-badge');
         const cartCount = document.getElementById('cart-count');
+        const totalItems = Store.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
         
         if (badge) {
-            if (Store.cart.length > 0) {
-                badge.textContent = Store.cart.length;
+            if (totalItems > 0) {
+                badge.textContent = totalItems;
                 badge.style.display = 'flex';
             } else {
                 badge.style.display = 'none';
@@ -244,7 +263,7 @@ const Store = {
         }
         
         if (cartCount) {
-            cartCount.textContent = Store.cart.length;
+            cartCount.textContent = totalItems;
         }
     }
 };
@@ -263,6 +282,25 @@ window.Store = Store;
 
 // --- ADMIN PRODUCT MANAGEMENT ---
 const Admin = {
+    filterSearch: '',
+    filterCategory: '',
+    siteSettings: {
+        title: 'TechR Innovations',
+        description: 'Pioneering the intersection of cybersecurity, advanced education, and clothing.',
+        email: 'contact@techr.com'
+    },
+
+    previewImage: (url) => {
+        const preview = document.getElementById('image-preview');
+        if (preview && url) {
+            preview.src = url;
+            preview.style.display = 'block';
+            preview.onerror = () => { preview.style.display = 'none'; };
+        } else if (preview) {
+            preview.style.display = 'none';
+        }
+    },
+
     showAddModal: () => {
         document.getElementById('modal-title').textContent = 'Add Product';
         document.getElementById('product-edit-id').value = '';
@@ -281,6 +319,7 @@ const Admin = {
         document.getElementById('product-category').value = product.category;
         document.getElementById('product-image').value = product.image;
         document.getElementById('product-desc').value = product.desc;
+        Admin.previewImage(product.image);
         document.getElementById('product-modal').style.display = 'flex';
         if (window.lucide) lucide.createIcons();
     },
@@ -378,16 +417,22 @@ const Components = {
     CartItem: (item, index) => `
         <div class="cart-item">
             <div class="cart-item-info" style="display: flex; align-items: center; gap: 1rem;">
-                <img src="${item.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--bg-tertiary);" alt="${item.name}">
+                <img src="${item.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: var(--bg-tertiary);" alt="${item.name}">
                 <div>
                     <strong>${item.name}</strong>
                     <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-transform: capitalize;">${item.category}</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">$${parseFloat(item.price).toFixed(2)} each</p>
                 </div>
             </div>
-            <div class="cart-item-actions">
-                <span class="price">$${parseFloat(item.price).toFixed(2)}</span>
-                <button class="remove-btn remove-from-cart-btn" data-cart-id="${item.cartId}" title="Remove item">
-                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            <div class="cart-item-actions" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="qty-controls">
+                    <button onclick="Store.updateQuantity(${item.cartId}, -1)" title="Decrease quantity" aria-label="Decrease quantity">\u2212</button>
+                    <span>${item.quantity || 1}</span>
+                    <button onclick="Store.updateQuantity(${item.cartId}, 1)" title="Increase quantity">+</button>
+                </div>
+                <span class="cart-item-total">$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</span>
+                <button class="remove-btn remove-from-cart-btn" data-cart-id="${item.cartId}" title="Remove item" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 0.5rem;">
+                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
         </div>
@@ -425,11 +470,11 @@ const Router = {
                     The Future of<br><span style="color: var(--accent);">Technology</span> is Here.
                 </h1>
                 <p class="reveal" style="font-size: 1.35rem; margin-top: 0; max-width: 650px;">
-                    TechR Innovations delivers enterprise-grade hardware and software solutions for cybersecurity, education, healthcare recovery, and AI-powered learning.
+                    TechR Innovations delivers enterprise-grade hardware, software, and apparel solutions for cybersecurity, education, clothing, and AI-powered learning.
                 </p>
                 <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
                     <a href="#techack" class="btn btn-primary btn-lg">Explore Products</a>
-                    <a href="#checkout" class="btn btn-secondary btn-lg">View Cart (${Store.cart.length})</a>
+                    <a href="#checkout" class="btn btn-secondary btn-lg">View Cart (<span id="cart-count">${Store.cart.reduce((s, i) => s + (i.quantity || 1), 0)}</span>)</a>
                 </div>
             </div>
             
@@ -452,10 +497,10 @@ const Router = {
                     </a>
                     <a href="#rithim" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 55, 95, 0.1);">
-                            <i data-lucide="heart" style="color: var(--color-rithim);"></i>
+                            <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                         </div>
-                        <h3 style="color: var(--color-rithim);">Rithim Bio</h3>
-                        <p>Clinical-grade biosensors for real-time physiological and recovery monitoring.</p>
+                        <h3 style="color: var(--color-rithim);">Rithim Clothing</h3>
+                        <p>Premium apparel and streetwear with signature Rithim branding and quality craftsmanship.</p>
                     </a>
                 </div>
                 
@@ -545,37 +590,33 @@ const Router = {
             `;
         },
 
-        // RITHIM RECOVERY DIVISION
+        // RITHIM CLOTHING DIVISION
         'rithim': () => {
             const products = Store.getProductsByCategory('rithim');
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-rithim">Recovery Division</span>
+                        <span class="badge badge-rithim">Clothing Line</span>
                         <h1 style="color: var(--color-rithim);">Rithim</h1>
-                        <p>Clinical-grade biosensors for continuous health and recovery monitoring.</p>
+                        <p>Premium apparel designed for style, comfort, and everyday confidence.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('heart-pulse', 'Real-Time Monitoring', '24/7 physiological tracking with instant alerts.', 'color-rithim')}
-                        ${Components.FeatureCard('activity', 'Recovery Analytics', 'AI-powered insights to optimize recovery protocols.', 'color-rithim')}
-                        ${Components.FeatureCard('shield-plus', 'HIPAA Compliant', 'Healthcare-grade data protection and privacy.', 'color-rithim')}
-                        ${Components.FeatureCard('smartphone', 'Mobile Integration', 'Seamless sync with iOS and Android devices.', 'color-rithim')}
+                        ${Components.FeatureCard('shirt', 'Signature Style', 'Bold designs with the iconic Rithim branding you love.', 'color-rithim')}
+                        ${Components.FeatureCard('heart', 'Premium Comfort', 'Soft fabrics and tailored fits for all-day wearability.', 'color-rithim')}
+                        ${Components.FeatureCard('star', 'Quality Craftsmanship', 'Durable construction with attention to every detail.', 'color-rithim')}
+                        ${Components.FeatureCard('palette', 'Versatile Collection', 'From casual tees to cozy hoodies, find your perfect look.', 'color-rithim')}
                     </div>
 
-                    <h2 class="reveal" style="margin-top: 4rem;">Rithim Products</h2>
+                    <h2 class="reveal" style="margin-top: 4rem;">Rithim Collection</h2>
                     <div class="product-grid" style="margin-top: 2rem;">
                         ${products.map(p => Components.ProductCard(p)).join('')}
                     </div>
 
-                    <div class="card reveal" style="margin-top: 4rem; text-align: center; padding: 3rem;">
-                        <i data-lucide="stethoscope" style="width: 48px; height: 48px; color: var(--color-rithim); margin-bottom: 1rem;"></i>
-                        <h3>For Healthcare Providers</h3>
-                        <p style="max-width: 500px; margin: 1rem auto;">
-                            Rithim devices are designed for integration with existing healthcare systems. 
-                            Contact us for API documentation and enterprise solutions.
-                        </p>
-                        <a href="#admin" class="btn btn-primary" style="margin-top: 1rem;">Healthcare Inquiry</a>
+                    <div class="cta-section reveal" style="margin-top: 4rem;">
+                        <h2>Wear the Brand</h2>
+                        <p>Explore our full clothing line and find pieces that match your vibe.</p>
+                        <a href="#checkout" class="btn btn-primary">Shop Now</a>
                     </div>
                 </div>
             `;
@@ -679,7 +720,17 @@ const Router = {
 
         // ADMIN DASHBOARD
         'dashboard': () => {
-            const products = Store.products;
+            const allProducts = Store.products;
+            const searchTerm = (Admin.filterSearch || '').toLowerCase();
+            const filterCat = Admin.filterCategory || '';
+            const products = allProducts.filter(p => {
+                const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm) || p.category.toLowerCase().includes(searchTerm);
+                const matchesCat = !filterCat || p.category === filterCat;
+                return matchesSearch && matchesCat;
+            });
+            const categories = [...new Set(allProducts.map(p => p.category))];
+            const avgPrice = allProducts.length > 0 ? (allProducts.reduce((s, p) => s + p.price, 0) / allProducts.length).toFixed(2) : '0.00';
+
             return `
                 <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
                     <div class="dashboard-header reveal">
@@ -699,17 +750,29 @@ const Router = {
 
                     <div class="admin-stats reveal">
                         <div class="admin-stat-card">
-                            <div class="admin-stat-value">${products.length}</div>
+                            <div class="admin-stat-value">${allProducts.length}</div>
                             <div class="admin-stat-label">Total Products</div>
                         </div>
                         <div class="admin-stat-card">
-                            <div class="admin-stat-value">${[...new Set(products.map(p => p.category))].length}</div>
+                            <div class="admin-stat-value">${categories.length}</div>
                             <div class="admin-stat-label">Categories</div>
                         </div>
                         <div class="admin-stat-card">
-                            <div class="admin-stat-value">$${products.reduce((sum, p) => sum + p.price, 0).toFixed(0)}</div>
-                            <div class="admin-stat-label">Total Value</div>
+                            <div class="admin-stat-value">$${allProducts.reduce((sum, p) => sum + p.price, 0).toFixed(0)}</div>
+                            <div class="admin-stat-label">Total Inventory Value</div>
                         </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value">$${avgPrice}</div>
+                            <div class="admin-stat-label">Avg. Price</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-search-bar reveal">
+                        <input type="text" id="admin-search" placeholder="Search products by name..." value="${Admin.filterSearch || ''}" oninput="Admin.filterSearch = this.value; Router.handleRoute();">
+                        <select id="admin-category-filter" onchange="Admin.filterCategory = this.value; Router.handleRoute();">
+                            <option value="">All Categories</option>
+                            ${categories.map(c => `<option value="${c}" ${filterCat === c ? 'selected' : ''}>${c}</option>`).join('')}
+                        </select>
                     </div>
 
                     <div class="admin-products-grid reveal">
@@ -731,6 +794,36 @@ const Router = {
                                 </div>
                             </div>
                         `).join('')}
+                    </div>
+
+                    <hr class="admin-section-divider">
+
+                    <div class="admin-settings-section reveal">
+                        <h2><i data-lucide="settings" style="width: 24px; height: 24px;"></i> Site Settings</h2>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label for="site-title">Site Title</label>
+                                <input type="text" id="site-title" value="${Admin.siteSettings.title}" onchange="Admin.siteSettings.title = this.value;">
+                            </div>
+                            <div class="form-group">
+                                <label for="site-desc">Site Description</label>
+                                <textarea id="site-desc" rows="2" onchange="Admin.siteSettings.description = this.value;">${Admin.siteSettings.description}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="site-email">Contact Email</label>
+                                <input type="email" id="site-email" value="${Admin.siteSettings.email}" onchange="Admin.siteSettings.email = this.value;">
+                            </div>
+                            <button class="btn btn-primary" onclick="Toast.success('Site settings saved!');">
+                                <i data-lucide="save" style="width: 16px; height: 16px;"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="admin-section-divider">
+
+                    <div class="admin-settings-section reveal">
+                        <h2><i data-lucide="package" style="width: 24px; height: 24px;"></i> Orders <span class="coming-soon-badge">Coming Soon</span></h2>
+                        <p style="color: var(--text-secondary);">Order management and tracking will be available in a future update.</p>
                     </div>
                 </div>
 
@@ -764,7 +857,8 @@ const Router = {
                             </div>
                             <div class="form-group">
                                 <label for="product-image">Image URL</label>
-                                <input type="url" id="product-image" placeholder="https://images.unsplash.com/..." required>
+                                <input type="url" id="product-image" placeholder="https://images.unsplash.com/..." required oninput="Admin.previewImage(this.value)">
+                                <img id="image-preview" class="image-preview" style="display: none;">
                             </div>
                             <div class="form-group">
                                 <label for="product-desc">Description</label>
@@ -839,7 +933,7 @@ const Router = {
         // CHECKOUT PAGE
         'checkout': () => {
             const total = Store.getCartTotal();
-            const itemCount = Store.cart.length;
+            const itemCount = Store.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
             if (itemCount === 0) {
                 return `
@@ -878,10 +972,16 @@ const Router = {
                         </div>
 
                         <div class="card reveal" style="margin-bottom: 2rem;">
-                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
-                                Order Summary
-                            </h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
+                                    Order Summary
+                                </h3>
+                                <button class="cart-clear-btn" onclick="Store.clearCart(); Router.handleRoute();">
+                                    <i data-lucide="trash" style="width: 14px; height: 14px;"></i>
+                                    Clear Cart
+                                </button>
+                            </div>
                             ${Store.cart.map((item, i) => Components.CartItem(item, i)).join('')}
                             <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-size: 1.1rem; font-weight: 500;">Total</span>
@@ -916,6 +1016,90 @@ const Router = {
                 </div>
             `;
         },
+
+        // ABOUT PAGE
+        'about': () => `
+            <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
+                <div class="about-hero reveal">
+                    <h1>About <span style="color: var(--accent);">TechR Innovations</span></h1>
+                    <p>Building the future through technology, education, and style.</p>
+                </div>
+
+                <div class="about-section reveal">
+                    <h2>Our Story</h2>
+                    <p>
+                        TechR Innovations was founded with a simple yet ambitious vision: to bridge the gap between cutting-edge technology 
+                        and everyday life. What started as a small team of passionate engineers and designers has grown into a multi-division 
+                        company delivering products across cybersecurity, education, apparel, and AI-powered learning. We believe that 
+                        innovation should be accessible, practical, and transformative.
+                    </p>
+                </div>
+
+                <div class="about-section reveal">
+                    <h2>Our Mission</h2>
+                    <p>
+                        Our mission is to empower individuals and organizations with tools that make a real difference. Whether it's 
+                        protecting digital infrastructure with Techack, inspiring the next generation of engineers with TechBox, 
+                        expressing identity through Rithim clothing, or personalizing education with StudyTech AI — every product 
+                        we create is designed to push boundaries and unlock potential.
+                    </p>
+                </div>
+
+                <div class="about-section reveal">
+                    <h2>Our Team</h2>
+                    <div class="team-grid">
+                        <div class="team-card">
+                            <div class="team-avatar">
+                                <i data-lucide="user" style="width: 48px; height: 48px; color: var(--accent);"></i>
+                            </div>
+                            <h3>Founder & CEO</h3>
+                            <p class="team-role">Visionary Leader</p>
+                            <p>Passionate about technology and innovation, leading TechR Innovations from concept to reality. Dedicated to building products that make a meaningful impact.</p>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-avatar">
+                                <i data-lucide="code" style="width: 48px; height: 48px; color: var(--color-techack);"></i>
+                            </div>
+                            <h3>Head of Engineering</h3>
+                            <p class="team-role">Technical Lead</p>
+                            <p>Driving the technical vision across all divisions, ensuring every product meets the highest standards of quality and performance.</p>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-avatar">
+                                <i data-lucide="palette" style="width: 48px; height: 48px; color: var(--color-rithim);"></i>
+                            </div>
+                            <h3>Creative Director</h3>
+                            <p class="team-role">Design & Brand</p>
+                            <p>Shaping the visual identity and user experience of TechR, from product design to the Rithim clothing line.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section reveal">
+                    <h2>Contact Us</h2>
+                    <p>
+                        We'd love to hear from you! Whether you have questions about our products, partnership inquiries, 
+                        or just want to say hello, reach out to us.
+                    </p>
+                    <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--accent);"></i>
+                            <a href="mailto:contact@techr.com" style="color: var(--accent);">contact@techr.com</a>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="globe" style="width: 20px; height: 20px; color: var(--accent);"></i>
+                            <span style="color: var(--text-secondary);">www.techr.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-section reveal" style="margin-top: 2rem;">
+                    <h2>Ready to Explore?</h2>
+                    <p>Check out our divisions and discover what TechR has to offer.</p>
+                    <a href="#techack" class="btn btn-primary btn-lg">Browse Products</a>
+                </div>
+            </div>
+        `,
 
         // SUCCESS PAGE
         'success': () => `
@@ -1127,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Remove from cart button
         const removeBtn = e.target.closest('.remove-from-cart-btn');
         if (removeBtn) {
-            const cartId = parseInt(removeBtn.dataset.cartId);
+            const cartId = parseFloat(removeBtn.dataset.cartId);
             if (cartId) {
                 Store.removeFromCart(cartId);
             }
