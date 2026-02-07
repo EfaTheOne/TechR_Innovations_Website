@@ -102,6 +102,24 @@ try {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
 }
 
+// --- REAL-TIME SYNC ---
+function initRealtimeSync() {
+    if (!supabase) return;
+    try {
+        supabase.channel('products-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
+                console.log('[TechR] Real-time update received');
+                await Store.fetchProducts();
+                Router.handleRoute();
+                Toast.info('Products updated in real-time');
+            })
+            .subscribe();
+        console.log('[TechR] Real-time sync enabled');
+    } catch(e) {
+        console.warn('[TechR] Real-time sync unavailable');
+    }
+}
+
 // --- STORE & STATE ---
 const Store = {
     products: [],
@@ -235,21 +253,108 @@ function toggleMobileMenu() {
 window.toggleMobileMenu = toggleMobileMenu;
 window.Store = Store;
 
+// --- ADMIN PRODUCT MANAGEMENT ---
+const Admin = {
+    showAddModal: () => {
+        document.getElementById('modal-title').textContent = 'Add Product';
+        document.getElementById('product-edit-id').value = '';
+        document.getElementById('product-form').reset();
+        document.getElementById('product-modal').style.display = 'flex';
+        if (window.lucide) lucide.createIcons();
+    },
+
+    showEditModal: (id) => {
+        const product = Store.products.find(p => p.id === id);
+        if (!product) return;
+        document.getElementById('modal-title').textContent = 'Edit Product';
+        document.getElementById('product-edit-id').value = id;
+        document.getElementById('product-name').value = product.name;
+        document.getElementById('product-price').value = product.price;
+        document.getElementById('product-category').value = product.category;
+        document.getElementById('product-image').value = product.image;
+        document.getElementById('product-desc').value = product.desc;
+        document.getElementById('product-modal').style.display = 'flex';
+        if (window.lucide) lucide.createIcons();
+    },
+
+    closeModal: () => {
+        document.getElementById('product-modal').style.display = 'none';
+    },
+
+    saveProduct: async () => {
+        const editId = document.getElementById('product-edit-id').value;
+        const productData = {
+            name: document.getElementById('product-name').value,
+            price: parseFloat(document.getElementById('product-price').value),
+            category: document.getElementById('product-category').value,
+            image: document.getElementById('product-image').value,
+            desc: document.getElementById('product-desc').value
+        };
+
+        try {
+            if (supabase) {
+                if (editId) {
+                    const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase.from('products').insert([productData]);
+                    if (error) throw error;
+                }
+            } else {
+                // Fallback: local only
+                if (editId) {
+                    const idx = Store.products.findIndex(p => p.id === parseInt(editId));
+                    if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
+                } else {
+                    productData.id = Date.now() + Math.floor(Math.random() * 1000);
+                    Store.products.push(productData);
+                }
+            }
+            await Store.fetchProducts();
+            Admin.closeModal();
+            Toast.success(editId ? 'Product updated!' : 'Product added!');
+            Router.handleRoute();
+        } catch(e) {
+            Toast.error('Save failed: ' + e.message);
+        }
+    },
+
+    deleteProduct: async (id) => {
+        if (!confirm('Delete this product?')) return;
+        try {
+            if (supabase) {
+                const { error } = await supabase.from('products').delete().eq('id', id);
+                if (error) throw error;
+            } else {
+                Store.products = Store.products.filter(p => p.id !== id);
+            }
+            await Store.fetchProducts();
+            Toast.success('Product deleted');
+            Router.handleRoute();
+        } catch(e) {
+            Toast.error('Delete failed: ' + e.message);
+        }
+    }
+};
+window.Admin = Admin;
+
 // --- COMPONENT FACTORY ---
 const Components = {
     ProductCard: (p) => `
         <div class="product-card reveal">
-            <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy">
-            <div class="product-content">
-                <h3>${p.name}</h3>
-                <p class="product-desc">${p.desc}</p>
-                <div class="product-meta">
-                    <span class="price">$${p.price.toFixed(2)}</span>
-                    <button class="btn btn-secondary btn-sm add-to-cart-btn" data-product-id="${p.id}">
-                        <i data-lucide="shopping-cart" style="width: 16px; height: 16px;"></i>
-                        Add to Cart
-                    </button>
+            <a href="#product/${p.id}" style="text-decoration: none; color: inherit;">
+                <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy">
+                <div class="product-content">
+                    <h3>${p.name}</h3>
+                    <p class="product-desc">${p.desc}</p>
                 </div>
+            </a>
+            <div class="product-meta" style="padding: 0 1.5rem 1.5rem;">
+                <span class="price">$${p.price.toFixed(2)}</span>
+                <button class="btn btn-secondary btn-sm add-to-cart-btn" data-product-id="${p.id}">
+                    <i data-lucide="shopping-cart" style="width: 16px; height: 16px;"></i>
+                    Add to Cart
+                </button>
             </div>
         </div>
     `,
@@ -264,9 +369,12 @@ const Components = {
 
     CartItem: (item, index) => `
         <div class="cart-item">
-            <div class="cart-item-info">
-                <strong>${item.name}</strong>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">${item.category}</p>
+            <div class="cart-item-info" style="display: flex; align-items: center; gap: 1rem;">
+                <img src="${item.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--bg-tertiary);" alt="${item.name}">
+                <div>
+                    <strong>${item.name}</strong>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-transform: capitalize;">${item.category}</p>
+                </div>
             </div>
             <div class="cart-item-actions">
                 <span class="price">$${parseFloat(item.price).toFixed(2)}</span>
@@ -561,6 +669,165 @@ const Router = {
             </div>
         `,
 
+        // ADMIN DASHBOARD
+        'dashboard': () => {
+            const products = Store.products;
+            return `
+                <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
+                    <div class="dashboard-header reveal">
+                        <div>
+                            <h1 style="font-size: 2.5rem;">Admin Dashboard</h1>
+                            <p>Manage products and inventory</p>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn btn-primary" onclick="Admin.showAddModal()">
+                                <i data-lucide="plus" style="width: 18px; height: 18px;"></i> Add Product
+                            </button>
+                            <button class="btn btn-secondary" onclick="Router.handleLogout()">
+                                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Sign Out
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-stats reveal">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value">${products.length}</div>
+                            <div class="admin-stat-label">Total Products</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value">${[...new Set(products.map(p => p.category))].length}</div>
+                            <div class="admin-stat-label">Categories</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value">$${products.reduce((sum, p) => sum + p.price, 0).toFixed(0)}</div>
+                            <div class="admin-stat-label">Total Value</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-products-grid reveal">
+                        ${products.map(p => `
+                            <div class="admin-product-card">
+                                <img src="${p.image}" alt="${p.name}" class="admin-product-img">
+                                <div class="admin-product-info">
+                                    <h3>${p.name}</h3>
+                                    <span class="badge badge-${p.category}" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">${p.category}</span>
+                                    <p class="admin-product-price">$${p.price.toFixed(2)}</p>
+                                </div>
+                                <div class="admin-product-actions">
+                                    <button class="btn btn-secondary btn-sm" onclick="Admin.showEditModal(${p.id})">
+                                        <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="Admin.deleteProduct(${p.id})">
+                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Product Modal -->
+                <div id="product-modal" class="modal-overlay" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="modal-title">Add Product</h2>
+                            <button class="modal-close" onclick="Admin.closeModal()">
+                                <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                            </button>
+                        </div>
+                        <form id="product-form" onsubmit="event.preventDefault(); Admin.saveProduct();">
+                            <input type="hidden" id="product-edit-id">
+                            <div class="form-group">
+                                <label for="product-name">Product Name</label>
+                                <input type="text" id="product-name" placeholder="Product name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-price">Price ($)</label>
+                                <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-category">Category</label>
+                                <select id="product-category" required>
+                                    <option value="techack">Techack</option>
+                                    <option value="techbox">TechBox</option>
+                                    <option value="rithim">Rithim</option>
+                                    <option value="studytech">StudyTech</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-image">Image URL</label>
+                                <input type="url" id="product-image" placeholder="https://images.unsplash.com/..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-desc">Description</label>
+                                <textarea id="product-desc" rows="3" placeholder="Product description..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i data-lucide="save" style="width: 18px; height: 18px;"></i> Save Product
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        },
+
+        // PRODUCT DETAIL PAGE
+        'product': () => {
+            const hash = window.location.hash;
+            const idMatch = hash.match(/product\/(\d+)/);
+            const id = idMatch ? parseInt(idMatch[1]) : null;
+            const product = id ? Store.products.find(p => p.id === id) : null;
+            
+            if (!product) {
+                return `
+                    <div class="container" style="padding-top: calc(var(--header-height) + 4rem); text-align: center;">
+                        <h2>Product Not Found</h2>
+                        <p>The product you're looking for doesn't exist.</p>
+                        <a href="#/" class="btn btn-primary" style="margin-top: 2rem;">Go Home</a>
+                    </div>
+                `;
+            }
+
+            const related = Store.getProductsByCategory(product.category).filter(p => p.id !== product.id);
+            
+            return `
+                <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
+                    <a href="#${product.category}" class="btn btn-secondary btn-sm reveal" style="margin-bottom: 2rem;">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to ${product.category}
+                    </a>
+                    
+                    <div class="product-detail reveal">
+                        <div class="product-detail-image">
+                            <img src="${product.image}" alt="${product.name}">
+                        </div>
+                        <div class="product-detail-info">
+                            <span class="badge badge-${product.category}">${product.category}</span>
+                            <h1 style="font-size: 2.5rem; margin: 1rem 0 0.5rem;">${product.name}</h1>
+                            <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">${product.desc}</p>
+                            <div class="price" style="font-size: 2.5rem; margin-bottom: 2rem;">$${product.price.toFixed(2)}</div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button class="btn btn-primary btn-lg add-to-cart-btn" data-product-id="${product.id}">
+                                    <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i> Add to Cart
+                                </button>
+                                <a href="#checkout" class="btn btn-secondary btn-lg">
+                                    <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i> Buy Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${related.length > 0 ? `
+                        <div style="margin-top: 4rem;">
+                            <h2 class="reveal">Related Products</h2>
+                            <div class="product-grid" style="margin-top: 2rem;">
+                                ${related.map(p => Components.ProductCard(p)).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        },
+
         // CHECKOUT PAGE
         'checkout': () => {
             const isSecure = window.location.protocol === 'https:';
@@ -662,7 +929,12 @@ const Router = {
     handleRoute: async () => {
         const app = document.getElementById('app');
         const hash = window.location.hash.slice(1) || '/';
-        const route = Router.routes[hash] || Router.routes['/'];
+        let route;
+        if (hash.startsWith('product/')) {
+            route = Router.routes['product'];
+        } else {
+            route = Router.routes[hash] || Router.routes['/'];
+        }
 
         // Scroll to top on route change
         window.scrollTo(0, 0);
@@ -701,14 +973,23 @@ const Router = {
         });
     },
 
-    handleLogin: () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        // Demo login - in production this would call Supabase Auth
-        if (email && password) {
-            alert('Login functionality requires backend integration. This is a demo.');
-        }
+    handleLogin: async () => {
+        const email = document.getElementById('email')?.value;
+        const password = document.getElementById('password')?.value;
+        if (!email || !password) { Toast.error('Please enter email and password'); return; }
+        try {
+            if (!supabase) { Toast.error('Database connection unavailable'); return; }
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { Toast.error(error.message); return; }
+            Toast.success('Welcome back!');
+            window.location.hash = '#dashboard';
+        } catch(e) { Toast.error('Login failed: ' + e.message); }
+    },
+
+    handleLogout: async () => {
+        if (supabase) { await supabase.auth.signOut(); }
+        Toast.info('Signed out');
+        window.location.hash = '#admin';
     },
 
     initCheckout: async () => {
@@ -789,6 +1070,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     Router.init();
     Router.handleRoute();
     Store.updateCartUI();
+    initRealtimeSync();
     
     // Event delegation for add to cart buttons
     document.addEventListener('click', (e) => {
