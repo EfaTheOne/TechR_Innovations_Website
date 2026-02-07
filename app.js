@@ -25,11 +25,11 @@ const Store = {
             this.products = [
                 {
                     id: 1,
-                    name: "Techack Pro Penetrator",
+                    name: "Techack1",
                     price: 299.99,
                     category: "techack",
-                    desc: "Advanced portable penetration testing device.",
-                    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80"
+                    desc: "Portable multi-tool for penetration testing. CC1101, Wi-Fi, BT, HID.",
+                    image: "https://images.unsplash.com/photo-1563770095162-95f88954dbd3?w=800&q=80"
                 },
                 {
                     id: 2,
@@ -155,7 +155,7 @@ const Router = {
     // Page Templates
     routes: {
         '/': () => `
-            <section class="hero">
+            <section class="hero reveal">
                 <h1>Innovating at the Edge of <span class="gradient-text">Possibility</span></h1>
                 <p>TechR Innovations bridges the gap between cybersecurity, education, potential, and human recovery.</p>
                 <div style="display: flex; justify-content: center; gap: 1rem;">
@@ -172,7 +172,81 @@ const Router = {
                 ${Components.DivisionCard('StudyTech', 'Offline AI Assistance', '#studytech', 'var(--color-studytech)', 'book-open')}
             </section>
         `,
-        'techack': () => Components.ProductPage('Techack', 'var(--color-techack)', 'Elite Penetration Testing Hardware', 'techack'),
+        'techack': () => `
+            <div class="container">
+                <section class="techack-hero reveal">
+                    <div class="techack-hero-content">
+                        <span class="badge">NEW RELEASE</span>
+                        <h1>Techack<span style="color: white;">1</span></h1>
+                        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                            The ultimate portable penetration testing framework. 
+                            <br>Compacted into a single, pocket-sized PCB.
+                        </p>
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="Store.addToCart(1)" class="btn-primary">
+                                Add to Cart - $299.99
+                            </button>
+                            <a href="#" style="padding: 0.75rem 1.5rem; border: 1px solid var(--border-glass); border-radius: 8px; color: white;">
+                                View Documentation
+                            </a>
+                        </div>
+                    </div>
+                    <div class="techack-visual">
+                        <img src="https://images.unsplash.com/photo-1563770095162-95f88954dbd3?w=800&q=80" alt="Techack1 Device">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, black, transparent); height: 100px;"></div>
+                    </div>
+                </section>
+
+                <div class="tech-grid reveal">
+                    <div class="tech-feature">
+                        <i data-lucide="radio" size="40"></i>
+                        <h3>Sub-GHz Transceiver</h3>
+                        <p style="color: var(--text-secondary);">Integrated CC1101 module for 433MHz and sub-GHz communication analysis.</p>
+                    </div>
+                    <div class="tech-feature">
+                        <i data-lucide="wifi" size="40"></i>
+                        <h3>Wi-Fi & Bluetooth</h3>
+                        <p style="color: var(--text-secondary);">Dual-stack wireless auditing with packet injection and sniffer modes.</p>
+                    </div>
+                    <div class="tech-feature">
+                        <i data-lucide="keyboard" size="40"></i>
+                        <h3>BadUSB HID</h3>
+                        <p style="color: var(--text-secondary);">Pre-programmable keystroke injection payloads for rapid deployment.</p>
+                    </div>
+                    <div class="tech-feature">
+                        <i data-lucide="cpu" size="40"></i>
+                        <h3>Open Hardware</h3>
+                        <p style="color: var(--text-secondary);">Powered by ESP32 architecture. Fully hackable and community driven.</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel reveal" style="padding: 3rem; margin-bottom: 4rem;">
+                    <h2 style="font-family: var(--font-heading); margin-bottom: 2rem;">Technical Specifications</h2>
+                    <table class="tech-specs-table">
+                        <tr>
+                            <td>MCU</td>
+                            <td>ESP32-S3 Dual Core 240MHz</td>
+                        </tr>
+                        <tr>
+                            <td>Radio Module</td>
+                            <td>TI CC1101 (300-928 MHz)</td>
+                        </tr>
+                        <tr>
+                            <td>Display</td>
+                            <td>1.3" OLED (128x64)</td>
+                        </tr>
+                        <tr>
+                            <td>Connectivity</td>
+                            <td>USB-C, MicroSD, GPIO Header</td>
+                        </tr>
+                        <tr>
+                            <td>Battery</td>
+                            <td>LiPo 800mAh (6 Hours Active)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        `,
         'techbox': () => Components.ProductPage('TechBox', 'var(--color-techbox)', 'Curiosity Unboxed. STEM Learning.', 'techbox'),
         'rithim': () => Components.ProductPage('Rithim', 'var(--color-rithim)', 'Recovery Redefined.', 'rithim'),
         'studytech': () => `
@@ -403,7 +477,7 @@ const Router = {
 /* --- COMPONENT HELPERS --- */
 const Components = {
     DivisionCard: (title, desc, link, color, icon) => `
-        <a href="${link}" class="division-card glass-panel" style="color: ${color}; border-color: rgba(255,255,255,0.05);">
+        <a href="${link}" class="division-card glass-panel reveal" style="color: ${color}; border-color: rgba(255,255,255,0.05);">
             <i data-lucide="${icon}" size="32"></i>
             <h3 style="color: white;">${title}</h3>
             <p>${desc}</p>
@@ -412,7 +486,7 @@ const Components = {
     `,
     ProductPage: (title, color, tagline, category) => `
         <div class="container">
-            <header style="margin-bottom: 3rem; border-bottom: 2px solid ${color}; padding-bottom: 1rem;">
+            <header class="reveal" style="margin-bottom: 3rem; border-bottom: 2px solid ${color}; padding-bottom: 1rem;">
                 <h1 style="color: ${color}; font-family: var(--font-heading); font-size: 3rem;">${title}</h1>
                 <p style="color: var(--text-secondary);">${tagline}</p>
             </header>
@@ -424,8 +498,8 @@ const Components = {
     ProductGrid: (category, color) => {
         const items = Store.products.filter(p => p.category === category);
         if (items.length === 0) return '<p>No inventory detected in this sector.</p>';
-        return items.map(p => `
-            <div class="product-card glass-panel">
+        return items.map((p, index) => `
+            <div class="product-card glass-panel reveal" style="transition-delay: ${index * 100}ms">
                 <img src="${sanitize(p.image)}" class="product-img" alt="${sanitize(p.name)}">
                 <div class="product-info">
                     <h3>${sanitize(p.name)}</h3>
@@ -448,9 +522,27 @@ window.toggleMobileMenu = () => {
     document.getElementById('mobile-menu').classList.toggle('hidden');
 };
 
+// Animation Observer
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+        }
+    });
+}, { threshold: 0.1 });
+
 // Start Engines
 document.addEventListener('DOMContentLoaded', () => {
     Store.init();
     Router.init();
     lucide.createIcons();
 });
+
+// Hook into Router to re-observe elements
+const originalHandleRoute = Router.handleRoute.bind(Router);
+Router.handleRoute = function () {
+    originalHandleRoute();
+    setTimeout(() => {
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }, 250); // Wait for render
+};
