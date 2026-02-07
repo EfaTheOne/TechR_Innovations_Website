@@ -266,18 +266,14 @@ const Router = {
                     </div>
 
                     <div class="glass-panel" style="padding: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem;"><i data-lucide="lock"></i> Payment Details (Encrypted)</h3>
-                        <form id="checkout-form">
-                            <input type="text" placeholder="Cardholder Name" required>
-                            <input type="text" placeholder="0000 0000 0000 0000" required>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <input type="text" placeholder="MM/YY" required>
-                                <input type="text" placeholder="CVC" required>
-                            </div>
+                        <h3 style="margin-bottom: 1.5rem;"><i data-lucide="lock"></i> Pay with Square (Secured)</h3>
+                        <form id="payment-form">
+                            <div id="card-container" style="min-height: 100px; background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"></div>
                             <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
                                 Pay Now
                             </button>
                         </form>
+                        <div id="payment-status-container" style="margin-top: 1rem; color: var(--text-accent);"></div>
                     </div>
                 `}
             </div>
@@ -344,23 +340,61 @@ const Router = {
                 }, 2500);
             });
         },
-        'checkout': () => {
-            const form = document.getElementById('checkout-form');
-            if (form) {
-                form.addEventListener('submit', (e) => {
+        'checkout': async () => {
+            if (Store.cart.length === 0) return;
+
+            // SQUARE PAYMENTS CONFIGURATION
+            // REPLACE WITH YOUR REAL SANDBOX CREDENTIALS
+            const appId = 'sandbox-sq0idb-baAQrwCn8BjaayFVRoDUJA';
+            const locationId = 'L0Y991888847';
+
+            try {
+                if (!window.Square) throw new Error("Square SDK not loaded");
+
+                const payments = window.Square.payments(appId, locationId);
+                const card = await payments.card();
+                await card.attach('#card-container');
+
+                const form = document.getElementById('payment-form');
+                form.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    document.getElementById('app').innerHTML = `
-                        <div class="container" style="text-align: center; padding: 4rem;">
-                            <i data-lucide="check-circle" size="64" color="#10b981" style="margin-bottom: 1rem;"></i>
-                            <h1>Payment Verified</h1>
-                            <p>Transaction ID: ${Date.now()}</p>
-                            <p style="margin-bottom: 2rem;">A receipt has been sent to your secure email.</p>
-                            <a href="#/" class="btn-primary">Return to Base</a>
-                        </div>
-                    `;
-                    lucide.createIcons();
-                    Store.clearCart();
+                    const statusParams = document.getElementById('payment-status-container');
+                    statusParams.textContent = "Securing connection...";
+
+                    try {
+                        const result = await card.tokenize();
+                        if (result.status === 'OK') {
+                            // In a real app, you send result.token to your backend
+                            console.log('Secure Token:', result.token);
+
+                            document.getElementById('app').innerHTML = `
+                                <div class="container" style="text-align: center; padding: 4rem;">
+                                    <div style="margin-bottom: 2rem;">
+                                        <i data-lucide="shield-check" size="80" color="#10b981"></i>
+                                    </div>
+                                    <h1 style="margin-bottom: 1rem;">Payment Secured.</h1>
+                                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem;">
+                                        Token Generated: <span style="font-family: monospace; background: #333; padding: 2px 6px;">${result.token.substring(0, 15)}...</span><br>
+                                        The encrypted token has been safely generated. No card data was stored on this device.
+                                    </p>
+                                    <a href="#/" class="btn-primary">Return to Base</a>
+                                </div>
+                            `;
+                            lucide.createIcons();
+                            Store.clearCart();
+                        } else {
+                            throw new Error(result.errors[0].message);
+                        }
+                    } catch (err) {
+                        statusParams.style.color = '#ef4444';
+                        statusParams.textContent = "Payment Failed: " + err.message;
+                    }
                 });
+            } catch (e) {
+                console.error("Square Logic Error:", e);
+                document.getElementById('card-container').innerHTML = `
+                    <p style="color: black;">Secure Payment failed to load. Ensure you are viewing via HTTPS (GitHub Pages) and not file://.</p>
+                `;
             }
         }
     }
