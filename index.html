@@ -1,13 +1,107 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>techrinnovationsweb</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com data:;">
+  <title>TechR Innovations | The Future, Unboxed.</title>
+  <meta name="description"
+    content="TechR Innovations: Bridging the gap between cybersecurity, education, recovery, and AI.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Icons (Lucide via CDN for zero-build usage) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Background FX -->
+  <div class="bg-noise"></div>
+  <div class="bg-glow"></div>
+
+  <!-- Navigation -->
+  <header class="glass-panel header-fixed">
+    <div class="container header-content">
+      <a href="#/" class="logo">
+        <i data-lucide="shield"></i>
+        <span>TechR <span class="text-accent">Innovations</span></span>
+      </a>
+
+      <nav class="desktop-nav">
+        <a href="#techack" class="nav-link"><i data-lucide="terminal"></i> Techack</a>
+        <a href="#techbox" class="nav-link"><i data-lucide="zap"></i> TechBox</a>
+        <a href="#rithim" class="nav-link"><i data-lucide="heart"></i> Rithim</a>
+        <a href="#studytech" class="nav-link"><i data-lucide="book-open"></i> StudyTech</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="#admin" class="admin-link">Staff Portal</a>
+        <a href="#checkout" class="cart-btn" id="cart-btn">
+          <i data-lucide="shopping-cart"></i>
+          <span class="cart-badge" id="cart-badge" style="display: none;">0</span>
+        </a>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobile-menu" class="mobile-nav glass-panel hidden">
+      <a href="#techack" onclick="toggleMobileMenu()"><i data-lucide="terminal"></i> Techack</a>
+      <a href="#techbox" onclick="toggleMobileMenu()"><i data-lucide="zap"></i> TechBox</a>
+      <a href="#rithim" onclick="toggleMobileMenu()"><i data-lucide="heart"></i> Rithim</a>
+      <a href="#studytech" onclick="toggleMobileMenu()"><i data-lucide="book-open"></i> StudyTech</a>
+    </div>
+  </header>
+
+  <!-- Main Application Container -->
+  <main id="app">
+    <!-- Dynamic Content Injected Here by app.js -->
+    <div class="loader">
+      <div class="spinner"></div>
+      <p>Initializing TechR Core...</p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h3>TechR Innovations</h3>
+        <p>Pioneering the future of technology, recovery, and education.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Divisions</h4>
+        <a href="#techack">Techack Security</a>
+        <a href="#techbox">TechBox Education</a>
+        <a href="#rithim">Rithim Recovery</a>
+        <a href="#studytech">StudyTech AI</a>
+      </div>
+      <div class="footer-col">
+        <h4>Internal</h4>
+        <a href="#admin">Employee Portal</a>
+        <a href="#/">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TechR Innovations. All systems nominal.</p>
+    </div>
+  </footer>
+
+  <!-- Core Engine -->
+  <script src="app.js"></script>
+</body>
+
 </html>
