@@ -306,7 +306,7 @@ const Admin = {
                     const idx = Store.products.findIndex(p => p.id === parseInt(editId));
                     if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
                 } else {
-                    productData.id = Date.now();
+                    productData.id = Date.now() + Math.floor(Math.random() * 1000);
                     Store.products.push(productData);
                 }
             }
@@ -373,7 +373,7 @@ const Components = {
                 <img src="${item.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--bg-tertiary);" alt="${item.name}">
                 <div>
                     <strong>${item.name}</strong>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; text-transform: capitalize;">${item.category}</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-transform: capitalize;">${item.category}</p>
                 </div>
             </div>
             <div class="cart-item-actions">
@@ -699,7 +699,7 @@ const Router = {
                             <div class="admin-stat-label">Categories</div>
                         </div>
                         <div class="admin-stat-card">
-                            <div class="admin-stat-value">$${products.reduce((s,p) => s + p.price, 0).toFixed(0)}</div>
+                            <div class="admin-stat-value">$${products.reduce((sum, p) => sum + p.price, 0).toFixed(0)}</div>
                             <div class="admin-stat-label">Total Value</div>
                         </div>
                     </div>
