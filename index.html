@@ -10,7 +10,7 @@
 
   <!-- SECURITY: Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://js.stripe.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://avatars.githubusercontent.com data: blob: https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com; connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co;">
+    content="default-src 'self'; script-src 'self' https://js.stripe.com https://unpkg.com https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://avatars.githubusercontent.com data: blob: https://*.stripe.com https://firebasestorage.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com; connect-src 'self' https://api.stripe.com https://firestore.googleapis.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;">
 
   <!-- SECURITY: Referrer Policy & Color Theme -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -26,8 +26,11 @@
   <!-- Icons: Lucide v0.469.0 (Pinned & Secured via SRI) -->
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 
-  <!-- DATABASE: Supabase JS Client (v2.39.0) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <!-- DATABASE: Firebase (v10.14.1) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 
   <!-- PAYMENT: Stripe.js -->
   <script src="https://js.stripe.com/v3/"></script>
