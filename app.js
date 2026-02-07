@@ -212,9 +212,10 @@ const Store = {
 
     resetToDefaults: () => {
         Store.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        Store.syncMode = 'local';
         Store.persistProducts();
         Store.lastSynced = new Date();
-        Toast.success('Products reset to defaults');
+        Toast.success('Products reset to defaults (12 original products restored)');
         Router.handleRoute();
     },
 
@@ -1412,7 +1413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     Toast.success('Site settings saved!');
                     break;
                 case 'reset-defaults':
-                    if (confirm('Reset all products to defaults? This will remove any changes you have made.')) {
+                    if (confirm('Reset all products to the original 12 defaults? This will remove any products you have added or changes you have made.')) {
                         Store.resetToDefaults();
                     }
                     break;
