@@ -8,9 +8,9 @@
   <meta name="description"
     content="Pioneering the intersection of cybersecurity, advanced education, and human recovery. Unbox the future.">
 
-  <!-- SECURITY: Strict Content Security Policy (SRI Enforced) -->
+  <!-- SECURITY: Updated Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://sandbox.web.squarecdn.com https://web.squarecdn.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com data:; frame-src https://sandbox.web.squarecdn.com https://web.squarecdn.com; connect-src 'self' https://sandbox.web.squarecdn.com https://web.squarecdn.com https://pci-connect.squareupsandbox.com https://pci-connect.squareup.com;">
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://sandbox.web.squarecdn.com https://web.squarecdn.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com data: https:; frame-src https://sandbox.web.squarecdn.com https://web.squarecdn.com; connect-src 'self' https://sandbox.web.squarecdn.com https://web.squarecdn.com https://pci-connect.squareupsandbox.com https://pci-connect.squareup.com https://*.supabase.co;">
 
   <!-- SECURITY: Referrer Policy & Color Theme -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -24,7 +24,6 @@
     rel="stylesheet">
 
   <!-- Icons: Lucide v0.469.0 (Pinned & Secured via SRI) -->
-  <!-- Note: We are using unpkg with strict versioning for stability -->
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 
   <!-- DATABASE: Supabase JS Client (v2.39.0) -->
@@ -42,41 +41,8 @@
   <div class="bg-noise"></div>
   <div class="bg-glow"></div>
 
-  <!-- Navigation -->
-  <header class="glass-panel header-fixed">
-    <div class="container header-content">
-      <a href="#/" class="logo">
-        <i data-lucide="shield"></i>
-        <span>TechR <span class="text-accent">Innovations</span></span>
-      </a>
-
-      <nav class="desktop-nav">
-        <a href="#techack" class="nav-link"><i data-lucide="terminal"></i> Techack</a>
-        <a href="#techbox" class="nav-link"><i data-lucide="zap"></i> TechBox</a>
-        <a href="#rithim" class="nav-link"><i data-lucide="heart"></i> Rithim</a>
-        <a href="#studytech" class="nav-link"><i data-lucide="book-open"></i> StudyTech</a>
-      </nav>
-
-      <div class="header-actions">
-        <a href="#admin" class="admin-link">Staff Portal</a>
-        <a href="#checkout" class="cart-btn" id="cart-btn">
-          <i data-lucide="shopping-cart"></i>
-          <span class="cart-badge" id="cart-badge" style="display: none;">0</span>
-        </a>
-        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-          <i data-lucide="menu"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Dropdown -->
-    <div id="mobile-menu" class="mobile-nav glass-panel hidden">
-      <a href="#techack" onclick="toggleMobileMenu()"><i data-lucide="terminal"></i> Techack</a>
-      <a href="#techbox" onclick="toggleMobileMenu()"><i data-lucide="zap"></i> TechBox</a>
-      <a href="#rithim" onclick="toggleMobileMenu()"><i data-lucide="heart"></i> Rithim</a>
-      <a href="#studytech" onclick="toggleMobileMenu()"><i data-lucide="book-open"></i> StudyTech</a>
-    </div>
-  </header>
+  <!-- Header will be injected by app.js -->
+  <header id="header-container"></header>
 
   <!-- Main Application Container -->
   <main id="app">
