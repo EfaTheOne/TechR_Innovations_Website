@@ -6,8 +6,16 @@
 // --- CONFIGURATION ---
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
-const SQUARE_APP_ID = 'sandbox-sq0idb-baAQrwCn8BjaayFVRoDUJA';
-const SQUARE_LOC_ID = 'LHWBP0QGBDD1G';
+
+// =====================================================
+// STRIPE CONFIGURATION
+// Replace the value below with your Stripe Publishable Key.
+// Find it at: https://dashboard.stripe.com/apikeys
+// Use 'pk_test_...' for testing, 'pk_live_...' for production.
+// Your Secret Key (sk_...) should NEVER be placed here.
+// It belongs on your backend server only.
+// =====================================================
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY_HERE';
 
 // --- TOAST NOTIFICATIONS ---
 const Toast = {
@@ -830,30 +838,17 @@ const Router = {
 
         // CHECKOUT PAGE
         'checkout': () => {
-            const isSecure = window.location.protocol === 'https:';
             const total = Store.getCartTotal();
-            
-            let alertHtml = '';
-            if (!isSecure) {
-                alertHtml = `
-                    <div class="alert-box alert-info">
-                        <i data-lucide="info"></i>
-                        <div>
-                            <strong>Demo Mode Active</strong><br>
-                            Payments require HTTPS. Deploy to production or use GitHub Pages to enable live payments.
-                        </div>
-                    </div>
-                `;
-            }
+            const itemCount = Store.cart.length;
 
-            if (Store.cart.length === 0) {
+            if (itemCount === 0) {
                 return `
                     <div class="container" style="padding-top: calc(var(--header-height) + 4rem);">
                         <div class="checkout-container">
                             <div class="card reveal" style="text-align: center; padding: 4rem 2rem;">
                                 <i data-lucide="shopping-cart" style="width: 64px; height: 64px; color: var(--text-secondary); margin-bottom: 1.5rem;"></i>
                                 <h2 style="margin-bottom: 1rem;">Your Cart is Empty</h2>
-                                <p style="margin-bottom: 2rem;">Looks like you haven't added any products yet.</p>
+                                <p style="margin-bottom: 2rem; color: var(--text-secondary);">Looks like you haven't added any products yet.</p>
                                 <a href="#techack" class="btn btn-primary">Browse Products</a>
                             </div>
                         </div>
@@ -864,9 +859,24 @@ const Router = {
             return `
                 <div class="container" style="padding-top: calc(var(--header-height) + 3rem);">
                     <div class="checkout-container">
-                        <h2 class="reveal" style="margin-bottom: 2rem;">Secure Checkout</h2>
-                        ${alertHtml}
+                        <h2 class="reveal" style="margin-bottom: 0.5rem;">Secure Checkout</h2>
+                        <p class="reveal" style="color: var(--text-secondary); margin-bottom: 2rem;">${itemCount} item${itemCount > 1 ? 's' : ''} in your cart</p>
                         
+                        <div class="checkout-steps reveal">
+                            <div class="checkout-step active">
+                                <span class="checkout-step-number">1</span>
+                                <span>Review</span>
+                            </div>
+                            <div class="checkout-step active">
+                                <span class="checkout-step-number">2</span>
+                                <span>Payment</span>
+                            </div>
+                            <div class="checkout-step">
+                                <span class="checkout-step-number">3</span>
+                                <span>Confirm</span>
+                            </div>
+                        </div>
+
                         <div class="card reveal" style="margin-bottom: 2rem;">
                             <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                                 <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
@@ -874,25 +884,28 @@ const Router = {
                             </h3>
                             ${Store.cart.map((item, i) => Components.CartItem(item, i)).join('')}
                             <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-size: 1.1rem;">Total</span>
+                                <span style="font-size: 1.1rem; font-weight: 500;">Total</span>
                                 <span class="price" style="font-size: 1.5rem;">$${total}</span>
                             </div>
                         </div>
 
-                        <div class="card reveal">
+                        <div class="card reveal checkout-payment-card">
                             <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                                 <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
                                 Payment Details
                             </h3>
-                            <div id="card-container"></div>
-                            <button id="pay-btn" class="btn btn-primary btn-lg" style="width: 100%;">
+                            <div id="card-container">
+                                <div id="card-element"></div>
+                                <div id="card-errors" role="alert" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.75rem; min-height: 1.25rem;"></div>
+                            </div>
+                            <button id="pay-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 0.5rem;">
                                 <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
                                 Pay $${total}
                             </button>
-                            <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 1rem;">
-                                <i data-lucide="shield-check" style="width: 14px; height: 14px; display: inline; vertical-align: middle;"></i>
-                                Payments secured by Square
-                            </p>
+                            <div style="text-align: center; margin-top: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary);">Payments secured by Stripe</span>
+                            </div>
                         </div>
                         
                         <details style="margin-top: 2rem;" class="reveal">
@@ -993,25 +1006,27 @@ const Router = {
     },
 
     initCheckout: async () => {
-        const cardContainer = document.getElementById('card-container');
+        const cardContainer = document.getElementById('card-element');
+        const cardErrors = document.getElementById('card-errors');
         const payBtn = document.getElementById('pay-btn');
         
         if (!cardContainer || !payBtn) return;
 
-        if (!window.Square) {
-            logger.error("Square SDK not loaded");
-            cardContainer.innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>Payment SDK unavailable</span></div>`;
+        if (!window.Stripe) {
+            logger.error("Stripe.js not loaded");
+            document.getElementById('card-container').innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>Payment SDK unavailable. Check your internet connection.</span></div>`;
             if (window.lucide) lucide.createIcons();
             return;
         }
 
-        if (window.location.protocol !== 'https:') {
-            logger.log("Demo mode: HTTPS required for live payments");
-            cardContainer.innerHTML = `
+        if (!STRIPE_PUBLISHABLE_KEY || !STRIPE_PUBLISHABLE_KEY.startsWith('pk_')) {
+            logger.log("Demo mode: Stripe publishable key not configured");
+            document.getElementById('card-container').innerHTML = `
                 <div style="background: var(--bg-tertiary); border: 2px dashed var(--border-glass); border-radius: 8px; padding: 2rem; text-align: center;">
                     <i data-lucide="credit-card" style="width: 32px; height: 32px; color: var(--text-secondary); margin-bottom: 1rem;"></i>
                     <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
-                        Card input appears here in production (HTTPS required)
+                        Card input appears here once Stripe is configured.<br>
+                        <span style="font-size: 0.8rem;">Set your publishable key in app.js (STRIPE_PUBLISHABLE_KEY)</span>
                     </p>
                 </div>
             `;
@@ -1032,33 +1047,58 @@ const Router = {
         }
 
         try {
-            logger.log("Initializing Square Payments...");
-            const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
-            const card = await payments.card();
-            await card.attach('#card-container');
-            logger.log("Card element attached successfully");
+            logger.log("Initializing Stripe Payments...");
+            const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
+            const elements = stripe.elements();
+            
+            const style = {
+                base: {
+                    color: '#ffffff',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSmoothing: 'antialiased',
+                    fontSize: '16px',
+                    '::placeholder': { color: '#86868b' }
+                },
+                invalid: {
+                    color: '#ff453a',
+                    iconColor: '#ff453a'
+                }
+            };
+
+            const card = elements.create('card', { style });
+            card.mount('#card-element');
+            logger.log("Stripe card element mounted successfully");
+
+            card.on('change', (event) => {
+                if (cardErrors) {
+                    cardErrors.textContent = event.error ? event.error.message : '';
+                }
+            });
 
             payBtn.addEventListener('click', async () => {
                 PayButton.setLoading(payBtn);
                 
-                logger.log("Tokenizing card...");
-                const result = await card.tokenize();
+                logger.log("Creating payment token...");
+                const { token, error } = await stripe.createToken(card);
                 
-                if (result.status === 'OK') {
-                    logger.log(`Token received: ${result.token.substring(0, 20)}...`);
+                if (error) {
+                    logger.error(error.message);
+                    if (cardErrors) cardErrors.textContent = error.message;
+                    PayButton.setReady(payBtn, Store.getCartTotal());
+                    Toast.error("Payment failed: " + error.message);
+                } else {
+                    logger.log(`Token received: ${token.id.substring(0, 20)}...`);
                     Toast.success("Payment successful! Thank you for your order.");
-                    // In production, send token to backend to complete payment
+                    // In production, send token.id to your backend server to complete the charge
+                    // Example: await fetch('/api/charge', { method: 'POST', body: JSON.stringify({ token: token.id, amount: Math.round(total * 100) }) })
+                    // Note: Stripe expects amounts in the smallest currency unit (cents for USD)
                     Store.clearCart();
                     window.location.hash = '#success';
-                } else {
-                    logger.error(result.errors[0].message);
-                    PayButton.setReady(payBtn, Store.getCartTotal());
-                    Toast.error("Payment failed: " + result.errors[0].message);
                 }
             });
         } catch (e) {
-            logger.error(`Square Exception: ${e.message}`);
-            cardContainer.innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>${e.message}</span></div>`;
+            logger.error(`Stripe Exception: ${e.message}`);
+            document.getElementById('card-container').innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>${e.message}</span></div>`;
             if (window.lucide) lucide.createIcons();
         }
     }
