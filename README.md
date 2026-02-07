@@ -22,7 +22,7 @@ This app supports **dual-cloud sync** for real-time data and image uploads acros
 **Firebase** (Image storage & sync fallback):
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Register a web app and copy the config keys
-3. Paste the config keys into `app.js` → `FIREBASE_CONFIG` object (line ~11)
+3. Paste the config keys into `app.js` → `FIREBASE_CONFIG` object (line ~20)
 4. Enable **Firestore Database**, **Firebase Storage**, and **Authentication** (Email/Password)
 
 > **📖 For a detailed step-by-step walkthrough (with screenshots descriptions, security rules, and troubleshooting), see [FIREBASE_SETUP.md](FIREBASE_SETUP.md)**

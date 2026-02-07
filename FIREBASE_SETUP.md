@@ -60,7 +60,7 @@ const firebaseConfig = {
 
 ## Step 3: Paste Your Config Keys into app.js
 
-Open `app.js` and find the `FIREBASE_CONFIG` object near the top of the file (around **line 11**):
+Open `app.js` and find the `FIREBASE_CONFIG` object near the top of the file (around **line 20**):
 
 ```javascript
 // Firebase Configuration - Replace with your own Firebase project config
@@ -263,8 +263,8 @@ regardless of which database is active for product data.
 
 | What | Where | Line |
 |---|---|---|
-| Firebase API keys | `app.js` → `FIREBASE_CONFIG` object | ~Line 11 |
+| Firebase API keys | `app.js` → `FIREBASE_CONFIG` object | ~Line 20 |
 | Supabase keys | `app.js` → `SUPABASE_URL` and `SUPABASE_KEY` | ~Line 7-8 |
-| Stripe keys | `app.js` → `STRIPE_PUBLISHABLE_KEY` | ~Line 25 |
-| Firebase SDKs | `index.html` → `<head>` section | Lines 32-36 |
-| CSP headers | `index.html` → `<meta>` tag | Line 13 |
+| Stripe keys | `app.js` → `STRIPE_PUBLISHABLE_KEY` | ~Line 37 |
+| Firebase SDKs | `index.html` → `<head>` section | Lines 33-36 |
+| CSP headers | `index.html` → `<meta>` tag | Line 12-13 |
