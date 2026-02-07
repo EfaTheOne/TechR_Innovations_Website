@@ -1,17 +1,77 @@
 /* 
-   TechR Innovations - Protocol: STRUCTURE
+   TechR Innovations - Protocol: STRUCTURE v10.0
    Engine: Professional, Debuggable, Secure
 */
 
 // --- CONFIGURATION ---
-// Credentials provided by User
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 const SQUARE_APP_ID = 'sandbox-sq0idb-baAQrwCn8BjaayFVRoDUJA';
 const SQUARE_LOC_ID = 'LHWBP0QGBDD1G';
 
-// Initialize Clients
-let supabase;
+// --- TOAST NOTIFICATIONS ---
+const Toast = {
+    container: null,
+    
+    init: () => {
+        if (!Toast.container) {
+            Toast.container = document.createElement('div');
+            Toast.container.id = 'toast-container';
+            Toast.container.style.cssText = 'position: fixed; top: 100px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
+            document.body.appendChild(Toast.container);
+        }
+    },
+    
+    show: (message, type = 'info', duration = 4000) => {
+        Toast.init();
+        const toast = document.createElement('div');
+        const colors = {
+            success: 'rgba(52, 199, 89, 0.95)',
+            error: 'rgba(255, 69, 58, 0.95)',
+            info: 'rgba(41, 151, 255, 0.95)'
+        };
+        toast.style.cssText = `
+            background: ${colors[type] || colors.info};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        `;
+        toast.textContent = message;
+        Toast.container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    },
+    
+    success: (msg) => Toast.show(msg, 'success'),
+    error: (msg) => Toast.show(msg, 'error'),
+    info: (msg) => Toast.show(msg, 'info')
+};
+
+// --- PAYMENT BUTTON HELPER ---
+const PayButton = {
+    setLoading: (btn) => {
+        if (!btn) return;
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Processing...';
+        if (window.lucide) lucide.createIcons();
+    },
+    
+    setReady: (btn, amount) => {
+        if (!btn) return;
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="lock" style="width: 18px; height: 18px;"></i> Pay $${amount}`;
+        if (window.lucide) lucide.createIcons();
+    }
+};
+
+// --- LOGGER ---
 const logger = {
     log: (msg) => {
         console.log(`[TechR] ${msg}`);
@@ -31,13 +91,15 @@ const logger = {
     }
 };
 
+// --- SUPABASE INIT ---
+let supabase;
 try {
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("Supabase Online");
+        console.log("[TechR] Supabase Online");
     }
 } catch (e) {
-    console.warn("Supabase Init Failed");
+    console.warn("[TechR] Supabase Init Failed - using fallback data");
 }
 
 // --- STORE & STATE ---
@@ -46,10 +108,15 @@ const Store = {
     cart: [],
 
     init: async () => {
-        const savedCart = localStorage.getItem('techr_cart_v2');
-        if (savedCart) Store.cart = JSON.parse(savedCart);
+        const savedCart = localStorage.getItem('techr_cart_v3');
+        if (savedCart) {
+            try {
+                Store.cart = JSON.parse(savedCart);
+            } catch (e) {
+                Store.cart = [];
+            }
+        }
         await Store.fetchProducts();
-        Router.handleRoute();
     },
 
     fetchProducts: async () => {
@@ -61,91 +128,172 @@ const Store = {
                     return;
                 }
             }
-        } catch (e) { /* Ignore fallback */ }
+        } catch (e) { 
+            console.warn("[TechR] Database unavailable, using fallback inventory");
+        }
 
-        // Fallback Inventory
+        // Comprehensive Fallback Inventory
         Store.products = [
-            { id: 1, name: "Techack1 Unit", price: 299.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techack", desc: "Portable pentesting framework." },
-            { id: 2, name: "TechBox Starter", price: 49.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", category: "techbox", desc: "Complete STEM electronics kit." },
-            { id: 3, name: "Rithim Biosensor", price: 149.99, image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80", category: "rithim", desc: "Recovery monitoring wearable." }
+            // Techack Products
+            { id: 1, name: "Techack1 Pro", price: 499.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techack", desc: "Enterprise-grade portable pentesting framework with WiFi 6 and Bluetooth 5.2 capabilities." },
+            { id: 2, name: "Techack1 Lite", price: 299.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", category: "techack", desc: "Compact security testing device for educational and professional use." },
+            { id: 3, name: "Techack Network Probe", price: 149.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", category: "techack", desc: "Passive network analysis tool with real-time packet inspection." },
+            
+            // TechBox Products
+            { id: 4, name: "TechBox Starter Kit", price: 79.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", category: "techbox", desc: "Complete STEM electronics kit with Arduino-compatible microcontroller and 50+ components." },
+            { id: 5, name: "TechBox Advanced", price: 149.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", category: "techbox", desc: "Advanced robotics and IoT development platform with sensor arrays." },
+            { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
+            
+            // Rithim Products
+            { id: 7, name: "Rithim Band", price: 199.99, image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80", category: "rithim", desc: "Clinical-grade biosensor wristband for 24/7 recovery monitoring." },
+            { id: 8, name: "Rithim Pro Patch", price: 89.99, image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80", category: "rithim", desc: "Disposable medical-grade monitoring patch (pack of 10) for intensive recovery tracking." },
+            { id: 9, name: "Rithim Hub", price: 299.99, image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", category: "rithim", desc: "Central monitoring station for healthcare providers and recovery facilities." },
+
+            // StudyTech Products
+            { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
+            { id: 11, name: "StudyTech AI Tutor - Annual", price: 149.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", category: "studytech", desc: "Full year of AI tutoring with advanced analytics and progress tracking." },
+            { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
         ];
+    },
+
+    getProductsByCategory: (category) => {
+        return Store.products.filter(p => p.category === category);
     },
 
     addToCart: (id) => {
         const product = Store.products.find(p => p.id === id);
         if (product) {
-            Store.cart.push(product);
+            Store.cart.push({...product, cartId: Date.now() + Math.random()});
             Store.persist();
+            Store.updateCartUI();
+            
             // Button feedback
-            const btns = document.querySelectorAll(`button[data-id="${id}"]`);
+            const btns = document.querySelectorAll(`button[data-product-id="${id}"]`);
             btns.forEach(b => {
-                const old = b.innerHTML;
-                b.innerHTML = "Added";
-                b.classList.add('btn-primary');
-                b.classList.remove('btn-secondary');
+                const originalText = b.textContent;
+                b.textContent = "✓ Added";
+                b.classList.add('btn-success');
+                b.classList.remove('btn-secondary', 'btn-primary');
                 setTimeout(() => {
-                    b.innerHTML = old;
-                    b.classList.remove('btn-primary');
+                    b.textContent = originalText;
+                    b.classList.remove('btn-success');
                     b.classList.add('btn-secondary');
-                }, 1000);
+                }, 1500);
             });
-            Auth.updateCartCount();
         }
     },
 
-    removeFromCart: (index) => {
-        Store.cart.splice(index, 1);
+    removeFromCart: (cartId) => {
+        Store.cart = Store.cart.filter(item => item.cartId !== cartId);
         Store.persist();
+        Store.updateCartUI();
         Router.handleRoute();
     },
 
     clearCart: () => {
         Store.cart = [];
         Store.persist();
+        Store.updateCartUI();
+    },
+
+    getCartTotal: () => {
+        return Store.cart.reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2);
     },
 
     persist: () => {
-        localStorage.setItem('techr_cart_v2', JSON.stringify(Store.cart));
+        localStorage.setItem('techr_cart_v3', JSON.stringify(Store.cart));
+    },
+
+    updateCartUI: () => {
+        const badge = document.getElementById('cart-badge');
+        const cartCount = document.getElementById('cart-count');
+        
+        if (badge) {
+            if (Store.cart.length > 0) {
+                badge.textContent = Store.cart.length;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        if (cartCount) {
+            cartCount.textContent = Store.cart.length;
+        }
     }
 };
 
-const Auth = {
-    user: null,
-    updateCartCount: () => {
-        const btn = document.getElementById('cart-count');
-        if (btn) btn.textContent = Store.cart.length;
+// --- MOBILE MENU ---
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    if (menu) {
+        menu.classList.toggle('hidden');
     }
-};
+}
+
+// Make it globally available
+window.toggleMobileMenu = toggleMobileMenu;
+window.Store = Store;
 
 // --- COMPONENT FACTORY ---
 const Components = {
-    Header: () => `
-        <nav class="nav-bar">
-            <div class="container nav-container">
-                <a href="#/" class="brand">
-                    <i data-lucide="cpu"></i> TechR
-                </a>
-                <div class="nav-links">
-                    <a href="#techack">Products</a>
-                    <a href="#admin">Login</a>
-                    <a href="#checkout" class="btn btn-primary btn-sm">
-                        Checkout (<span id="cart-count">${Store.cart.length}</span>)
-                    </a>
-                </div>
-            </div>
-        </nav>
-    `,
-
     ProductCard: (p) => `
         <div class="product-card reveal">
-            <img src="${p.image}" class="product-img" alt="${p.name}">
+            <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy">
             <div class="product-content">
                 <h3>${p.name}</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 1rem;">${p.desc}</p>
+                <p class="product-desc">${p.desc}</p>
                 <div class="product-meta">
-                    <span class="price">$${p.price}</span>
-                    <button class="btn btn-secondary" onclick="Store.addToCart(${p.id})" data-id="${p.id}">Add to Cart</button>
+                    <span class="price">$${p.price.toFixed(2)}</span>
+                    <button class="btn btn-secondary btn-sm add-to-cart-btn" data-product-id="${p.id}">
+                        <i data-lucide="shopping-cart" style="width: 16px; height: 16px;"></i>
+                        Add to Cart
+                    </button>
                 </div>
+            </div>
+        </div>
+    `,
+
+    FeatureCard: (icon, title, description, color = 'accent') => `
+        <div class="feature-card reveal">
+            <i data-lucide="${icon}" style="color: var(--${color});"></i>
+            <h3>${title}</h3>
+            <p>${description}</p>
+        </div>
+    `,
+
+    CartItem: (item, index) => `
+        <div class="cart-item">
+            <div class="cart-item-info">
+                <strong>${item.name}</strong>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">${item.category}</p>
+            </div>
+            <div class="cart-item-actions">
+                <span class="price">$${parseFloat(item.price).toFixed(2)}</span>
+                <button class="remove-btn remove-from-cart-btn" data-cart-id="${item.cartId}" title="Remove item">
+                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                </button>
+            </div>
+        </div>
+    `,
+
+    StatsSection: () => `
+        <div class="stats-grid reveal">
+            <div class="stat-item">
+                <div class="stat-value">500+</div>
+                <div class="stat-label">Enterprise Clients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">50K+</div>
+                <div class="stat-label">Devices Deployed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">99.9%</div>
+                <div class="stat-label">Uptime SLA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Support Available</div>
             </div>
         </div>
     `
@@ -154,101 +302,361 @@ const Components = {
 // --- ROUTER ---
 const Router = {
     routes: {
+        // HOME PAGE
         '/': () => `
             <div class="fullscreen-section container">
-                <h1 class="reveal">Precision Engineering<br>for the Modern Era.</h1>
-                <p class="reveal" style="font-size: 1.5rem; margin-top: 1rem;">
-                    TechR Innovations delivers enterprise-grade hardware solutions for security, education, and physiological monitoring.
+                <h1 class="reveal" style="margin-bottom: 1.5rem;">
+                    The Future of<br><span style="color: var(--accent);">Technology</span> is Here.
+                </h1>
+                <p class="reveal" style="font-size: 1.35rem; margin-top: 0; max-width: 650px;">
+                    TechR Innovations delivers enterprise-grade hardware and software solutions for cybersecurity, education, healthcare recovery, and AI-powered learning.
                 </p>
-                <div class="reveal" style="margin-top: 2rem; display: flex; gap: 1rem;">
-                    <a href="#techack" class="btn btn-primary">View Products</a>
-                    <a href="#checkout" class="btn btn-secondary">Order Now</a>
+                <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <a href="#techack" class="btn btn-primary btn-lg">Explore Products</a>
+                    <a href="#checkout" class="btn btn-secondary btn-lg">View Cart (${Store.cart.length})</a>
                 </div>
             </div>
             
-            <div class="container" style="padding-bottom: 6rem;">
+            <div class="container" style="padding-bottom: 4rem;">
+                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">Our Divisions</h2>
                 <div class="grid-3">
-                    <div class="card reveal">
-                        <div class="card-icon"><i data-lucide="shield"></i></div>
-                        <h3>Techack Security</h3>
-                        <p>Advanced penetration testing hardware designed for red team operations.</p>
-                    </div>
-                    <div class="card reveal">
-                        <div class="card-icon"><i data-lucide="box"></i></div>
-                        <h3>TechBox EDU</h3>
-                        <p>Comprehensive STEM learning kits powering the next generation of engineers.</p>
-                    </div>
-                    <div class="card reveal">
-                        <div class="card-icon"><i data-lucide="activity"></i></div>
-                        <h3>Rithim Bio</h3>
-                        <p>Clinical-grade biosensors for real-time recovery tracking.</p>
-                    </div>
+                    <a href="#techack" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
+                            <i data-lucide="shield" style="color: var(--color-techack);"></i>
+                        </div>
+                        <h3 style="color: var(--color-techack);">Techack Security</h3>
+                        <p>Advanced penetration testing hardware for red team operations and security assessments.</p>
+                    </a>
+                    <a href="#techbox" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(255, 159, 10, 0.1);">
+                            <i data-lucide="box" style="color: var(--color-techbox);"></i>
+                        </div>
+                        <h3 style="color: var(--color-techbox);">TechBox EDU</h3>
+                        <p>STEM learning kits and educational platforms for the next generation of engineers.</p>
+                    </a>
+                    <a href="#rithim" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(255, 55, 95, 0.1);">
+                            <i data-lucide="heart" style="color: var(--color-rithim);"></i>
+                        </div>
+                        <h3 style="color: var(--color-rithim);">Rithim Bio</h3>
+                        <p>Clinical-grade biosensors for real-time physiological and recovery monitoring.</p>
+                    </a>
+                </div>
+                
+                <div class="grid-3" style="margin-top: 2rem;">
+                    <a href="#studytech" class="card reveal" style="text-decoration: none; grid-column: span 1;">
+                        <div class="card-icon" style="background: rgba(94, 92, 230, 0.1);">
+                            <i data-lucide="brain" style="color: var(--color-studytech);"></i>
+                        </div>
+                        <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
+                        <p>AI-powered adaptive learning assistants that personalize education at scale.</p>
+                    </a>
                 </div>
             </div>
-        `,
-        'techack': () => `
-            <div class="container" style="padding-top: 8rem; padding-bottom: 4rem;">
-                <h2 class="reveal">Product Catalog</h2>
-                <div class="product-grid reveal" style="margin-top: 2rem;">
-                    ${Store.products.map(p => Components.ProductCard(p)).join('')}
-                </div>
-            </div>
-        `,
-        'checkout': async () => {
-            const isSecure = window.location.protocol === 'https:';
-            let alertHtml = '';
 
+            ${Components.StatsSection()}
+
+            <div class="container">
+                <div class="cta-section reveal">
+                    <h2>Ready to Transform Your Operations?</h2>
+                    <p>Join 500+ enterprises already using TechR solutions.</p>
+                    <a href="#techack" class="btn btn-primary btn-lg">Browse All Products</a>
+                </div>
+            </div>
+        `,
+
+        // TECHACK SECURITY DIVISION
+        'techack': () => {
+            const products = Store.getProductsByCategory('techack');
+            return `
+                <div class="division-hero container">
+                    <div class="division-header reveal">
+                        <span class="badge badge-techack">Security Division</span>
+                        <h1 style="color: var(--color-techack);">Techack</h1>
+                        <p>Enterprise-grade penetration testing and security assessment hardware for professionals.</p>
+                    </div>
+
+                    <div class="features-grid">
+                        ${Components.FeatureCard('shield-check', 'Military-Grade Security', 'Hardware encryption and secure boot protect your operations.', 'color-techack')}
+                        ${Components.FeatureCard('wifi', 'Wireless Penetration', 'WiFi 6 and Bluetooth 5.2 support for comprehensive testing.', 'color-techack')}
+                        ${Components.FeatureCard('cpu', 'High Performance', 'Quad-core processor handles complex security operations.', 'color-techack')}
+                        ${Components.FeatureCard('lock', 'Compliance Ready', 'Meets PCI-DSS, HIPAA, and SOC 2 requirements.', 'color-techack')}
+                    </div>
+
+                    <h2 class="reveal" style="margin-top: 4rem;">Techack Products</h2>
+                    <div class="product-grid" style="margin-top: 2rem;">
+                        ${products.map(p => Components.ProductCard(p)).join('')}
+                    </div>
+
+                    <div class="cta-section reveal" style="margin-top: 4rem;">
+                        <h2>Need Custom Security Solutions?</h2>
+                        <p>Contact our enterprise team for custom configurations and volume pricing.</p>
+                        <a href="#admin" class="btn btn-primary">Contact Sales</a>
+                    </div>
+                </div>
+            `;
+        },
+
+        // TECHBOX EDUCATION DIVISION
+        'techbox': () => {
+            const products = Store.getProductsByCategory('techbox');
+            return `
+                <div class="division-hero container">
+                    <div class="division-header reveal">
+                        <span class="badge badge-techbox">Education Division</span>
+                        <h1 style="color: var(--color-techbox);">TechBox</h1>
+                        <p>Comprehensive STEM education kits designed for learners of all ages.</p>
+                    </div>
+
+                    <div class="features-grid">
+                        ${Components.FeatureCard('book-open', 'Curriculum Aligned', 'Content aligned with national STEM education standards.', 'color-techbox')}
+                        ${Components.FeatureCard('users', 'Classroom Ready', 'Bulk packages designed for educational institutions.', 'color-techbox')}
+                        ${Components.FeatureCard('code', 'Learn to Code', 'From block coding to Python, grow with the platform.', 'color-techbox')}
+                        ${Components.FeatureCard('trophy', 'Competition Ready', 'Prepares students for robotics and coding competitions.', 'color-techbox')}
+                    </div>
+
+                    <h2 class="reveal" style="margin-top: 4rem;">TechBox Products</h2>
+                    <div class="product-grid" style="margin-top: 2rem;">
+                        ${products.map(p => Components.ProductCard(p)).join('')}
+                    </div>
+
+                    <div class="cta-section reveal" style="margin-top: 4rem;">
+                        <h2>Educator Discounts Available</h2>
+                        <p>Schools and educational institutions receive special pricing.</p>
+                        <a href="#admin" class="btn btn-primary">Apply for Edu Discount</a>
+                    </div>
+                </div>
+            `;
+        },
+
+        // RITHIM RECOVERY DIVISION
+        'rithim': () => {
+            const products = Store.getProductsByCategory('rithim');
+            return `
+                <div class="division-hero container">
+                    <div class="division-header reveal">
+                        <span class="badge badge-rithim">Recovery Division</span>
+                        <h1 style="color: var(--color-rithim);">Rithim</h1>
+                        <p>Clinical-grade biosensors for continuous health and recovery monitoring.</p>
+                    </div>
+
+                    <div class="features-grid">
+                        ${Components.FeatureCard('heart-pulse', 'Real-Time Monitoring', '24/7 physiological tracking with instant alerts.', 'color-rithim')}
+                        ${Components.FeatureCard('activity', 'Recovery Analytics', 'AI-powered insights to optimize recovery protocols.', 'color-rithim')}
+                        ${Components.FeatureCard('shield-plus', 'HIPAA Compliant', 'Healthcare-grade data protection and privacy.', 'color-rithim')}
+                        ${Components.FeatureCard('smartphone', 'Mobile Integration', 'Seamless sync with iOS and Android devices.', 'color-rithim')}
+                    </div>
+
+                    <h2 class="reveal" style="margin-top: 4rem;">Rithim Products</h2>
+                    <div class="product-grid" style="margin-top: 2rem;">
+                        ${products.map(p => Components.ProductCard(p)).join('')}
+                    </div>
+
+                    <div class="card reveal" style="margin-top: 4rem; text-align: center; padding: 3rem;">
+                        <i data-lucide="stethoscope" style="width: 48px; height: 48px; color: var(--color-rithim); margin-bottom: 1rem;"></i>
+                        <h3>For Healthcare Providers</h3>
+                        <p style="max-width: 500px; margin: 1rem auto;">
+                            Rithim devices are designed for integration with existing healthcare systems. 
+                            Contact us for API documentation and enterprise solutions.
+                        </p>
+                        <a href="#admin" class="btn btn-primary" style="margin-top: 1rem;">Healthcare Inquiry</a>
+                    </div>
+                </div>
+            `;
+        },
+
+        // STUDYTECH AI DIVISION
+        'studytech': () => {
+            const products = Store.getProductsByCategory('studytech');
+            return `
+                <div class="division-hero container">
+                    <div class="division-header reveal">
+                        <span class="badge badge-studytech">AI Division</span>
+                        <h1 style="color: var(--color-studytech);">StudyTech</h1>
+                        <p>AI-powered personalized learning that adapts to every student.</p>
+                    </div>
+
+                    <div class="features-grid">
+                        ${Components.FeatureCard('brain', 'Adaptive AI', 'Machine learning algorithms personalize every lesson.', 'color-studytech')}
+                        ${Components.FeatureCard('bar-chart-3', 'Progress Tracking', 'Detailed analytics for students, parents, and educators.', 'color-studytech')}
+                        ${Components.FeatureCard('globe', 'Any Subject', 'From mathematics to languages, comprehensive coverage.', 'color-studytech')}
+                        ${Components.FeatureCard('zap', 'Instant Feedback', 'Real-time explanations and guided problem solving.', 'color-studytech')}
+                    </div>
+
+                    <h2 class="reveal" style="margin-top: 4rem;">StudyTech Subscriptions</h2>
+                    <div class="pricing-grid" style="margin-top: 2rem;">
+                        <div class="pricing-card reveal">
+                            <h3>Monthly</h3>
+                            <div class="price">$19.99<span>/mo</span></div>
+                            <ul class="pricing-features">
+                                <li><i data-lucide="check"></i> Unlimited AI tutoring sessions</li>
+                                <li><i data-lucide="check"></i> All subjects included</li>
+                                <li><i data-lucide="check"></i> Progress tracking</li>
+                                <li><i data-lucide="check"></i> Cancel anytime</li>
+                            </ul>
+                            <button class="btn btn-secondary add-to-cart-btn" data-product-id="10" style="width: 100%;">Subscribe Monthly</button>
+                        </div>
+                        <div class="pricing-card featured reveal">
+                            <h3>Annual</h3>
+                            <div class="price">$149.99<span>/yr</span></div>
+                            <ul class="pricing-features">
+                                <li><i data-lucide="check"></i> Everything in Monthly</li>
+                                <li><i data-lucide="check"></i> Advanced analytics</li>
+                                <li><i data-lucide="check"></i> Priority support</li>
+                                <li><i data-lucide="check"></i> Save $89.89/year</li>
+                            </ul>
+                            <button class="btn btn-primary add-to-cart-btn" data-product-id="11" style="width: 100%;">Subscribe Annually</button>
+                        </div>
+                        <div class="pricing-card reveal">
+                            <h3>Enterprise</h3>
+                            <div class="price">$999.99<span>/yr</span></div>
+                            <ul class="pricing-features">
+                                <li><i data-lucide="check"></i> Up to 100 students</li>
+                                <li><i data-lucide="check"></i> Admin dashboard</li>
+                                <li><i data-lucide="check"></i> Custom curriculum</li>
+                                <li><i data-lucide="check"></i> Dedicated support</li>
+                            </ul>
+                            <button class="btn btn-secondary add-to-cart-btn" data-product-id="12" style="width: 100%;">Get Enterprise</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        // ADMIN / LOGIN PAGE
+        'admin': () => `
+            <div class="auth-container">
+                <div class="auth-form reveal">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <i data-lucide="shield" style="width: 48px; height: 48px; color: var(--accent);"></i>
+                    </div>
+                    <h2 style="text-align: center;">Staff Portal</h2>
+                    <p style="text-align: center;">Access restricted to authorized personnel only.</p>
+                    
+                    <form onsubmit="event.preventDefault(); Router.handleLogin();">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="you@techr.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                            <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+                            Sign In
+                        </button>
+                    </form>
+                    
+                    <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-glass);">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">Need help?</p>
+                        <a href="mailto:support@techr.com" style="color: var(--accent); font-size: 0.9rem;">Contact IT Support</a>
+                    </div>
+                </div>
+                
+                <div class="card reveal" style="margin-top: 2rem; text-align: center;">
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">Looking for our products?</p>
+                    <a href="#techack" class="btn btn-secondary">Browse Catalog</a>
+                </div>
+            </div>
+        `,
+
+        // CHECKOUT PAGE
+        'checkout': () => {
+            const isSecure = window.location.protocol === 'https:';
+            const total = Store.getCartTotal();
+            
+            let alertHtml = '';
             if (!isSecure) {
                 alertHtml = `
-                    <div class="alert-box alert-error">
-                        <i data-lucide="alert-triangle"></i>
+                    <div class="alert-box alert-info">
+                        <i data-lucide="info"></i>
                         <div>
-                            <strong>Secure Environment Required</strong><br>
-                            Payments are disabled on Localhost. Deploy to GitHub Pages (HTTPS) to enable Square.
+                            <strong>Demo Mode Active</strong><br>
+                            Payments require HTTPS. Deploy to production or use GitHub Pages to enable live payments.
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (Store.cart.length === 0) {
+                return `
+                    <div class="container" style="padding-top: calc(var(--header-height) + 4rem);">
+                        <div class="checkout-container">
+                            <div class="card reveal" style="text-align: center; padding: 4rem 2rem;">
+                                <i data-lucide="shopping-cart" style="width: 64px; height: 64px; color: var(--text-secondary); margin-bottom: 1.5rem;"></i>
+                                <h2 style="margin-bottom: 1rem;">Your Cart is Empty</h2>
+                                <p style="margin-bottom: 2rem;">Looks like you haven't added any products yet.</p>
+                                <a href="#techack" class="btn btn-primary">Browse Products</a>
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
             return `
-                <div class="container" style="padding-top: 8rem;">
+                <div class="container" style="padding-top: calc(var(--header-height) + 3rem);">
                     <div class="checkout-container">
-                        <h2>Secure Checkout</h2>
+                        <h2 class="reveal" style="margin-bottom: 2rem;">Secure Checkout</h2>
                         ${alertHtml}
                         
-                        ${Store.cart.length === 0 ? '<div class="card">Your cart is empty.</div>' : `
-                            <div class="card" style="margin-bottom: 2rem;">
-                                ${Store.cart.map(item => `
-                                    <div style="display:flex; justify-content:space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle);">
-                                        <span>${item.name}</span>
-                                        <span class="price">$${item.price}</span>
-                                    </div>
-                                `).join('')}
-                                <div style="margin-top: 1rem; text-align: right; font-weight: 700; font-size: 1.25rem;">
-                                    Total: $${Store.cart.reduce((a, b) => a + parseFloat(b.price), 0).toFixed(2)}
-                                </div>
+                        <div class="card reveal" style="margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
+                                Order Summary
+                            </h3>
+                            ${Store.cart.map((item, i) => Components.CartItem(item, i)).join('')}
+                            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 1.1rem;">Total</span>
+                                <span class="price" style="font-size: 1.5rem;">$${total}</span>
                             </div>
+                        </div>
 
-                            <div class="card">
-                                <h3>Payment Details</h3>
-                                <div id="card-container" style="background: white; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; min-height: 50px;"></div>
-                                <button id="pay-btn" class="btn btn-primary" style="width: 100%;">Pay Now</button>
-                            </div>
-                            
-                            <div style="margin-top: 2rem;">
-                                <h4>Debug Console</h4>
-                                <pre id="debug-log" class="debug-log">Waiting for intialization...</pre>
-                            </div>
-                        `}
+                        <div class="card reveal">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
+                                Payment Details
+                            </h3>
+                            <div id="card-container"></div>
+                            <button id="pay-btn" class="btn btn-primary btn-lg" style="width: 100%;">
+                                <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
+                                Pay $${total}
+                            </button>
+                            <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 1rem;">
+                                <i data-lucide="shield-check" style="width: 14px; height: 14px; display: inline; vertical-align: middle;"></i>
+                                Payments secured by Square
+                            </p>
+                        </div>
+                        
+                        <details style="margin-top: 2rem;" class="reveal">
+                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 0.9rem;">Developer Console</summary>
+                            <pre id="debug-log" class="debug-log" style="margin-top: 1rem;">Awaiting payment initialization...</pre>
+                        </details>
                     </div>
                 </div>
             `;
-        }
-    }, // End Routes
+        },
+
+        // SUCCESS PAGE
+        'success': () => `
+            <div class="success-container reveal">
+                <div class="success-icon">
+                    <i data-lucide="check"></i>
+                </div>
+                <h1>Payment Successful!</h1>
+                <p style="font-size: 1.1rem; margin: 1.5rem 0;">
+                    Thank you for your order. You will receive a confirmation email shortly.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <a href="#/" class="btn btn-primary">Return Home</a>
+                    <a href="#techack" class="btn btn-secondary">Continue Shopping</a>
+                </div>
+            </div>
+        `
+    },
 
     init: () => {
         window.addEventListener('hashchange', Router.handleRoute);
-        Router.handleRoute();
     },
 
     handleRoute: async () => {
@@ -256,65 +664,169 @@ const Router = {
         const hash = window.location.hash.slice(1) || '/';
         const route = Router.routes[hash] || Router.routes['/'];
 
-        app.innerHTML = Components.Header();
-        app.innerHTML += await route();
+        // Scroll to top on route change
+        window.scrollTo(0, 0);
 
-        if (window.lucide) lucide.createIcons();
+        // Render content
+        const content = await route();
+        app.innerHTML = content;
+
+        // Initialize icons
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        // Update cart UI
+        Store.updateCartUI();
+
+        // Initialize reveal animations
         Router.observeReveal();
 
+        // Initialize checkout if on that page
         if (hash === 'checkout' && Store.cart.length > 0) {
-            Router.initCheckout(); // Explicit init
+            setTimeout(() => Router.initCheckout(), 100);
         }
     },
 
     observeReveal: () => {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             const observer = new IntersectionObserver(entries => {
-                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+                entries.forEach(e => { 
+                    if (e.isIntersecting) {
+                        e.target.classList.add('active');
+                    }
+                });
             }, { threshold: 0.1 });
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        }, 100);
+        });
+    },
+
+    handleLogin: () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        // Demo login - in production this would call Supabase Auth
+        if (email && password) {
+            alert('Login functionality requires backend integration. This is a demo.');
+        }
     },
 
     initCheckout: async () => {
+        const cardContainer = document.getElementById('card-container');
+        const payBtn = document.getElementById('pay-btn');
+        
+        if (!cardContainer || !payBtn) return;
+
         if (!window.Square) {
-            logger.error("Square SDK script not loaded in index.html");
+            logger.error("Square SDK not loaded");
+            cardContainer.innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>Payment SDK unavailable</span></div>`;
+            if (window.lucide) lucide.createIcons();
             return;
         }
 
         if (window.location.protocol !== 'https:') {
-            logger.error("Protocol violation: HTTPS required.");
-            document.getElementById('card-container').innerHTML = "<em>Payments Disabled (Insecure Origin)</em>";
-            document.getElementById('pay-btn').disabled = true;
+            logger.log("Demo mode: HTTPS required for live payments");
+            cardContainer.innerHTML = `
+                <div style="background: var(--bg-tertiary); border: 2px dashed var(--border-glass); border-radius: 8px; padding: 2rem; text-align: center;">
+                    <i data-lucide="credit-card" style="width: 32px; height: 32px; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                        Card input appears here in production (HTTPS required)
+                    </p>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+            
+            // Demo mode - simulate payment
+            payBtn.addEventListener('click', () => {
+                PayButton.setLoading(payBtn);
+                
+                setTimeout(() => {
+                    logger.log("Demo payment simulated successfully");
+                    Toast.success("Payment successful! Thank you for your order.");
+                    Store.clearCart();
+                    window.location.hash = '#success';
+                }, 2000);
+            });
             return;
         }
 
         try {
-            logger.log("Initializing Square...");
+            logger.log("Initializing Square Payments...");
             const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
             const card = await payments.card();
             await card.attach('#card-container');
-            logger.log("Card Element attached successfully.");
+            logger.log("Card element attached successfully");
 
-            document.getElementById('pay-btn').addEventListener('click', async () => {
+            payBtn.addEventListener('click', async () => {
+                PayButton.setLoading(payBtn);
+                
                 logger.log("Tokenizing card...");
                 const result = await card.tokenize();
+                
                 if (result.status === 'OK') {
-                    logger.log(`Success! Token: ${result.token}`);
-                    alert("Payment Successful (Sandbox)!");
+                    logger.log(`Token received: ${result.token.substring(0, 20)}...`);
+                    Toast.success("Payment successful! Thank you for your order.");
+                    // In production, send token to backend to complete payment
                     Store.clearCart();
+                    window.location.hash = '#success';
                 } else {
                     logger.error(result.errors[0].message);
-                    alert("Payment Failed: " + result.errors[0].message);
+                    PayButton.setReady(payBtn, Store.getCartTotal());
+                    Toast.error("Payment failed: " + result.errors[0].message);
                 }
             });
         } catch (e) {
             logger.error(`Square Exception: ${e.message}`);
+            cardContainer.innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>${e.message}</span></div>`;
+            if (window.lucide) lucide.createIcons();
         }
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    Store.init();
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', async () => {
+    await Store.init();
     Router.init();
+    Router.handleRoute();
+    Store.updateCartUI();
+    
+    // Event delegation for add to cart buttons
+    document.addEventListener('click', (e) => {
+        // Add to cart button
+        const addBtn = e.target.closest('.add-to-cart-btn');
+        if (addBtn) {
+            const productId = parseInt(addBtn.dataset.productId);
+            if (productId) {
+                Store.addToCart(productId);
+            }
+            return;
+        }
+        
+        // Remove from cart button
+        const removeBtn = e.target.closest('.remove-from-cart-btn');
+        if (removeBtn) {
+            const cartId = parseInt(removeBtn.dataset.cartId);
+            if (cartId) {
+                Store.removeFromCart(cartId);
+            }
+            return;
+        }
+        
+        // Mobile menu toggle
+        const mobileMenuBtn = e.target.closest('.mobile-menu-btn');
+        if (mobileMenuBtn) {
+            toggleMobileMenu();
+            return;
+        }
+    });
+    
+    // Form submission handler for login
+    document.addEventListener('submit', (e) => {
+        if (e.target.closest('.auth-form')) {
+            e.preventDefault();
+            Router.handleLogin();
+        }
+    });
+    
+    console.log("[TechR] Application initialized");
 });
