@@ -4,15 +4,8 @@
 */
 
 // --- CONFIGURATION ---
-// Firebase Configuration - Replace with your own Firebase project config
-const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyDExample-ReplaceWithYourKey",
-    authDomain: "techr-innovations.firebaseapp.com",
-    projectId: "techr-innovations",
-    storageBucket: "techr-innovations.firebasestorage.app",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:abcdef1234567890"
-};
+const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 
 // =====================================================
 // STRIPE CONFIGURATION
@@ -106,42 +99,29 @@ const logger = {
     }
 };
 
-// --- FIREBASE INIT ---
-let db;
-let storage;
-let firebaseAuth;
+// --- SUPABASE INIT ---
+let supabase;
 try {
-    if (window.firebase) {
-        const app = firebase.initializeApp(FIREBASE_CONFIG);
-        db = firebase.firestore();
-        storage = firebase.storage();
-        firebaseAuth = firebase.auth();
-        console.log("[TechR] Firebase Online");
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("[TechR] Supabase Online");
     }
 } catch (e) {
-    console.warn("[TechR] Firebase Init Failed - using fallback data");
+    console.warn("[TechR] Supabase Init Failed - using fallback data");
 }
 
 // --- REAL-TIME SYNC ---
 function initRealtimeSync() {
-    if (!db) return;
+    if (!supabase) return;
     try {
-        db.collection('products').onSnapshot((snapshot) => {
-            if (snapshot.metadata.hasPendingWrites) return;
-            const products = [];
-            snapshot.forEach(doc => {
-                products.push({ id: doc.id, ...doc.data() });
-            });
-            if (products.length > 0) {
-                Store.products = products;
-                Store.syncMode = 'firebase';
-                Store.lastSynced = new Date();
-                Router.handleRoute();
+        supabase.channel('products-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
                 console.log('[TechR] Real-time update received');
-            }
-        }, (error) => {
-            console.warn('[TechR] Real-time sync error:', error);
-        });
+                await Store.fetchProducts();
+                Router.handleRoute();
+                Toast.info('Products updated in real-time');
+            })
+            .subscribe();
         console.log('[TechR] Real-time sync enabled');
     } catch(e) {
         console.warn('[TechR] Real-time sync unavailable');
@@ -175,7 +155,7 @@ const DEFAULT_PRODUCTS = [
 const Store = {
     products: [],
     cart: [],
-    syncMode: 'local', // 'firebase' or 'local'
+    syncMode: 'local', // 'supabase' or 'local'
     lastSynced: null,
 
     init: async () => {
@@ -192,15 +172,11 @@ const Store = {
 
     fetchProducts: async () => {
         try {
-            if (db) {
-                const snapshot = await db.collection('products').get();
-                if (!snapshot.empty) {
-                    const data = [];
-                    snapshot.forEach(doc => {
-                        data.push({ id: doc.id, ...doc.data() });
-                    });
+            if (supabase) {
+                const { data, error } = await supabase.from('products').select('*');
+                if (!error && data && data.length > 0) {
                     Store.products = data;
-                    Store.syncMode = 'firebase';
+                    Store.syncMode = 'supabase';
                     Store.lastSynced = new Date();
                     return;
                 }
@@ -421,35 +397,20 @@ const Admin = {
     importJSON: (file) => {
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = async (e) => {
+        reader.onload = (e) => {
             try {
                 const imported = JSON.parse(e.target.result);
                 if (!Array.isArray(imported)) { Toast.error('Invalid JSON format: expected an array'); return; }
                 let count = 0;
-                if (db && Store.syncMode === 'firebase') {
-                    const batch = db.batch();
-                    imported.forEach(p => {
-                        if (p.name && p.price != null && p.category) {
-                            if (!p.status) p.status = 'active';
-                            const docRef = db.collection('products').doc();
-                            const { id, ...productData } = p;
-                            batch.set(docRef, productData);
-                            count++;
-                        }
-                    });
-                    await batch.commit();
-                    await Store.fetchProducts();
-                } else {
-                    imported.forEach(p => {
-                        if (p.name && p.price != null && p.category) {
-                            p.id = Date.now() + Math.floor(Math.random() * 10000) + count;
-                            if (!p.status) p.status = 'active';
-                            Store.products.push(p);
-                            count++;
-                        }
-                    });
-                    Store.persistProducts();
-                }
+                imported.forEach(p => {
+                    if (p.name && p.price != null && p.category) {
+                        p.id = Date.now() + Math.floor(Math.random() * 10000) + count;
+                        if (!p.status) p.status = 'active';
+                        Store.products.push(p);
+                        count++;
+                    }
+                });
+                Store.persistProducts();
                 Admin.logActivity('Imported ' + count + ' products from JSON');
                 Toast.success('Imported ' + count + ' products');
                 Router.handleRoute();
@@ -460,52 +421,29 @@ const Admin = {
         reader.readAsText(file);
     },
 
-    duplicateProduct: async (id) => {
-        const product = Store.products.find(p => String(p.id) === String(id));
+    duplicateProduct: (id) => {
+        const product = Store.products.find(p => p.id === id);
         if (!product) return;
         const clone = JSON.parse(JSON.stringify(product));
-        delete clone.id;
+        clone.id = Date.now() + Math.floor(Math.random() * 1000);
         clone.name = product.name + ' (Copy)';
-        try {
-            if (db && Store.syncMode === 'firebase') {
-                await db.collection('products').add(clone);
-                await Store.fetchProducts();
-            } else {
-                clone.id = Date.now() + Math.floor(Math.random() * 1000);
-                Store.products.push(clone);
-                Store.persistProducts();
-            }
-            Admin.logActivity('Duplicated product: ' + product.name);
-            Toast.success('Product duplicated');
-            Router.handleRoute();
-        } catch(e) {
-            Toast.error('Duplicate failed: ' + e.message);
-        }
+        Store.products.push(clone);
+        Store.persistProducts();
+        Admin.logActivity('Duplicated product: ' + product.name);
+        Toast.success('Product duplicated');
+        Router.handleRoute();
     },
 
-    bulkDelete: async () => {
+    bulkDelete: () => {
         if (Admin.selectedProducts.length === 0) { Toast.error('No products selected'); return; }
         if (!confirm('Delete ' + Admin.selectedProducts.length + ' selected products?')) return;
         const count = Admin.selectedProducts.length;
-        try {
-            if (db && Store.syncMode === 'firebase') {
-                const batch = db.batch();
-                Admin.selectedProducts.forEach(id => {
-                    batch.delete(db.collection('products').doc(String(id)));
-                });
-                await batch.commit();
-                await Store.fetchProducts();
-            } else {
-                Store.products = Store.products.filter(p => !Admin.selectedProducts.includes(p.id));
-                Store.persistProducts();
-            }
-            Admin.logActivity('Bulk deleted ' + count + ' products');
-            Admin.selectedProducts = [];
-            Toast.success(count + ' products deleted');
-            Router.handleRoute();
-        } catch(e) {
-            Toast.error('Bulk delete failed: ' + e.message);
-        }
+        Store.products = Store.products.filter(p => !Admin.selectedProducts.includes(p.id));
+        Store.persistProducts();
+        Admin.logActivity('Bulk deleted ' + count + ' products');
+        Admin.selectedProducts = [];
+        Toast.success(count + ' products deleted');
+        Router.handleRoute();
     },
 
     toggleProductSelection: (id) => {
@@ -532,25 +470,18 @@ const Admin = {
         Admin.viewMode = Admin.viewMode === 'grid' ? 'list' : 'grid';
     },
 
-    quickEditPrice: async (id) => {
-        const product = Store.products.find(p => String(p.id) === String(id));
+    quickEditPrice: (id) => {
+        const product = Store.products.find(p => p.id === id);
         if (!product) return;
         const newPrice = prompt('Enter new price for "' + product.name + '":', product.price);
         if (newPrice === null) return;
         const parsed = parseFloat(newPrice);
         if (isNaN(parsed) || parsed < 0) { Toast.error('Invalid price'); return; }
         product.price = parsed;
-        try {
-            if (db && Store.syncMode === 'firebase') {
-                await db.collection('products').doc(String(id)).update({ price: parsed });
-            }
-            Store.persistProducts();
-            Admin.logActivity('Quick-edited price of ' + product.name + ' to $' + parsed.toFixed(2));
-            Toast.success('Price updated to $' + parsed.toFixed(2));
-            Router.handleRoute();
-        } catch(e) {
-            Toast.error('Price update failed: ' + e.message);
-        }
+        Store.persistProducts();
+        Admin.logActivity('Quick-edited price of ' + product.name + ' to $' + parsed.toFixed(2));
+        Toast.success('Price updated to $' + parsed.toFixed(2));
+        Router.handleRoute();
     },
 
     addNote: (id) => {
@@ -628,48 +559,15 @@ const Admin = {
             Toast.error('Image must be under 5MB');
             return;
         }
-
-        if (storage && Store.syncMode === 'firebase') {
-            // Upload to Firebase Storage for cross-device sync
-            const fileName = `products/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-            const storageRef = storage.ref(fileName);
-            const uploadTask = storageRef.put(file);
-            Toast.info('Uploading image...');
-            uploadTask.on('state_changed',
-                null,
-                (error) => {
-                    console.error('[TechR] Upload failed:', error);
-                    Toast.error('Image upload failed, saving locally');
-                    // Fallback to base64
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const dataUrl = e.target.result;
-                        const urlInput = document.getElementById('product-image');
-                        if (urlInput) urlInput.value = dataUrl;
-                        Admin.previewImage(dataUrl);
-                    };
-                    reader.readAsDataURL(file);
-                },
-                async () => {
-                    const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                    const urlInput = document.getElementById('product-image');
-                    if (urlInput) urlInput.value = downloadURL;
-                    Admin.previewImage(downloadURL);
-                    Toast.success('Image uploaded successfully');
-                }
-            );
-        } else {
-            // Fallback: base64 for local-only mode
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const dataUrl = e.target.result;
-                const urlInput = document.getElementById('product-image');
-                if (urlInput) urlInput.value = dataUrl;
-                Admin.previewImage(dataUrl);
-                Toast.success('Image uploaded successfully');
-            };
-            reader.readAsDataURL(file);
-        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            const urlInput = document.getElementById('product-image');
+            if (urlInput) urlInput.value = dataUrl;
+            Admin.previewImage(dataUrl);
+            Toast.success('Image uploaded successfully');
+        };
+        reader.readAsDataURL(file);
     },
 
     handleAdditionalImages: (files) => {
@@ -678,37 +576,12 @@ const Admin = {
         Array.from(files).forEach(file => {
             if (!file.type.startsWith('image/')) return;
             if (file.size > 5 * 1024 * 1024) return;
-
-            if (storage && Store.syncMode === 'firebase') {
-                const fileName = `products/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-                const storageRef = storage.ref(fileName);
-                const uploadTask = storageRef.put(file);
-                uploadTask.on('state_changed',
-                    null,
-                    (error) => {
-                        console.error('[TechR] Additional image upload failed:', error);
-                        // Fallback to base64
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            Admin.pendingImages.push(e.target.result);
-                            Admin.renderAdditionalPreviews();
-                        };
-                        reader.readAsDataURL(file);
-                    },
-                    async () => {
-                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                        Admin.pendingImages.push(downloadURL);
-                        Admin.renderAdditionalPreviews();
-                    }
-                );
-            } else {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    Admin.pendingImages.push(e.target.result);
-                    Admin.renderAdditionalPreviews();
-                };
-                reader.readAsDataURL(file);
-            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                Admin.pendingImages.push(e.target.result);
+                Admin.renderAdditionalPreviews();
+            };
+            reader.readAsDataURL(file);
         });
     },
 
@@ -775,19 +648,21 @@ const Admin = {
         };
 
         try {
-            let usedFirebase = false;
-            if (db && Store.syncMode === 'firebase') {
+            let usedSupabase = false;
+            if (supabase && Store.syncMode === 'supabase') {
                 if (editId) {
-                    await db.collection('products').doc(editId).update(productData);
+                    const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
+                    if (error) throw error;
                 } else {
-                    await db.collection('products').add(productData);
+                    const { error } = await supabase.from('products').insert([productData]);
+                    if (error) throw error;
                 }
-                usedFirebase = true;
+                usedSupabase = true;
                 await Store.fetchProducts();
             } else {
                 // Local storage mode
                 if (editId) {
-                    const idx = Store.products.findIndex(p => String(p.id) === String(editId));
+                    const idx = Store.products.findIndex(p => p.id === parseInt(editId));
                     if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
                 } else {
                     productData.id = Date.now() + Math.floor(Math.random() * 1000);
@@ -797,7 +672,7 @@ const Admin = {
                 Store.lastSynced = new Date();
             }
             Admin.closeModal();
-            const modeLabel = usedFirebase ? ' (synced to cloud)' : ' (saved locally)';
+            const modeLabel = usedSupabase ? ' (synced to cloud)' : ' (saved locally)';
             const actionMsg = editId ? 'Product updated: ' + productData.name : 'Product added: ' + productData.name;
             Admin.logActivity(actionMsg);
             Toast.success((editId ? 'Product updated!' : 'Product added!') + modeLabel);
@@ -809,14 +684,15 @@ const Admin = {
 
     deleteProduct: async (id) => {
         if (!confirm('Delete this product?')) return;
-        const product = Store.products.find(p => String(p.id) === String(id));
+        const product = Store.products.find(p => p.id === id);
         const productName = product ? product.name : 'Unknown';
         try {
-            if (db && Store.syncMode === 'firebase') {
-                await db.collection('products').doc(String(id)).delete();
+            if (supabase && Store.syncMode === 'supabase') {
+                const { error } = await supabase.from('products').delete().eq('id', id);
+                if (error) throw error;
                 await Store.fetchProducts();
             } else {
-                Store.products = Store.products.filter(p => String(p.id) !== String(id));
+                Store.products = Store.products.filter(p => p.id !== id);
                 Store.persistProducts();
                 Store.lastSynced = new Date();
             }
@@ -832,7 +708,7 @@ const Admin = {
         Toast.info('Refreshing products...');
         await Store.fetchProducts();
         Store.lastSynced = new Date();
-        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'firebase' ? 'Cloud' : 'Local'));
+        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'supabase' ? 'Cloud' : 'Local'));
         Router.handleRoute();
     }
 };
@@ -1209,9 +1085,9 @@ const Router = {
             const totalRevenue = allProducts.reduce((s, p) => s + p.price, 0).toFixed(2);
             const activeCount = allProducts.filter(p => (p.status || 'active') === 'active').length;
             const lowStockCount = 0;
-            const syncIcon = Store.syncMode === 'firebase' ? 'cloud' : 'hard-drive';
-            const syncLabel = Store.syncMode === 'firebase' ? 'Cloud Synced' : 'Local Storage';
-            const syncColor = Store.syncMode === 'firebase' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
+            const syncIcon = Store.syncMode === 'supabase' ? 'cloud' : 'hard-drive';
+            const syncLabel = Store.syncMode === 'supabase' ? 'Cloud Synced' : 'Local Storage';
+            const syncColor = Store.syncMode === 'supabase' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
             const lastSync = Store.lastSynced ? Store.lastSynced.toLocaleTimeString() : 'Never';
             const tab = Admin.activeTab || 'overview';
             const themeClass = Admin.adminTheme === 'light' ? 'admin-theme-light' : '';
@@ -2128,17 +2004,16 @@ const Router = {
         const password = document.getElementById('password')?.value;
         if (!email || !password) { Toast.error('Please enter email and password'); return; }
         try {
-            if (!firebaseAuth) { Toast.error('Database connection unavailable'); return; }
-            const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-            if (userCredential.user) {
-                Toast.success('Welcome back!');
-                window.location.hash = '#dashboard';
-            }
+            if (!supabase) { Toast.error('Database connection unavailable'); return; }
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { Toast.error(error.message); return; }
+            Toast.success('Welcome back!');
+            window.location.hash = '#dashboard';
         } catch(e) { Toast.error('Login failed: ' + e.message); }
     },
 
     handleLogout: async () => {
-        if (firebaseAuth) { await firebaseAuth.signOut(); }
+        if (supabase) { await supabase.auth.signOut(); }
         Toast.info('Signed out');
         window.location.hash = '#admin';
     },
