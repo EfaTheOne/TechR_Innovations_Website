@@ -420,7 +420,7 @@ const Router = {
             // SQUARE PAYMENTS CONFIGURATION
             // REPLACE WITH YOUR REAL SANDBOX CREDENTIALS
             const appId = 'sandbox-sq0idb-baAQrwCn8BjaayFVRoDUJA';
-            const locationId = 'L0Y991888847';
+            const locationId = 'LHWBP0QGBDD1G';
 
             try {
                 if (!window.Square) throw new Error("Square SDK not loaded");
