@@ -128,10 +128,35 @@ function initRealtimeSync() {
     }
 }
 
+// --- DEFAULT PRODUCTS ---
+const DEFAULT_PRODUCTS = [
+    // Techack Products
+    { id: 1, name: "Techack1 Pro", price: 499.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techack", desc: "Enterprise-grade portable pentesting framework with WiFi 6 and Bluetooth 5.2 capabilities." },
+    { id: 2, name: "Techack1 Lite", price: 299.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", category: "techack", desc: "Compact security testing device for educational and professional use." },
+    { id: 3, name: "Techack Network Probe", price: 149.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", category: "techack", desc: "Passive network analysis tool with real-time packet inspection." },
+    
+    // TechBox Products
+    { id: 4, name: "TechBox Starter Kit", price: 79.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", category: "techbox", desc: "Complete STEM electronics kit with Arduino-compatible microcontroller and 50+ components." },
+    { id: 5, name: "TechBox Advanced", price: 149.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", category: "techbox", desc: "Advanced robotics and IoT development platform with sensor arrays." },
+    { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
+    
+    // Rithim Products
+    { id: 7, name: "Rithim Classic Tee", price: 34.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", category: "rithim", desc: "Premium cotton crew neck tee with embroidered Rithim logo. Available in all sizes." },
+    { id: 8, name: "Rithim Hoodie", price: 64.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", category: "rithim", desc: "Heavyweight fleece hoodie with kangaroo pocket and Rithim branding. Perfect for everyday wear." },
+    { id: 9, name: "Rithim Joggers", price: 49.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Soft cotton blend." },
+
+    // StudyTech Products
+    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
+    { id: 11, name: "StudyTech AI Tutor - Annual", price: 149.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", category: "studytech", desc: "Full year of AI tutoring with advanced analytics and progress tracking." },
+    { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
+];
+
 // --- STORE & STATE ---
 const Store = {
     products: [],
     cart: [],
+    syncMode: 'local', // 'supabase' or 'local'
+    lastSynced: null,
 
     init: async () => {
         const savedCart = localStorage.getItem('techr_cart_v3');
@@ -151,35 +176,46 @@ const Store = {
                 const { data, error } = await supabase.from('products').select('*');
                 if (!error && data && data.length > 0) {
                     Store.products = data;
+                    Store.syncMode = 'supabase';
+                    Store.lastSynced = new Date();
                     return;
                 }
             }
         } catch (e) { 
-            console.warn("[TechR] Database unavailable, using fallback inventory");
+            console.warn("[TechR] Database unavailable, using local storage");
         }
 
-        // Comprehensive Fallback Inventory
-        Store.products = [
-            // Techack Products
-            { id: 1, name: "Techack1 Pro", price: 499.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techack", desc: "Enterprise-grade portable pentesting framework with WiFi 6 and Bluetooth 5.2 capabilities." },
-            { id: 2, name: "Techack1 Lite", price: 299.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", category: "techack", desc: "Compact security testing device for educational and professional use." },
-            { id: 3, name: "Techack Network Probe", price: 149.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", category: "techack", desc: "Passive network analysis tool with real-time packet inspection." },
-            
-            // TechBox Products
-            { id: 4, name: "TechBox Starter Kit", price: 79.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", category: "techbox", desc: "Complete STEM electronics kit with Arduino-compatible microcontroller and 50+ components." },
-            { id: 5, name: "TechBox Advanced", price: 149.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", category: "techbox", desc: "Advanced robotics and IoT development platform with sensor arrays." },
-            { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
-            
-            // Rithim Products
-            { id: 7, name: "Rithim Classic Tee", price: 34.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", category: "rithim", desc: "Premium cotton crew neck tee with embroidered Rithim logo. Available in all sizes." },
-            { id: 8, name: "Rithim Hoodie", price: 64.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", category: "rithim", desc: "Heavyweight fleece hoodie with kangaroo pocket and Rithim branding. Perfect for everyday wear." },
-            { id: 9, name: "Rithim Joggers", price: 49.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Soft cotton blend." },
+        // Try loading from localStorage first (persisted local edits)
+        Store.syncMode = 'local';
+        const savedProducts = localStorage.getItem('techr_products_v1');
+        if (savedProducts) {
+            try {
+                Store.products = JSON.parse(savedProducts);
+                Store.lastSynced = new Date();
+                return;
+            } catch (e) {
+                console.warn("[TechR] Failed to parse saved products");
+            }
+        }
 
-            // StudyTech Products
-            { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
-            { id: 11, name: "StudyTech AI Tutor - Annual", price: 149.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", category: "studytech", desc: "Full year of AI tutoring with advanced analytics and progress tracking." },
-            { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
-        ];
+        // Fall back to default inventory
+        Store.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        Store.persistProducts();
+        Store.lastSynced = new Date();
+    },
+
+    persistProducts: () => {
+        if (Store.syncMode === 'local') {
+            localStorage.setItem('techr_products_v1', JSON.stringify(Store.products));
+        }
+    },
+
+    resetToDefaults: () => {
+        Store.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        Store.persistProducts();
+        Store.lastSynced = new Date();
+        Toast.success('Products reset to defaults');
+        Router.handleRoute();
     },
 
     getProductsByCategory: (category) => {
@@ -339,7 +375,8 @@ const Admin = {
         };
 
         try {
-            if (supabase) {
+            let usedSupabase = false;
+            if (supabase && Store.syncMode === 'supabase') {
                 if (editId) {
                     const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
                     if (error) throw error;
@@ -347,8 +384,10 @@ const Admin = {
                     const { error } = await supabase.from('products').insert([productData]);
                     if (error) throw error;
                 }
+                usedSupabase = true;
+                await Store.fetchProducts();
             } else {
-                // Fallback: local only
+                // Local storage mode
                 if (editId) {
                     const idx = Store.products.findIndex(p => p.id === parseInt(editId));
                     if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
@@ -356,10 +395,12 @@ const Admin = {
                     productData.id = Date.now() + Math.floor(Math.random() * 1000);
                     Store.products.push(productData);
                 }
+                Store.persistProducts();
+                Store.lastSynced = new Date();
             }
-            await Store.fetchProducts();
             Admin.closeModal();
-            Toast.success(editId ? 'Product updated!' : 'Product added!');
+            const modeLabel = usedSupabase ? ' (synced to cloud)' : ' (saved locally)';
+            Toast.success((editId ? 'Product updated!' : 'Product added!') + modeLabel);
             Router.handleRoute();
         } catch(e) {
             Toast.error('Save failed: ' + e.message);
@@ -369,18 +410,28 @@ const Admin = {
     deleteProduct: async (id) => {
         if (!confirm('Delete this product?')) return;
         try {
-            if (supabase) {
+            if (supabase && Store.syncMode === 'supabase') {
                 const { error } = await supabase.from('products').delete().eq('id', id);
                 if (error) throw error;
+                await Store.fetchProducts();
             } else {
                 Store.products = Store.products.filter(p => p.id !== id);
+                Store.persistProducts();
+                Store.lastSynced = new Date();
             }
-            await Store.fetchProducts();
             Toast.success('Product deleted');
             Router.handleRoute();
         } catch(e) {
             Toast.error('Delete failed: ' + e.message);
         }
+    },
+
+    refreshProducts: async () => {
+        Toast.info('Refreshing products...');
+        await Store.fetchProducts();
+        Store.lastSynced = new Date();
+        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'supabase' ? 'Cloud' : 'Local'));
+        Router.handleRoute();
     }
 };
 window.Admin = Admin;
@@ -426,9 +477,9 @@ const Components = {
             </div>
             <div class="cart-item-actions" style="display: flex; align-items: center; gap: 1rem;">
                 <div class="qty-controls">
-                    <button onclick="Store.updateQuantity(${item.cartId}, -1)" title="Decrease quantity" aria-label="Decrease quantity">\u2212</button>
+                    <button data-action="update-qty" data-cart-id="${item.cartId}" data-delta="-1" title="Decrease quantity" aria-label="Decrease quantity">\u2212</button>
                     <span>${item.quantity || 1}</span>
-                    <button onclick="Store.updateQuantity(${item.cartId}, 1)" title="Increase quantity">+</button>
+                    <button data-action="update-qty" data-cart-id="${item.cartId}" data-delta="1" title="Increase quantity">+</button>
                 </div>
                 <span class="cart-item-total">$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</span>
                 <button class="remove-btn remove-from-cart-btn" data-cart-id="${item.cartId}" title="Remove item" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 0.5rem;">
@@ -690,7 +741,7 @@ const Router = {
                     <h2 style="text-align: center;">Staff Portal</h2>
                     <p style="text-align: center;">Access restricted to authorized personnel only.</p>
                     
-                    <form onsubmit="event.preventDefault(); Router.handleLogin();">
+                    <form id="login-form">
                         <div class="form-group">
                             <label for="email">Email Address</label>
                             <input type="email" id="email" placeholder="you@techr.com" required>
@@ -730,6 +781,10 @@ const Router = {
             });
             const categories = [...new Set(allProducts.map(p => p.category))];
             const avgPrice = allProducts.length > 0 ? (allProducts.reduce((s, p) => s + p.price, 0) / allProducts.length).toFixed(2) : '0.00';
+            const syncIcon = Store.syncMode === 'supabase' ? 'cloud' : 'hard-drive';
+            const syncLabel = Store.syncMode === 'supabase' ? 'Cloud Synced' : 'Local Storage';
+            const syncColor = Store.syncMode === 'supabase' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
+            const lastSync = Store.lastSynced ? Store.lastSynced.toLocaleTimeString() : 'Never';
 
             return `
                 <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
@@ -738,13 +793,28 @@ const Router = {
                             <h1 style="font-size: 2.5rem;">Admin Dashboard</h1>
                             <p>Manage products and inventory</p>
                         </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <button class="btn btn-primary" onclick="Admin.showAddModal()">
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                            <button class="btn btn-primary" data-action="add-product">
                                 <i data-lucide="plus" style="width: 18px; height: 18px;"></i> Add Product
                             </button>
-                            <button class="btn btn-secondary" onclick="Router.handleLogout()">
+                            <button class="btn btn-secondary" data-action="refresh-products">
+                                <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i> Refresh
+                            </button>
+                            <button class="btn btn-secondary" data-action="logout">
                                 <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Sign Out
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Sync Status Banner -->
+                    <div class="admin-sync-banner reveal" style="background: ${syncColor}; color: white; padding: 0.75rem 1.25rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="${syncIcon}" style="width: 18px; height: 18px;"></i>
+                            <strong>${syncLabel}</strong>
+                            <span style="opacity: 0.85; font-size: 0.85rem;">&mdash; Last synced: ${lastSync}</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            ${Store.syncMode === 'local' ? '<button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 0.8rem; padding: 0.35rem 0.75rem;" data-action="reset-defaults">Reset to Defaults</button>' : ''}
                         </div>
                     </div>
 
@@ -768,33 +838,42 @@ const Router = {
                     </div>
 
                     <div class="admin-search-bar reveal">
-                        <input type="text" id="admin-search" placeholder="Search products by name..." value="${Admin.filterSearch || ''}" oninput="Admin.filterSearch = this.value; Router.handleRoute();">
-                        <select id="admin-category-filter" onchange="Admin.filterCategory = this.value; Router.handleRoute();">
+                        <input type="text" id="admin-search" placeholder="Search products by name or category..." value="${Admin.filterSearch || ''}">
+                        <select id="admin-category-filter">
                             <option value="">All Categories</option>
                             ${categories.map(c => `<option value="${c}" ${filterCat === c ? 'selected' : ''}>${c}</option>`).join('')}
                         </select>
                     </div>
 
-                    <div class="admin-products-grid reveal">
-                        ${products.map(p => `
-                            <div class="admin-product-card">
-                                <img src="${p.image}" alt="${p.name}" class="admin-product-img">
-                                <div class="admin-product-info">
-                                    <h3>${p.name}</h3>
-                                    <span class="badge badge-${p.category}" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">${p.category}</span>
-                                    <p class="admin-product-price">$${p.price.toFixed(2)}</p>
+                    ${products.length === 0 ? `
+                        <div class="card reveal" style="text-align: center; padding: 3rem 2rem;">
+                            <i data-lucide="package-x" style="width: 48px; height: 48px; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                            <h3 style="margin-bottom: 0.5rem;">No Products Found</h3>
+                            <p style="color: var(--text-secondary);">${searchTerm || filterCat ? 'Try adjusting your search or filter.' : 'Add your first product to get started.'}</p>
+                        </div>
+                    ` : `
+                        <div class="admin-products-grid reveal">
+                            ${products.map(p => `
+                                <div class="admin-product-card">
+                                    <img src="${p.image}" alt="${p.name}" class="admin-product-img">
+                                    <div class="admin-product-info">
+                                        <h3>${p.name}</h3>
+                                        <span class="badge badge-${p.category}" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">${p.category}</span>
+                                        <p class="admin-product-desc">${p.desc}</p>
+                                        <p class="admin-product-price">$${p.price.toFixed(2)}</p>
+                                    </div>
+                                    <div class="admin-product-actions">
+                                        <button class="btn btn-secondary btn-sm" data-action="edit-product" data-product-id="${p.id}">
+                                            <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-action="delete-product" data-product-id="${p.id}">
+                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="admin-product-actions">
-                                    <button class="btn btn-secondary btn-sm" onclick="Admin.showEditModal(${p.id})">
-                                        <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Edit
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="Admin.deleteProduct(${p.id})">
-                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
-                                    </button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
+                            `).join('')}
+                        </div>
+                    `}
 
                     <hr class="admin-section-divider">
 
@@ -803,17 +882,17 @@ const Router = {
                         <div class="settings-form">
                             <div class="form-group">
                                 <label for="site-title">Site Title</label>
-                                <input type="text" id="site-title" value="${Admin.siteSettings.title}" onchange="Admin.siteSettings.title = this.value;">
+                                <input type="text" id="site-title" value="${Admin.siteSettings.title}">
                             </div>
                             <div class="form-group">
                                 <label for="site-desc">Site Description</label>
-                                <textarea id="site-desc" rows="2" onchange="Admin.siteSettings.description = this.value;">${Admin.siteSettings.description}</textarea>
+                                <textarea id="site-desc" rows="2">${Admin.siteSettings.description}</textarea>
                             </div>
                             <div class="form-group">
                                 <label for="site-email">Contact Email</label>
-                                <input type="email" id="site-email" value="${Admin.siteSettings.email}" onchange="Admin.siteSettings.email = this.value;">
+                                <input type="email" id="site-email" value="${Admin.siteSettings.email}">
                             </div>
-                            <button class="btn btn-primary" onclick="Toast.success('Site settings saved!');">
+                            <button class="btn btn-primary" data-action="save-settings">
                                 <i data-lucide="save" style="width: 16px; height: 16px;"></i> Save Settings
                             </button>
                         </div>
@@ -832,32 +911,34 @@ const Router = {
                     <div class="modal-content">
                         <div class="modal-header">
                             <h2 id="modal-title">Add Product</h2>
-                            <button class="modal-close" onclick="Admin.closeModal()">
+                            <button class="modal-close" data-action="close-modal">
                                 <i data-lucide="x" style="width: 24px; height: 24px;"></i>
                             </button>
                         </div>
-                        <form id="product-form" onsubmit="event.preventDefault(); Admin.saveProduct();">
+                        <form id="product-form">
                             <input type="hidden" id="product-edit-id">
                             <div class="form-group">
                                 <label for="product-name">Product Name</label>
                                 <input type="text" id="product-name" placeholder="Product name" required>
                             </div>
-                            <div class="form-group">
-                                <label for="product-price">Price ($)</label>
-                                <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="product-category">Category</label>
-                                <select id="product-category" required>
-                                    <option value="techack">Techack</option>
-                                    <option value="techbox">TechBox</option>
-                                    <option value="rithim">Rithim</option>
-                                    <option value="studytech">StudyTech</option>
-                                </select>
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="product-price">Price ($)</label>
+                                    <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product-category">Category</label>
+                                    <select id="product-category" required>
+                                        <option value="techack">Techack</option>
+                                        <option value="techbox">TechBox</option>
+                                        <option value="rithim">Rithim</option>
+                                        <option value="studytech">StudyTech</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="product-image">Image URL</label>
-                                <input type="url" id="product-image" placeholder="https://images.unsplash.com/..." required oninput="Admin.previewImage(this.value)">
+                                <input type="url" id="product-image" placeholder="https://images.unsplash.com/..." required>
                                 <img id="image-preview" class="image-preview" style="display: none;">
                             </div>
                             <div class="form-group">
@@ -977,7 +1058,7 @@ const Router = {
                                     <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
                                     Order Summary
                                 </h3>
-                                <button class="cart-clear-btn" onclick="Store.clearCart(); Router.handleRoute();">
+                                <button class="cart-clear-btn" data-action="clear-cart">
                                     <i data-lucide="trash" style="width: 14px; height: 14px;"></i>
                                     Clear Cart
                                 </button>
@@ -1296,8 +1377,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     Store.updateCartUI();
     initRealtimeSync();
     
-    // Event delegation for add to cart buttons
+    // Event delegation for all interactive elements
     document.addEventListener('click', (e) => {
+        // Data-action buttons (admin dashboard, cart, etc.)
+        const actionBtn = e.target.closest('[data-action]');
+        if (actionBtn) {
+            const action = actionBtn.dataset.action;
+            switch (action) {
+                case 'add-product':
+                    Admin.showAddModal();
+                    break;
+                case 'edit-product':
+                    Admin.showEditModal(parseInt(actionBtn.dataset.productId));
+                    break;
+                case 'delete-product':
+                    Admin.deleteProduct(parseInt(actionBtn.dataset.productId));
+                    break;
+                case 'refresh-products':
+                    Admin.refreshProducts();
+                    break;
+                case 'logout':
+                    Router.handleLogout();
+                    break;
+                case 'close-modal':
+                    Admin.closeModal();
+                    break;
+                case 'save-settings':
+                    const titleEl = document.getElementById('site-title');
+                    const descEl = document.getElementById('site-desc');
+                    const emailEl = document.getElementById('site-email');
+                    if (titleEl) Admin.siteSettings.title = titleEl.value;
+                    if (descEl) Admin.siteSettings.description = descEl.value;
+                    if (emailEl) Admin.siteSettings.email = emailEl.value;
+                    Toast.success('Site settings saved!');
+                    break;
+                case 'reset-defaults':
+                    if (confirm('Reset all products to defaults? This will remove any changes you have made.')) {
+                        Store.resetToDefaults();
+                    }
+                    break;
+                case 'clear-cart':
+                    Store.clearCart();
+                    Router.handleRoute();
+                    break;
+                case 'update-qty':
+                    Store.updateQuantity(parseFloat(actionBtn.dataset.cartId), parseInt(actionBtn.dataset.delta));
+                    break;
+            }
+            return;
+        }
+
         // Add to cart button
         const addBtn = e.target.closest('.add-to-cart-btn');
         if (addBtn) {
@@ -1324,10 +1453,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             toggleMobileMenu();
             return;
         }
+
+        // Mobile nav link - close menu on click
+        const mobileNavLink = e.target.closest('.mobile-nav-link');
+        if (mobileNavLink) {
+            toggleMobileMenu();
+            return;
+        }
     });
     
-    // Form submission handler for login
+    // Event delegation for input/change events (search, filter, image preview)
+    document.addEventListener('input', (e) => {
+        if (e.target.id === 'admin-search') {
+            Admin.filterSearch = e.target.value;
+            Router.handleRoute();
+        }
+        if (e.target.id === 'product-image') {
+            Admin.previewImage(e.target.value);
+        }
+    });
+
+    document.addEventListener('change', (e) => {
+        if (e.target.id === 'admin-category-filter') {
+            Admin.filterCategory = e.target.value;
+            Router.handleRoute();
+        }
+    });
+    
+    // Form submission handler for login and product forms
     document.addEventListener('submit', (e) => {
+        const loginForm = e.target.closest('#login-form');
+        if (loginForm) {
+            e.preventDefault();
+            Router.handleLogin();
+            return;
+        }
+        const productForm = e.target.closest('#product-form');
+        if (productForm) {
+            e.preventDefault();
+            Admin.saveProduct();
+            return;
+        }
         if (e.target.closest('.auth-form')) {
             e.preventDefault();
             Router.handleLogin();
