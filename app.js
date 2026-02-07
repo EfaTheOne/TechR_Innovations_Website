@@ -9,6 +9,68 @@ const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 const SQUARE_APP_ID = 'sandbox-sq0idb-baAQrwCn8BjaayFVRoDUJA';
 const SQUARE_LOC_ID = 'LHWBP0QGBDD1G';
 
+// --- TOAST NOTIFICATIONS ---
+const Toast = {
+    container: null,
+    
+    init: () => {
+        if (!Toast.container) {
+            Toast.container = document.createElement('div');
+            Toast.container.id = 'toast-container';
+            Toast.container.style.cssText = 'position: fixed; top: 100px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
+            document.body.appendChild(Toast.container);
+        }
+    },
+    
+    show: (message, type = 'info', duration = 4000) => {
+        Toast.init();
+        const toast = document.createElement('div');
+        const colors = {
+            success: 'rgba(52, 199, 89, 0.95)',
+            error: 'rgba(255, 69, 58, 0.95)',
+            info: 'rgba(41, 151, 255, 0.95)'
+        };
+        toast.style.cssText = `
+            background: ${colors[type] || colors.info};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        `;
+        toast.textContent = message;
+        Toast.container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    },
+    
+    success: (msg) => Toast.show(msg, 'success'),
+    error: (msg) => Toast.show(msg, 'error'),
+    info: (msg) => Toast.show(msg, 'info')
+};
+
+// --- PAYMENT BUTTON HELPER ---
+const PayButton = {
+    setLoading: (btn) => {
+        if (!btn) return;
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Processing...';
+        if (window.lucide) lucide.createIcons();
+    },
+    
+    setReady: (btn, amount) => {
+        if (!btn) return;
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="lock" style="width: 18px; height: 18px;"></i> Pay $${amount}`;
+        if (window.lucide) lucide.createIcons();
+    }
+};
+
 // --- LOGGER ---
 const logger = {
     log: (msg) => {
@@ -101,7 +163,7 @@ const Store = {
     addToCart: (id) => {
         const product = Store.products.find(p => p.id === id);
         if (product) {
-            Store.cart.push({...product, cartId: Date.now()});
+            Store.cart.push({...product, cartId: Date.now() + Math.random()});
             Store.persist();
             Store.updateCartUI();
             
@@ -676,12 +738,11 @@ const Router = {
             
             // Demo mode - simulate payment
             payBtn.addEventListener('click', () => {
-                payBtn.disabled = true;
-                payBtn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Processing...';
-                if (window.lucide) lucide.createIcons();
+                PayButton.setLoading(payBtn);
                 
                 setTimeout(() => {
                     logger.log("Demo payment simulated successfully");
+                    Toast.success("Payment successful! Thank you for your order.");
                     Store.clearCart();
                     window.location.hash = '#success';
                 }, 2000);
@@ -697,24 +758,21 @@ const Router = {
             logger.log("Card element attached successfully");
 
             payBtn.addEventListener('click', async () => {
-                payBtn.disabled = true;
-                payBtn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Processing...';
-                if (window.lucide) lucide.createIcons();
+                PayButton.setLoading(payBtn);
                 
                 logger.log("Tokenizing card...");
                 const result = await card.tokenize();
                 
                 if (result.status === 'OK') {
                     logger.log(`Token received: ${result.token.substring(0, 20)}...`);
+                    Toast.success("Payment successful! Thank you for your order.");
                     // In production, send token to backend to complete payment
                     Store.clearCart();
                     window.location.hash = '#success';
                 } else {
                     logger.error(result.errors[0].message);
-                    payBtn.disabled = false;
-                    payBtn.innerHTML = `<i data-lucide="lock" style="width: 18px; height: 18px;"></i> Pay $${Store.getCartTotal()}`;
-                    if (window.lucide) lucide.createIcons();
-                    alert("Payment failed: " + result.errors[0].message);
+                    PayButton.setReady(payBtn, Store.getCartTotal());
+                    Toast.error("Payment failed: " + result.errors[0].message);
                 }
             });
         } catch (e) {

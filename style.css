@@ -956,7 +956,7 @@ label {
     border: 1px solid var(--border-glass);
     border-radius: 8px;
     padding: 1rem;
-    font-family: 'Space Grotesk', monospace;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 0.8rem;
     color: var(--color-techack);
     max-height: 200px;
@@ -1463,5 +1463,28 @@ label {
     }
     100% {
         background-position: -200% 0;
+    }
+}
+
+/* Toast Notifications */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
     }
 }
