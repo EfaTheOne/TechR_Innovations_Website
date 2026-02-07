@@ -215,6 +215,15 @@ const DEFAULT_PRODUCTS = [
     { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", images: ["https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#5e5ce6", "#2d3436"], category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
 ];
 
+// --- TIMEOUT HELPER ---
+function withTimeout(promise, ms) {
+    let timerId;
+    const timeout = new Promise((_, reject) => {
+        timerId = setTimeout(() => reject(new Error('Request timed out')), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timerId));
+}
+
 // --- STORE & STATE ---
 const Store = {
     products: [],
@@ -238,7 +247,7 @@ const Store = {
         // Try Supabase first
         try {
             if (supabase) {
-                const { data, error } = await supabase.from('products').select('*');
+                const { data, error } = await withTimeout(supabase.from('products').select('*'), 5000);
                 if (!error && data && data.length > 0) {
                     Store.products = data;
                     Store.syncMode = 'supabase';
@@ -253,7 +262,7 @@ const Store = {
         // Try Firebase as fallback
         try {
             if (firebaseDb) {
-                const snapshot = await firebaseDb.collection('products').get();
+                const snapshot = await withTimeout(firebaseDb.collection('products').get(), 5000);
                 if (!snapshot.empty) {
                     const data = [];
                     snapshot.forEach(doc => {
