@@ -7,7 +7,16 @@
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 
-// Firebase Configuration - Replace with your own Firebase project config
+// =====================================================
+// FIREBASE CONFIGURATION
+// Replace the placeholder values below with your Firebase project config.
+// To get these values:
+//   1. Go to https://console.firebase.google.com
+//   2. Select your project → Project Settings (gear icon)
+//   3. Scroll to "Your apps" → select your web app
+//   4. Copy the config values shown there
+// For full setup instructions, see FIREBASE_SETUP.md
+// =====================================================
 const FIREBASE_CONFIG = {
     apiKey: "YOUR_FIREBASE_API_KEY_HERE",
     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",

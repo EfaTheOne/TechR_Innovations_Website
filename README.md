@@ -21,11 +21,11 @@ This app supports **dual-cloud sync** for real-time data and image uploads acros
 
 **Firebase** (Image storage & sync fallback):
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable **Firestore Database** (for product data sync when Supabase is unavailable)
-3. Enable **Firebase Storage** (for image uploads that sync across all devices)
-4. Enable **Firebase Authentication** with Email/Password (fallback login)
-5. Copy your Firebase config from Project Settings → General → Your apps → Web app
-6. Replace the `FIREBASE_CONFIG` values in `app.js` with your config
+2. Register a web app and copy the config keys
+3. Paste the config keys into `app.js` → `FIREBASE_CONFIG` object (line ~11)
+4. Enable **Firestore Database**, **Firebase Storage**, and **Authentication** (Email/Password)
+
+> **📖 For a detailed step-by-step walkthrough (with screenshots descriptions, security rules, and troubleshooting), see [FIREBASE_SETUP.md](FIREBASE_SETUP.md)**
 
 **Sync priority:** Supabase → Firebase → localStorage (offline fallback)
 
