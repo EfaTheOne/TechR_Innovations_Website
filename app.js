@@ -121,12 +121,17 @@ const Auth = {
     },
 
     // Check current session on load
+    // Note: In production, implement proper role-based access control by checking
+    // user metadata or a separate roles table in Supabase
     checkSession: async () => {
         if (!supabase) return false;
         try {
             const { data: { session }, error } = await supabase.auth.getSession();
             if (session && !error) {
                 Auth.user = session.user;
+                // Check for admin role in user metadata (if available)
+                // For now, all authenticated users have admin access
+                // In production: Auth.isAdmin = session.user.user_metadata?.role === 'admin';
                 Auth.isAdmin = true;
                 return true;
             }
@@ -314,12 +319,12 @@ const Components = {
                     <a href="#techack">Products</a>
                     ${Auth.isAdmin ? `
                         <a href="#admin-dashboard">Dashboard</a>
-                        <a href="#/" onclick="Auth.logout()">Logout</a>
+                        <a href="#/" id="logout-link">Logout</a>
                     ` : `
                         <a href="#admin">Staff Portal</a>
                     `}
                     <a href="#checkout" class="btn btn-primary btn-sm">
-                        Cart (<span id="cart-count">${Store.cart.length}</span>)
+                        View Cart (<span id="cart-count">${Store.cart.length}</span>)
                     </a>
                 </div>
             </div>
@@ -700,6 +705,15 @@ const Router = {
         if (window.lucide) lucide.createIcons();
         Router.observeReveal();
 
+        // Bind logout link if present
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                Auth.logout();
+            });
+        }
+
         // Initialize specific page handlers
         if (hash === 'checkout' && Store.cart.length > 0) {
             Router.initCheckout();
@@ -936,8 +950,24 @@ const AdminUI = {
             // Image preview handler
             document.getElementById('product-image').addEventListener('input', (e) => {
                 const preview = document.getElementById('image-preview');
-                if (e.target.value) {
-                    preview.innerHTML = `<img src="${e.target.value}" alt="Preview" onerror="this.src='https://via.placeholder.com/200'">`;
+                const url = e.target.value.trim();
+                if (url) {
+                    // Validate URL format to prevent XSS
+                    try {
+                        const parsedUrl = new URL(url);
+                        if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
+                            const img = document.createElement('img');
+                            img.src = parsedUrl.href;
+                            img.alt = 'Preview';
+                            img.onerror = function() { this.src = 'https://via.placeholder.com/200'; };
+                            preview.innerHTML = '';
+                            preview.appendChild(img);
+                        } else {
+                            preview.innerHTML = '<p>Invalid URL protocol</p>';
+                        }
+                    } catch {
+                        preview.innerHTML = '<p>Invalid URL format</p>';
+                    }
                 } else {
                     preview.innerHTML = '<p>Image preview will appear here</p>';
                 }
@@ -959,8 +989,24 @@ const AdminUI = {
             // Image preview handler
             document.getElementById('product-image').addEventListener('input', (e) => {
                 const preview = document.getElementById('image-preview');
-                if (e.target.value) {
-                    preview.innerHTML = `<img src="${e.target.value}" alt="Preview" onerror="this.src='https://via.placeholder.com/200'">`;
+                const url = e.target.value.trim();
+                if (url) {
+                    // Validate URL format to prevent XSS
+                    try {
+                        const parsedUrl = new URL(url);
+                        if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
+                            const img = document.createElement('img');
+                            img.src = parsedUrl.href;
+                            img.alt = 'Preview';
+                            img.onerror = function() { this.src = 'https://via.placeholder.com/200'; };
+                            preview.innerHTML = '';
+                            preview.appendChild(img);
+                        } else {
+                            preview.innerHTML = '<p>Invalid URL protocol</p>';
+                        }
+                    } catch {
+                        preview.innerHTML = '<p>Invalid URL format</p>';
+                    }
                 } else {
                     preview.innerHTML = '<p>Image preview will appear here</p>';
                 }
