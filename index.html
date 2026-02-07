@@ -10,7 +10,7 @@
 
   <!-- SECURITY: Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://sandbox.web.squarecdn.com https://web.squarecdn.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com data:; frame-src https://sandbox.web.squarecdn.com https://web.squarecdn.com; connect-src 'self' https://sandbox.web.squarecdn.com https://web.squarecdn.com https://pci-connect.squareupsandbox.com https://pci-connect.squareup.com https://*.supabase.co wss://*.supabase.co;">
+    content="default-src 'self'; script-src 'self' https://js.stripe.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com data: https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com; connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co;">
 
   <!-- SECURITY: Referrer Policy & Color Theme -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -29,8 +29,8 @@
   <!-- DATABASE: Supabase JS Client (v2.39.0) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 
-  <!-- PAYMENT: Square Web Payments SDK (Sandbox) -->
-  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <!-- PAYMENT: Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
 
   <!-- Core Styles -->
   <link rel="stylesheet" href="style.css">

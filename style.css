@@ -1440,13 +1440,36 @@ label {
     color: var(--success);
 }
 
-/* Square Payment Form Styling */
+/* Stripe Payment Form Styling */
 #card-container {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    min-height: 50px;
     margin-bottom: 1.5rem;
+}
+
+#card-element {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    min-height: 44px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#card-element:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+#card-element.StripeElement--focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.15);
+}
+
+#card-element.StripeElement--invalid {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.15);
+}
+
+.checkout-payment-card {
+    border: 1px solid rgba(41, 151, 255, 0.15);
 }
 
 /* Skeleton Loading */
