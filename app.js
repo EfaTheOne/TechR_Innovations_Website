@@ -1648,7 +1648,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Remove additional image in admin modal
         const removeImgBtn = e.target.closest('.remove-additional-img');
         if (removeImgBtn) {
-            const idx = parseInt(removeImgBtn.dataset.imgIndex);
+            const idx = parseInt(removeImgBtn.dataset.imgIndex, 10);
             Admin.pendingImages.splice(idx, 1);
             Admin.renderAdditionalPreviews();
             return;
