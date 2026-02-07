@@ -131,24 +131,24 @@ function initRealtimeSync() {
 // --- DEFAULT PRODUCTS ---
 const DEFAULT_PRODUCTS = [
     // Techack Products
-    { id: 1, name: "Techack1 Pro", price: 499.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techack", desc: "Enterprise-grade portable pentesting framework with WiFi 6 and Bluetooth 5.2 capabilities." },
-    { id: 2, name: "Techack1 Lite", price: 299.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", category: "techack", desc: "Compact security testing device for educational and professional use." },
-    { id: 3, name: "Techack Network Probe", price: 149.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", category: "techack", desc: "Passive network analysis tool with real-time packet inspection." },
+    { id: 1, name: "Techack1 Pro", price: 499.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", images: ["https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80", "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Enterprise-grade portable pentesting framework with WiFi 6 and Bluetooth 5.2 capabilities." },
+    { id: 2, name: "Techack1 Lite", price: 299.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", images: ["https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "Compact security testing device for educational and professional use." },
+    { id: 3, name: "Techack Network Probe", price: 149.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", images: ["https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "Passive network analysis tool with real-time packet inspection." },
     
     // TechBox Products
-    { id: 4, name: "TechBox Starter Kit", price: 79.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", category: "techbox", desc: "Complete STEM electronics kit with Arduino-compatible microcontroller and 50+ components." },
-    { id: 5, name: "TechBox Advanced", price: 149.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", category: "techbox", desc: "Advanced robotics and IoT development platform with sensor arrays." },
-    { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
+    { id: 4, name: "TechBox Starter Kit", price: 79.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", images: ["https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", "https://images.unsplash.com/photo-1553406830-ef2f0c93b5c4?w=800&q=80"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "Complete STEM electronics kit with Arduino-compatible microcontroller and 50+ components." },
+    { id: 5, name: "TechBox Advanced", price: 149.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", images: ["https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Advanced robotics and IoT development platform with sensor arrays." },
+    { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", images: ["https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
     
     // Rithim Products
-    { id: 7, name: "Rithim Classic Tee", price: 34.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", category: "rithim", desc: "Premium cotton crew neck tee with embroidered Rithim logo. Available in all sizes." },
-    { id: 8, name: "Rithim Hoodie", price: 64.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", category: "rithim", desc: "Heavyweight fleece hoodie with kangaroo pocket and Rithim branding. Perfect for everyday wear." },
-    { id: 9, name: "Rithim Joggers", price: 49.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Soft cotton blend." },
+    { id: 7, name: "Rithim Classic Tee", price: 34.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80", "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&q=80"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Premium cotton crew neck tee with embroidered Rithim logo. Available in all sizes." },
+    { id: 8, name: "Rithim Hoodie", price: 64.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80", "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=800&q=80"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Heavyweight fleece hoodie with kangaroo pocket and Rithim branding. Perfect for everyday wear." },
+    { id: 9, name: "Rithim Joggers", price: 49.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", images: ["https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80"], colors: ["#2d3436", "#636e72", "#b2bec3"], category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Soft cotton blend." },
 
     // StudyTech Products
-    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
-    { id: 11, name: "StudyTech AI Tutor - Annual", price: 149.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", category: "studytech", desc: "Full year of AI tutoring with advanced analytics and progress tracking." },
-    { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
+    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", images: ["https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80"], colors: ["#5e5ce6"], category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
+    { id: 11, name: "StudyTech AI Tutor - Annual", price: 149.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", images: ["https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80"], colors: ["#5e5ce6", "#a29bfe"], category: "studytech", desc: "Full year of AI tutoring with advanced analytics and progress tracking." },
+    { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", images: ["https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#5e5ce6", "#2d3436"], category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
 ];
 
 // --- STORE & STATE ---
@@ -327,6 +327,8 @@ const Admin = {
         email: 'contact@techr.com'
     },
 
+    pendingImages: [],
+
     previewImage: (url) => {
         const preview = document.getElementById('image-preview');
         if (preview && url) {
@@ -338,10 +340,63 @@ const Admin = {
         }
     },
 
+    handleFileUpload: (files) => {
+        if (!files || files.length === 0) return;
+        const file = files[0];
+        if (!file.type.startsWith('image/')) {
+            Toast.error('Please select an image file');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            Toast.error('Image must be under 5MB');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            const urlInput = document.getElementById('product-image');
+            if (urlInput) urlInput.value = dataUrl;
+            Admin.previewImage(dataUrl);
+            Toast.success('Image uploaded successfully');
+        };
+        reader.readAsDataURL(file);
+    },
+
+    handleAdditionalImages: (files) => {
+        if (!files || files.length === 0) return;
+        const container = document.getElementById('additional-images-preview');
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            if (file.size > 5 * 1024 * 1024) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                Admin.pendingImages.push(e.target.result);
+                Admin.renderAdditionalPreviews();
+            };
+            reader.readAsDataURL(file);
+        });
+    },
+
+    renderAdditionalPreviews: () => {
+        const container = document.getElementById('additional-images-preview');
+        if (!container) return;
+        container.innerHTML = Admin.pendingImages.map((img, i) => `
+            <div class="additional-img-thumb" style="position: relative; display: inline-block;">
+                <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-glass);">
+                <button type="button" class="remove-additional-img" data-img-index="${i}" style="position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--danger); color: white; border: none; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+            </div>
+        `).join('');
+    },
+
     showAddModal: () => {
         document.getElementById('modal-title').textContent = 'Add Product';
         document.getElementById('product-edit-id').value = '';
         document.getElementById('product-form').reset();
+        document.getElementById('product-colors').value = '';
+        Admin.pendingImages = [];
+        Admin.renderAdditionalPreviews();
+        const preview = document.getElementById('image-preview');
+        if (preview) preview.style.display = 'none';
         document.getElementById('product-modal').style.display = 'flex';
         if (window.lucide) lucide.createIcons();
     },
@@ -356,6 +411,9 @@ const Admin = {
         document.getElementById('product-category').value = product.category;
         document.getElementById('product-image').value = product.image;
         document.getElementById('product-desc').value = product.desc;
+        document.getElementById('product-colors').value = (product.colors || []).join(', ');
+        Admin.pendingImages = (product.images || []).filter(img => img !== product.image);
+        Admin.renderAdditionalPreviews();
         Admin.previewImage(product.image);
         document.getElementById('product-modal').style.display = 'flex';
         if (window.lucide) lucide.createIcons();
@@ -367,11 +425,17 @@ const Admin = {
 
     saveProduct: async () => {
         const editId = document.getElementById('product-edit-id').value;
+        const mainImage = document.getElementById('product-image').value;
+        const colorsRaw = document.getElementById('product-colors').value;
+        const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(c => c) : [];
+        const allImages = [mainImage, ...Admin.pendingImages].filter(Boolean);
         const productData = {
             name: document.getElementById('product-name').value,
             price: parseFloat(document.getElementById('product-price').value),
             category: document.getElementById('product-category').value,
-            image: document.getElementById('product-image').value,
+            image: mainImage,
+            images: allImages,
+            colors: colors,
             desc: document.getElementById('product-desc').value
         };
 
@@ -938,9 +1002,32 @@ const Router = {
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="product-image">Image URL</label>
-                                <input type="url" id="product-image" placeholder="https://images.unsplash.com/..." required>
-                                <img id="image-preview" class="image-preview" style="display: none;">
+                                <label>Main Product Image</label>
+                                <div class="image-upload-area">
+                                    <div class="upload-options" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <label for="product-image-file" class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                            <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Upload Photo
+                                        </label>
+                                        <input type="file" id="product-image-file" accept="image/*" style="display: none;">
+                                        <span style="color: var(--text-secondary); font-size: 0.85rem; align-self: center;">or paste URL below</span>
+                                    </div>
+                                    <input type="text" id="product-image" placeholder="https://images.unsplash.com/... or upload above" required>
+                                    <img id="image-preview" class="image-preview" style="display: none;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Additional Photos</label>
+                                <div class="image-upload-area">
+                                    <label for="product-additional-images" class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem;">
+                                        <i data-lucide="images" style="width: 14px; height: 14px;"></i> Add More Photos
+                                    </label>
+                                    <input type="file" id="product-additional-images" accept="image/*" multiple style="display: none;">
+                                    <div id="additional-images-preview" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-colors">Colors (comma-separated hex codes)</label>
+                                <input type="text" id="product-colors" placeholder="#ffffff, #2d3436, #ff375f">
                             </div>
                             <div class="form-group">
                                 <label for="product-desc">Description</label>
@@ -973,23 +1060,79 @@ const Router = {
             }
 
             const related = Store.getProductsByCategory(product.category).filter(p => p.id !== product.id);
+            const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
+            const productColors = product.colors && product.colors.length > 0 ? product.colors : [];
+            const categoryLabels = { techack: 'Techack Security', techbox: 'TechBox Education', rithim: 'Rithim Clothing', studytech: 'StudyTech AI' };
             
             return `
                 <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
-                    <a href="#${product.category}" class="btn btn-secondary btn-sm reveal" style="margin-bottom: 2rem;">
-                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to ${product.category}
-                    </a>
+                    <div class="product-detail-breadcrumb reveal">
+                        <a href="#/">Home</a>
+                        <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                        <a href="#${product.category}">${categoryLabels[product.category] || product.category}</a>
+                        <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                        <span>${product.name}</span>
+                    </div>
                     
                     <div class="product-detail reveal">
-                        <div class="product-detail-image">
-                            <img src="${product.image}" alt="${product.name}">
+                        <div class="product-detail-gallery">
+                            <div class="product-detail-main-image">
+                                <img id="product-main-img" src="${productImages[0]}" alt="${product.name}">
+                            </div>
+                            ${productImages.length > 1 ? `
+                                <div class="product-detail-thumbnails">
+                                    ${productImages.map((img, i) => `
+                                        <button class="product-thumb ${i === 0 ? 'active' : ''}" data-action="switch-image" data-img-src="${img}">
+                                            <img src="${img}" alt="${product.name} view ${i + 1}">
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                         <div class="product-detail-info">
-                            <span class="badge badge-${product.category}">${product.category}</span>
+                            <span class="badge badge-${product.category}">${categoryLabels[product.category] || product.category}</span>
                             <h1 style="font-size: 2.5rem; margin: 1rem 0 0.5rem;">${product.name}</h1>
-                            <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">${product.desc}</p>
-                            <div class="price" style="font-size: 2.5rem; margin-bottom: 2rem;">$${product.price.toFixed(2)}</div>
-                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div class="product-detail-rating">
+                                <div class="stars">
+                                    <i data-lucide="star" style="width: 16px; height: 16px; fill: #ff9f0a; color: #ff9f0a;"></i>
+                                    <i data-lucide="star" style="width: 16px; height: 16px; fill: #ff9f0a; color: #ff9f0a;"></i>
+                                    <i data-lucide="star" style="width: 16px; height: 16px; fill: #ff9f0a; color: #ff9f0a;"></i>
+                                    <i data-lucide="star" style="width: 16px; height: 16px; fill: #ff9f0a; color: #ff9f0a;"></i>
+                                    <i data-lucide="star" style="width: 16px; height: 16px; color: #ff9f0a;"></i>
+                                </div>
+                                <span class="rating-text">4.0 (12 reviews)</span>
+                            </div>
+                            <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; color: var(--text-secondary);">${product.desc}</p>
+                            
+                            ${productColors.length > 0 ? `
+                                <div class="product-detail-colors">
+                                    <label>Color</label>
+                                    <div class="color-options">
+                                        ${productColors.map((color, i) => `
+                                            <button class="color-swatch ${i === 0 ? 'active' : ''}" style="background: ${color};" title="${color}" data-color="${color}"></button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="price" style="font-size: 2.5rem; margin-bottom: 1.5rem;">$${product.price.toFixed(2)}</div>
+                            
+                            <div class="product-detail-features">
+                                <div class="detail-feature">
+                                    <i data-lucide="truck" style="width: 18px; height: 18px; color: var(--success);"></i>
+                                    <span>Free shipping over $50</span>
+                                </div>
+                                <div class="detail-feature">
+                                    <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                                    <span>1-year warranty</span>
+                                </div>
+                                <div class="detail-feature">
+                                    <i data-lucide="refresh-cw" style="width: 18px; height: 18px; color: var(--color-techbox);"></i>
+                                    <span>30-day returns</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
                                 <button class="btn btn-primary btn-lg add-to-cart-btn" data-product-id="${product.id}">
                                     <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i> Add to Cart
                                 </button>
@@ -1002,7 +1145,7 @@ const Router = {
 
                     ${related.length > 0 ? `
                         <div style="margin-top: 4rem;">
-                            <h2 class="reveal">Related Products</h2>
+                            <h2 class="reveal">You May Also Like</h2>
                             <div class="product-grid" style="margin-top: 2rem;">
                                 ${related.map(p => Components.ProductCard(p)).join('')}
                             </div>
@@ -1107,13 +1250,38 @@ const Router = {
                     <p>Building the future through technology, education, and style.</p>
                 </div>
 
+                <div class="about-founder-section reveal">
+                    <div class="about-founder-card">
+                        <div class="about-founder-photo">
+                            <img src="https://avatars.githubusercontent.com/u/100300869?v=4" alt="Ryan Pegg - Founder">
+                        </div>
+                        <div class="about-founder-info">
+                            <span class="badge" style="background: rgba(41, 151, 255, 0.15); color: var(--accent); margin-bottom: 0.75rem; display: inline-block;">Founder & CEO</span>
+                            <h2>Ryan Pegg</h2>
+                            <p class="about-founder-tagline">Young entrepreneur, hardware hacker, and innovator passionate about building the future of technology.</p>
+                            <p class="about-founder-bio">
+                                Ryan is the driving force behind TechR Innovations. With deep expertise in cybersecurity hardware, embedded systems, 
+                                and a creative vision for tech-forward fashion, he founded TechR to bring together his passions for hacking, education, 
+                                and style into one unified brand. From designing custom penetration testing devices like the Techack1 to creating 
+                                STEM education kits and the Rithim clothing line, Ryan embodies the spirit of a modern maker and entrepreneur.
+                            </p>
+                            <div class="about-founder-links">
+                                <a href="https://github.com/EfaTheOne" target="_blank" rel="noopener noreferrer" class="founder-social-link">
+                                    <i data-lucide="github" style="width: 18px; height: 18px;"></i> GitHub
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="about-section reveal">
                     <h2>Our Story</h2>
                     <p>
-                        TechR Innovations was founded with a simple yet ambitious vision: to bridge the gap between cutting-edge technology 
-                        and everyday life. What started as a small team of passionate engineers and designers has grown into a multi-division 
-                        company delivering products across cybersecurity, education, apparel, and AI-powered learning. We believe that 
-                        innovation should be accessible, practical, and transformative.
+                        TechR Innovations was born from a passion for hands-on technology and the belief that innovation should be accessible to everyone. 
+                        What started as personal hardware hacking projects — building custom macropads, NFC hacking cards, and penetration testing 
+                        devices — evolved into a full-fledged company spanning four distinct divisions. Ryan's journey from building his first 
+                        Tech_Pad to creating the Techack1 Pro pentesting framework is the foundation of everything TechR stands for: curiosity, 
+                        craftsmanship, and relentless innovation.
                     </p>
                 </div>
 
@@ -1127,33 +1295,27 @@ const Router = {
                     </p>
                 </div>
 
-                <div class="about-section reveal">
-                    <h2>Our Team</h2>
-                    <div class="team-grid">
-                        <div class="team-card">
-                            <div class="team-avatar">
-                                <i data-lucide="user" style="width: 48px; height: 48px; color: var(--accent);"></i>
-                            </div>
-                            <h3>Founder & CEO</h3>
-                            <p class="team-role">Visionary Leader</p>
-                            <p>Passionate about technology and innovation, leading TechR Innovations from concept to reality. Dedicated to building products that make a meaningful impact.</p>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">
-                                <i data-lucide="code" style="width: 48px; height: 48px; color: var(--color-techack);"></i>
-                            </div>
-                            <h3>Head of Engineering</h3>
-                            <p class="team-role">Technical Lead</p>
-                            <p>Driving the technical vision across all divisions, ensuring every product meets the highest standards of quality and performance.</p>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">
-                                <i data-lucide="palette" style="width: 48px; height: 48px; color: var(--color-rithim);"></i>
-                            </div>
-                            <h3>Creative Director</h3>
-                            <p class="team-role">Design & Brand</p>
-                            <p>Shaping the visual identity and user experience of TechR, from product design to the Rithim clothing line.</p>
-                        </div>
+                <div class="about-divisions-grid reveal">
+                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">Our Divisions</h2>
+                    <div class="about-division-card" style="border-color: var(--color-techack);">
+                        <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
+                        <h3 style="color: var(--color-techack);">Techack</h3>
+                        <p>Enterprise-grade penetration testing hardware. From the Techack1 Pro to network probes, we build the tools security professionals trust.</p>
+                    </div>
+                    <div class="about-division-card" style="border-color: var(--color-techbox);">
+                        <i data-lucide="box" style="width: 32px; height: 32px; color: var(--color-techbox);"></i>
+                        <h3 style="color: var(--color-techbox);">TechBox</h3>
+                        <p>STEM education kits that make learning electronics, coding, and robotics fun and accessible for students of all ages.</p>
+                    </div>
+                    <div class="about-division-card" style="border-color: var(--color-rithim);">
+                        <i data-lucide="shirt" style="width: 32px; height: 32px; color: var(--color-rithim);"></i>
+                        <h3 style="color: var(--color-rithim);">Rithim</h3>
+                        <p>Premium streetwear and apparel that merges tech culture with bold fashion. Express your identity with style.</p>
+                    </div>
+                    <div class="about-division-card" style="border-color: var(--color-studytech);">
+                        <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
+                        <h3 style="color: var(--color-studytech);">StudyTech</h3>
+                        <p>AI-powered adaptive learning that personalizes education at scale for students, parents, and institutions.</p>
                     </div>
                 </div>
 
@@ -1171,6 +1333,10 @@ const Router = {
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <i data-lucide="globe" style="width: 20px; height: 20px; color: var(--accent);"></i>
                             <span style="color: var(--text-secondary);">www.techr.com</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="github" style="width: 20px; height: 20px; color: var(--accent);"></i>
+                            <a href="https://github.com/EfaTheOne" target="_blank" rel="noopener noreferrer" style="color: var(--accent);">github.com/EfaTheOne</a>
                         </div>
                     </div>
                 </div>
@@ -1424,6 +1590,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'update-qty':
                     Store.updateQuantity(parseFloat(actionBtn.dataset.cartId), parseInt(actionBtn.dataset.delta));
                     break;
+                case 'switch-image':
+                    const imgSrc = actionBtn.dataset.imgSrc;
+                    const mainImg = document.getElementById('product-main-img');
+                    if (mainImg && imgSrc) {
+                        mainImg.src = imgSrc;
+                        document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+                        actionBtn.classList.add('active');
+                    }
+                    break;
             }
             return;
         }
@@ -1461,6 +1636,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             toggleMobileMenu();
             return;
         }
+
+        // Color swatch click
+        const colorSwatch = e.target.closest('.color-swatch');
+        if (colorSwatch) {
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            colorSwatch.classList.add('active');
+            return;
+        }
+
+        // Remove additional image in admin modal
+        const removeImgBtn = e.target.closest('.remove-additional-img');
+        if (removeImgBtn) {
+            const idx = parseInt(removeImgBtn.dataset.imgIndex);
+            Admin.pendingImages.splice(idx, 1);
+            Admin.renderAdditionalPreviews();
+            return;
+        }
     });
     
     // Event delegation for input/change events (search, filter, image preview)
@@ -1478,6 +1670,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target.id === 'admin-category-filter') {
             Admin.filterCategory = e.target.value;
             Router.handleRoute();
+        }
+        if (e.target.id === 'product-image-file') {
+            Admin.handleFileUpload(e.target.files);
+        }
+        if (e.target.id === 'product-additional-images') {
+            Admin.handleAdditionalImages(e.target.files);
         }
     });
     
