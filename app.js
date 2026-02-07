@@ -15,7 +15,7 @@ const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 // Your Secret Key (sk_...) should NEVER be placed here.
 // It belongs on your backend server only.
 // =====================================================
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY_HERE';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51MycO7Fe1hSNms1qzqy4TaiRu1XWGvKbHcdOXz0cnJgJTzpgf4hZaw86sEf1PMiSYe6X5FL9Pf7zRaz3e6oef8V000uVMlo2fe';
 
 // --- TOAST NOTIFICATIONS ---
 const Toast = {
@@ -1152,3 +1152,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     console.log("[TechR] Application initialized");
 });
+
