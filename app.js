@@ -1,114 +1,119 @@
 /* 
-   TechR Innovations - Protocol: PHOENIX 
-   Core Engine: Supabase Connected, Environment Aware
+   TechR Innovations - Protocol: STRUCTURE
+   Engine: Professional, Debuggable, Secure
 */
 
 // --- CONFIGURATION ---
-// REPLACE THESE WITH YOUR SUPABASE CREDENTIALS AFTER CREATING PROJECT
+// Credentials provided by User
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 const SQUARE_APP_ID = 'sandbox-sq0idb-baAQrwCn8BjaayFVRoDUJA';
-const SQUARE_LOC_ID = 'LHWBP0QGBDD1G'; // Sandbox Location
+const SQUARE_LOC_ID = 'LHWBP0QGBDD1G';
 
 // Initialize Clients
 let supabase;
+const logger = {
+    log: (msg) => {
+        console.log(`[TechR] ${msg}`);
+        const logEl = document.getElementById('debug-log');
+        if (logEl) {
+            logEl.innerHTML += `> ${msg}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+    },
+    error: (msg) => {
+        console.error(`[TechR] ERROR: ${msg}`);
+        const logEl = document.getElementById('debug-log');
+        if (logEl) {
+            logEl.innerHTML += `> [ERROR] ${msg}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+    }
+};
+
 try {
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("Supabase Client Initialized");
-    } else {
-        console.warn("Supabase SDK not loaded.");
+        console.log("Supabase Online");
     }
 } catch (e) {
-    console.warn("Supabase Config Missing. Admin features strictly disabled.");
+    console.warn("Supabase Init Failed");
 }
 
-// --- UTILS ---
-const sanitize = (str) => {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-};
-
-// --- AUTH MODULE ---
-const Auth = {
-    user: null,
-    init: async () => {
-        if (!supabase) return;
-        const { data } = await supabase.auth.getSession();
-        Auth.user = data.session?.user || null;
-
-        supabase.auth.onAuthStateChange((_event, session) => {
-            Auth.user = session?.user || null;
-            Router.handleRoute(); // Re-render to update UI
-        });
-    },
-    signIn: async (email, password) => {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-    },
-    signOut: async () => {
-        await supabase.auth.signOut();
-    },
-    updateCartCount: () => {
-        const btn = document.getElementById('cart-count');
-        if (btn) btn.textContent = Store.cart.length;
-    }
-};
-
-// --- DATA STORE ---
+// --- STORE & STATE ---
 const Store = {
     products: [],
     cart: [],
 
     init: async () => {
-        // Hydrate Cart
-        const savedCart = localStorage.getItem('techr_cart');
+        const savedCart = localStorage.getItem('techr_cart_v2');
         if (savedCart) Store.cart = JSON.parse(savedCart);
-
-        // Fetch Products
         await Store.fetchProducts();
-
-        // Initial Render
         Router.handleRoute();
     },
 
     fetchProducts: async () => {
-        if (!supabase || SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
-            // Fallback for Demo Mode (No DB yet)
-            Store.products = [
-                { id: 1, name: "Techack1", price: 299.99, image: "https://images.unsplash.com/photo-1563770095162-95f88954dbd3?w=800&q=80", category: "techack", desc: "Portable Pen-Testing Unit" },
-                { id: 2, name: "TechBox Starter", price: 49.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techbox", desc: "STEM Learning Kit" },
-                { id: 3, name: "Rithim Band", price: 149.99, image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80", category: "rithim", desc: "Biofeedback Recovery Wearable" },
-                { id: 4, name: "StudyTech Stick", price: 29.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", category: "studytech", desc: "Offline AI Accelerator" }
-            ];
-            return;
-        }
+        try {
+            if (supabase) {
+                const { data, error } = await supabase.from('products').select('*');
+                if (!error && data && data.length > 0) {
+                    Store.products = data;
+                    return;
+                }
+            }
+        } catch (e) { /* Ignore fallback */ }
 
-        const { data, error } = await supabase.from('products').select('*');
-        if (!error && data) {
-            Store.products = data;
-        }
+        // Fallback Inventory
+        Store.products = [
+            { id: 1, name: "Techack1 Unit", price: 299.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", category: "techack", desc: "Portable pentesting framework." },
+            { id: 2, name: "TechBox Starter", price: 49.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", category: "techbox", desc: "Complete STEM electronics kit." },
+            { id: 3, name: "Rithim Biosensor", price: 149.99, image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80", category: "rithim", desc: "Recovery monitoring wearable." }
+        ];
     },
 
     addToCart: (id) => {
         const product = Store.products.find(p => p.id === id);
         if (product) {
             Store.cart.push(product);
-            localStorage.setItem('techr_cart', JSON.stringify(Store.cart));
+            Store.persist();
+            // Button feedback
+            const btns = document.querySelectorAll(`button[data-id="${id}"]`);
+            btns.forEach(b => {
+                const old = b.innerHTML;
+                b.innerHTML = "Added";
+                b.classList.add('btn-primary');
+                b.classList.remove('btn-secondary');
+                setTimeout(() => {
+                    b.innerHTML = old;
+                    b.classList.remove('btn-primary');
+                    b.classList.add('btn-secondary');
+                }, 1000);
+            });
             Auth.updateCartCount();
         }
     },
 
     removeFromCart: (index) => {
         Store.cart.splice(index, 1);
-        localStorage.setItem('techr_cart', JSON.stringify(Store.cart));
-        Router.handleRoute(); // Re-render checkout
+        Store.persist();
+        Router.handleRoute();
     },
 
     clearCart: () => {
         Store.cart = [];
-        localStorage.removeItem('techr_cart');
+        Store.persist();
+    },
+
+    persist: () => {
+        localStorage.setItem('techr_cart_v2', JSON.stringify(Store.cart));
+    }
+};
+
+const Auth = {
+    user: null,
+    updateCartCount: () => {
+        const btn = document.getElementById('cart-count');
+        if (btn) btn.textContent = Store.cart.length;
     }
 };
 
@@ -116,188 +121,130 @@ const Store = {
 const Components = {
     Header: () => `
         <nav class="nav-bar">
-            <div class="brand">TechR<span style="color:var(--text-secondary)">Innovations</span></div>
-            <div class="nav-links">
-                <a href="#/">Home</a>
-                <a href="#techack">Techack</a>
-                <a href="#techbox">TechBox</a>
-                <a href="#admin">Admin</a>
-                <a href="#checkout" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
-                    Cart (<span id="cart-count">${Store.cart.length}</span>)
+            <div class="container nav-container">
+                <a href="#/" class="brand">
+                    <i data-lucide="cpu"></i> TechR
                 </a>
+                <div class="nav-links">
+                    <a href="#techack">Products</a>
+                    <a href="#admin">Login</a>
+                    <a href="#checkout" class="btn btn-primary btn-sm">
+                        Checkout (<span id="cart-count">${Store.cart.length}</span>)
+                    </a>
+                </div>
             </div>
-            <button class="mobile-menu-btn" onclick="window.toggleMobileMenu()">☰</button>
         </nav>
-        <div id="mobile-menu" class="mobile-nav hidden" style="position:fixed; top:70px; right:20px; background:#111; padding:1rem; border-radius:12px; z-index:999; border:1px solid #333;">
-            <a href="#/" style="display:block; padding:0.5rem; color:white;">Home</a>
-            <a href="#techack" style="display:block; padding:0.5rem; color:white;">Techack</a>
-            <a href="#techbox" style="display:block; padding:0.5rem; color:white;">TechBox</a>
-            <a href="#admin" style="display:block; padding:0.5rem; color:white;">Admin</a>
-            <a href="#checkout" style="display:block; padding:0.5rem; color:white;">Checkout</a>
-        </div>
     `,
 
-    LoginScreen: () => `
-        <div class="login-overlay">
-            <div class="login-box glass-panel">
-                <h2>Admin Access</h2>
-                <p style="margin-bottom: 2rem;">Authenticating with Supabase.</p>
-                <form id="login-form">
-                    <input type="email" id="email" class="input-field" placeholder="admin@techr.com" required>
-                    <input type="password" id="password" class="input-field" placeholder="••••••••" required>
-                    <button type="submit" class="btn btn-primary" style="width:100%">Sign In</button>
-                    <div id="login-error" style="color: var(--danger); margin-top: 1rem;"></div>
-                </form>
+    ProductCard: (p) => `
+        <div class="product-card reveal">
+            <img src="${p.image}" class="product-img" alt="${p.name}">
+            <div class="product-content">
+                <h3>${p.name}</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">${p.desc}</p>
+                <div class="product-meta">
+                    <span class="price">$${p.price}</span>
+                    <button class="btn btn-secondary" onclick="Store.addToCart(${p.id})" data-id="${p.id}">Add to Cart</button>
+                </div>
             </div>
         </div>
-    `,
-
-    ProductGrid: (category) => {
-        const items = Store.products.filter(p => p.category === category);
-        return `
-            <div class="product-grid">
-                ${items.map(p => `
-                    <div class="product-item reveal">
-                        <img src="${sanitize(p.image)}" alt="${sanitize(p.name)}">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <h3 style="font-size:1.2rem; margin:0;">${sanitize(p.name)}</h3>
-                                <div style="color:var(--text-secondary);">$${p.price}</div>
-                            </div>
-                            <button onclick="Store.addToCart(${p.id})" class="btn btn-outline" style="padding:0.5rem 1rem;">
-                                Add
-                            </button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    }
+    `
 };
 
 // --- ROUTER ---
 const Router = {
     routes: {
         '/': () => `
-            <section class="fullscreen-section">
-                <h1 class="reveal">The Future.<br><span style="color:var(--text-secondary)">Unboxed.</span></h1>
-                <p class="reveal" style="margin-top: 2rem;">Pioneering the intersection of Hardware, Education, and Recovery.</p>
-                <div class="reveal" style="margin-top: 3rem; display:flex; gap:1rem; justify-content:center;">
-                    <a href="#techack" class="btn btn-primary">Discover Techack1</a>
-                    <a href="#techbox" class="btn btn-outline">Explore STEM</a>
+            <div class="fullscreen-section container">
+                <h1 class="reveal">Precision Engineering<br>for the Modern Era.</h1>
+                <p class="reveal" style="font-size: 1.5rem; margin-top: 1rem;">
+                    TechR Innovations delivers enterprise-grade hardware solutions for security, education, and physiological monitoring.
+                </p>
+                <div class="reveal" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <a href="#techack" class="btn btn-primary">View Products</a>
+                    <a href="#checkout" class="btn btn-secondary">Order Now</a>
                 </div>
-            </section>
+            </div>
             
-            <section class="container">
-                <div class="bento-grid">
-                    <a href="#techack" class="bento-card reveal">
-                        <i data-lucide="shield" size="40" color="var(--color-techack)"></i>
-                        <h3>Techack</h3>
-                        <p>Advanced penetration testing hardware for the modern era.</p>
-                    </a>
-                    <a href="#techbox" class="bento-card reveal">
-                        <i data-lucide="box" size="40" color="var(--color-techbox)"></i>
-                        <h3>TechBox</h3>
-                        <p>Curiosity delivered. STEM education kits for all ages.</p>
-                    </a>
-                    <a href="#rithim" class="bento-card reveal">
-                        <i data-lucide="heart" size="40" color="var(--color-rithim)"></i>
-                        <h3>Rithim</h3>
-                        <p>Recovery reimagined through proprietary wearable tech.</p>
-                    </a>
+            <div class="container" style="padding-bottom: 6rem;">
+                <div class="grid-3">
+                    <div class="card reveal">
+                        <div class="card-icon"><i data-lucide="shield"></i></div>
+                        <h3>Techack Security</h3>
+                        <p>Advanced penetration testing hardware designed for red team operations.</p>
+                    </div>
+                    <div class="card reveal">
+                        <div class="card-icon"><i data-lucide="box"></i></div>
+                        <h3>TechBox EDU</h3>
+                        <p>Comprehensive STEM learning kits powering the next generation of engineers.</p>
+                    </div>
+                    <div class="card reveal">
+                        <div class="card-icon"><i data-lucide="activity"></i></div>
+                        <h3>Rithim Bio</h3>
+                        <p>Clinical-grade biosensors for real-time recovery tracking.</p>
+                    </div>
                 </div>
-            </section>
+            </div>
         `,
         'techack': () => `
-            <div class="container" style="padding-top: 6rem;">
-                <h1 class="reveal" style="font-size:8rem; color:var(--color-techack);">TECHACK<span style="color:white">1</span></h1>
-                <p class="reveal">The ultimate portable penetration testing framework.</p>
-                ${Components.ProductGrid('techack')}
-            </div>
-        `,
-        'techbox': () => `
-            <div class="container" style="padding-top: 6rem;">
-                <h1 class="reveal" style="color:var(--color-techbox);">TechBox</h1>
-                <p class="reveal">Unbox your potential.</p>
-                ${Components.ProductGrid('techbox')}
-            </div>
-        `,
-        'rithim': () => `
-            <div class="container" style="padding-top: 6rem;">
-                <h1 class="reveal" style="color:var(--color-rithim);">Rithim</h1>
-                <p class="reveal">Recovery Redefined.</p>
-                ${Components.ProductGrid('rithim')}
-            </div>
-        `,
-        'admin': () => {
-            if (!Auth.user) return Components.LoginScreen();
-
-            // Authenticated Admin Dashboard
-            return `
-                <div class="container" style="padding-top: 8rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem;">
-                        <h1>Command Center</h1>
-                        <button onclick="Auth.signOut()" class="btn btn-outline">Sign Out</button>
-                    </div>
-                    <div class="bento-card reveal">
-                        <h3>Inventory Database</h3>
-                        <p>Connected to Supabase Cloud.</p>
-                        <!-- CRUD Table would go here in V2 -->
-                        <div style="margin-top:2rem; padding:1rem; background:#111; border-radius:8px; font-family:monospace;">
-                            User: ${Auth.user.email}<br>
-                            Role: Authenticated<br>
-                            Status: ${SUPABASE_URL.includes('YOUR_PROJECT') ? 'DEMO MODE (No DB)' : 'Connected'}
-                        </div>
-                    </div>
+            <div class="container" style="padding-top: 8rem; padding-bottom: 4rem;">
+                <h2 class="reveal">Product Catalog</h2>
+                <div class="product-grid reveal" style="margin-top: 2rem;">
+                    ${Store.products.map(p => Components.ProductCard(p)).join('')}
                 </div>
-            `;
-        },
+            </div>
+        `,
         'checkout': async () => {
             const isSecure = window.location.protocol === 'https:';
+            let alertHtml = '';
 
             if (!isSecure) {
-                setTimeout(() => {
-                    const warning = document.getElementById('checkout-warning');
-                    if (warning) warning.innerHTML = `
-                        <div style="background:var(--danger); color:white; padding:1rem; border-radius:8px; text-align:center; margin-bottom:2rem;">
-                            <strong>Security Alert:</strong> You are viewing this on Localhost/File.<br>
-                            Real Payments are disabled. Deploy to GitHub Pages (HTTPS) to activate Square.
+                alertHtml = `
+                    <div class="alert-box alert-error">
+                        <i data-lucide="alert-triangle"></i>
+                        <div>
+                            <strong>Secure Environment Required</strong><br>
+                            Payments are disabled on Localhost. Deploy to GitHub Pages (HTTPS) to enable Square.
                         </div>
-                    `;
-                }, 100);
+                    </div>
+                `;
             }
 
             return `
-                <div class="container" style="padding-top: 8rem; max-width:600px;">
-                    <h2>Secure Checkout</h2>
-                    <div id="checkout-warning"></div>
-                    
-                    ${Store.cart.length === 0 ? '<p>Your cart is empty.</p>' : `
-                        <div class="bento-card" style="margin-bottom:2rem;">
-                            ${Store.cart.map(item => `
-                                <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #333;">
-                                    <span>${item.name}</span>
-                                    <span>$${item.price}</span>
+                <div class="container" style="padding-top: 8rem;">
+                    <div class="checkout-container">
+                        <h2>Secure Checkout</h2>
+                        ${alertHtml}
+                        
+                        ${Store.cart.length === 0 ? '<div class="card">Your cart is empty.</div>' : `
+                            <div class="card" style="margin-bottom: 2rem;">
+                                ${Store.cart.map(item => `
+                                    <div style="display:flex; justify-content:space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle);">
+                                        <span>${item.name}</span>
+                                        <span class="price">$${item.price}</span>
+                                    </div>
+                                `).join('')}
+                                <div style="margin-top: 1rem; text-align: right; font-weight: 700; font-size: 1.25rem;">
+                                    Total: $${Store.cart.reduce((a, b) => a + parseFloat(b.price), 0).toFixed(2)}
                                 </div>
-                            `).join('')}
-                            <div style="margin-top:1rem; text-align:right; font-weight:bold; font-size:1.5rem;">
-                                Total: $${Store.cart.reduce((a, b) => a + parseFloat(b.price), 0).toFixed(2)}
                             </div>
-                        </div>
 
-                        <div class="bento-card">
-                            <h3 style="margin-bottom:1.5rem;">Payment Method</h3>
-                            <form id="payment-form">
-                                <div id="card-container" style="min-height: 100px; background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"></div>
-                                <button id="card-button" type="submit" class="btn btn-primary" style="width:100%">Pay Now</button>
-                            </form>
-                            <div id="payment-status"></div>
-                        </div>
-                    `}
+                            <div class="card">
+                                <h3>Payment Details</h3>
+                                <div id="card-container" style="background: white; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; min-height: 50px;"></div>
+                                <button id="pay-btn" class="btn btn-primary" style="width: 100%;">Pay Now</button>
+                            </div>
+                            
+                            <div style="margin-top: 2rem;">
+                                <h4>Debug Console</h4>
+                                <pre id="debug-log" class="debug-log">Waiting for intialization...</pre>
+                            </div>
+                        `}
+                    </div>
                 </div>
             `;
         }
-    },
+    }, // End Routes
 
     init: () => {
         window.addEventListener('hashchange', Router.handleRoute);
@@ -309,93 +256,65 @@ const Router = {
         const hash = window.location.hash.slice(1) || '/';
         const route = Router.routes[hash] || Router.routes['/'];
 
-        // Render Header & Content
         app.innerHTML = Components.Header();
-        const content = typeof route === 'function' ? await route() : route;
-        app.innerHTML += content;
+        app.innerHTML += await route();
 
-        // Initialize Icons & Observers
         if (window.lucide) lucide.createIcons();
         Router.observeReveal();
 
-        // Attach Event Listeners
-        Router.attachListeners(hash);
+        if (hash === 'checkout' && Store.cart.length > 0) {
+            Router.initCheckout(); // Explicit init
+        }
     },
 
     observeReveal: () => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        setTimeout(() => {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }, 100);
     },
 
-    attachListeners: async (hash) => {
-        // Login Logic
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const btn = loginForm.querySelector('button');
-                const err = document.getElementById('login-error');
-                btn.textContent = "Verifying...";
-                try {
-                    await Auth.signIn(
-                        document.getElementById('email').value,
-                        document.getElementById('password').value
-                    );
-                } catch (e) {
-                    err.textContent = "Access Denied: " + e.message;
-                    btn.textContent = "Sign In";
-                }
-            });
+    initCheckout: async () => {
+        if (!window.Square) {
+            logger.error("Square SDK script not loaded in index.html");
+            return;
         }
 
-        // Square Logic (Checkout)
-        if (hash === 'checkout' && Store.cart.length > 0) {
-            if (window.Square && window.location.protocol === 'https:') {
-                try {
-                    const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
-                    const card = await payments.card();
-                    await card.attach('#card-container');
+        if (window.location.protocol !== 'https:') {
+            logger.error("Protocol violation: HTTPS required.");
+            document.getElementById('card-container').innerHTML = "<em>Payments Disabled (Insecure Origin)</em>";
+            document.getElementById('pay-btn').disabled = true;
+            return;
+        }
 
-                    document.getElementById('payment-form').addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        const status = document.getElementById('payment-status');
-                        status.textContent = "Processing Securely...";
+        try {
+            logger.log("Initializing Square...");
+            const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
+            const card = await payments.card();
+            await card.attach('#card-container');
+            logger.log("Card Element attached successfully.");
 
-                        const result = await card.tokenize();
-                        if (result.status === 'OK') {
-                            Store.clearCart();
-                            const app = document.getElementById('app');
-                            app.innerHTML = Components.Header() + `
-                                <div class="container fullscreen-section">
-                                    <i data-lucide="check-circle" size="80" color="#34c759"></i>
-                                    <h1 style="margin-top:1rem;">Order Confirmed.</h1>
-                                    <p>Token: ${result.token.slice(0, 10)}...</p>
-                                    <a href="#/" class="btn btn-primary" style="margin-top:2rem;">Return Home</a>
-                                </div>
-                            `;
-                            if (window.lucide) lucide.createIcons();
-                        } else {
-                            status.textContent = "Payment Failed: " + result.errors[0].message;
-                        }
-                    });
-                } catch (e) {
-                    console.error(e);
+            document.getElementById('pay-btn').addEventListener('click', async () => {
+                logger.log("Tokenizing card...");
+                const result = await card.tokenize();
+                if (result.status === 'OK') {
+                    logger.log(`Success! Token: ${result.token}`);
+                    alert("Payment Successful (Sandbox)!");
+                    Store.clearCart();
+                } else {
+                    logger.error(result.errors[0].message);
+                    alert("Payment Failed: " + result.errors[0].message);
                 }
-            }
+            });
+        } catch (e) {
+            logger.error(`Square Exception: ${e.message}`);
         }
     }
 };
 
-// --- BOOTSTRAP ---
-document.addEventListener('DOMContentLoaded', async () => {
-    // Utility for mobile menu
-    window.toggleMobileMenu = () => {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
-    };
-
-    await Auth.init();
-    await Store.init();
+document.addEventListener('DOMContentLoaded', () => {
+    Store.init();
     Router.init();
 });
