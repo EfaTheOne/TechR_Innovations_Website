@@ -12,7 +12,7 @@ const FIREBASE_CONFIG = {
     apiKey: "YOUR_FIREBASE_API_KEY_HERE",
     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
     projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
     messagingSenderId: "YOUR_SENDER_ID",
     appId: "YOUR_APP_ID"
 };
@@ -160,17 +160,19 @@ function initRealtimeSync() {
         try {
             firebaseDb.collection('products').onSnapshot((snapshot) => {
                 if (snapshot.metadata.hasPendingWrites) return;
-                // Only use Firebase data if Supabase isn't the active sync mode
+                // Only use Firebase data if not actively using Supabase
                 if (Store.syncMode === 'supabase') return;
                 const products = [];
                 snapshot.forEach(doc => {
                     products.push({ id: doc.id, ...doc.data() });
                 });
-                Store.products = products;
-                Store.syncMode = 'firebase';
-                Store.lastSynced = new Date();
-                Router.handleRoute();
-                console.log('[TechR] Real-time update received (Firebase)');
+                if (products.length > 0) {
+                    Store.products = products;
+                    Store.syncMode = 'firebase';
+                    Store.lastSynced = new Date();
+                    Router.handleRoute();
+                    console.log('[TechR] Real-time update received (Firebase)');
+                }
             }, (error) => {
                 console.warn('[TechR] Firebase real-time sync error:', error);
             });
@@ -278,10 +280,7 @@ const Store = {
     },
 
     persistProducts: () => {
-        if (Store.syncMode === 'local') {
-            localStorage.setItem('techr_products_v1', JSON.stringify(Store.products));
-        }
-        // Always keep localStorage as a backup
+        // Always persist to localStorage as a backup
         localStorage.setItem('techr_products_v1', JSON.stringify(Store.products));
     },
 
@@ -391,6 +390,13 @@ function toggleMobileMenu() {
 // Make it globally available
 window.toggleMobileMenu = toggleMobileMenu;
 window.Store = Store;
+
+// --- STORAGE FILENAME HELPER ---
+function generateStoragePath(originalName) {
+    const parts = originalName.split('.');
+    const ext = (parts.length > 1 ? parts.pop() : 'img').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    return `products/${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
+}
 
 // --- ADMIN PRODUCT MANAGEMENT ---
 const Admin = {
@@ -682,8 +688,7 @@ const Admin = {
 
         if (firebaseStorage) {
             // Upload to Firebase Storage for cross-device sync
-            const ext = file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '') || 'img';
-            const fileName = `products/${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
+            const fileName = generateStoragePath(file.name);
             const storageRef = firebaseStorage.ref(fileName);
             const uploadTask = storageRef.put(file);
             Toast.info('Uploading image...');
@@ -732,8 +737,7 @@ const Admin = {
             if (file.size > 5 * 1024 * 1024) return;
 
             if (firebaseStorage) {
-                const ext = file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '') || 'img';
-                const fileName = `products/${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
+                const fileName = generateStoragePath(file.name);
                 const storageRef = firebaseStorage.ref(fileName);
                 const uploadTask = storageRef.put(file);
                 uploadTask.on('state_changed',
