@@ -378,6 +378,13 @@ const StudyTech = {
     quizQuestions: [],
     currentQuizIndex: 0,
 
+    // Helper to sanitize HTML to prevent XSS
+    escapeHtml: (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+
     init: () => {
         // Load saved flashcards from localStorage
         const saved = localStorage.getItem('studytech_cards');
@@ -435,8 +442,8 @@ const StudyTech = {
         const quizOptions = document.querySelectorAll('.quiz-option');
         quizOptions.forEach(opt => {
             opt.addEventListener('click', () => {
-                const answer = opt.getAttribute('data-answer');
-                StudyTech.checkAnswer(answer);
+                const optionIndex = parseInt(opt.getAttribute('data-option-index'));
+                StudyTech.checkAnswer(optionIndex);
             });
         });
         
@@ -509,11 +516,11 @@ const StudyTech = {
                 <div class="flashcard" id="flashcard">
                     <div class="flashcard-inner">
                         <div class="flashcard-front">
-                            <p>${card.front}</p>
+                            <p>${StudyTech.escapeHtml(card.front)}</p>
                             <span class="flip-hint">Click to flip</span>
                         </div>
                         <div class="flashcard-back">
-                            <p>${card.back}</p>
+                            <p>${StudyTech.escapeHtml(card.back)}</p>
                             <span class="flip-hint">Click to flip</span>
                         </div>
                     </div>
@@ -649,13 +656,13 @@ const StudyTech = {
                     </div>
                 </div>
                 <div class="quiz-question">
-                    <h3>${q.question}</h3>
+                    <h3>${StudyTech.escapeHtml(q.question)}</h3>
                 </div>
                 <div class="quiz-options">
                     ${q.options.map((opt, i) => `
-                        <button class="quiz-option" data-answer="${opt.replace(/"/g, '&quot;')}">
+                        <button class="quiz-option" data-option-index="${i}">
                             <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-                            ${opt}
+                            ${StudyTech.escapeHtml(opt)}
                         </button>
                     `).join('')}
                 </div>
@@ -664,21 +671,23 @@ const StudyTech = {
         StudyTech.attachContentEventListeners();
     },
 
-    checkAnswer: (answer) => {
+    checkAnswer: (optionIndex) => {
         const q = StudyTech.quizQuestions[StudyTech.currentQuizIndex];
+        const answer = q.options[optionIndex];
         const isCorrect = answer === q.correct;
         
         if (isCorrect) {
             StudyTech.quizScore++;
         }
 
-        // Show feedback briefly
+        // Show feedback briefly - find correct option by index
         const options = document.querySelectorAll('.quiz-option');
-        options.forEach(opt => {
+        const correctIndex = q.options.indexOf(q.correct);
+        options.forEach((opt, idx) => {
             opt.disabled = true;
-            if (opt.textContent.includes(q.correct)) {
+            if (idx === correctIndex) {
                 opt.classList.add('correct');
-            } else if (opt.textContent.includes(answer) && !isCorrect) {
+            } else if (idx === optionIndex && !isCorrect) {
                 opt.classList.add('incorrect');
             }
         });
@@ -710,8 +719,8 @@ const StudyTech = {
                         ${StudyTech.flashcards.map((card, i) => `
                             <div class="card-item">
                                 <div class="card-preview">
-                                    <strong>${card.front}</strong>
-                                    <span>${card.back}</span>
+                                    <strong>${StudyTech.escapeHtml(card.front)}</strong>
+                                    <span>${StudyTech.escapeHtml(card.back)}</span>
                                 </div>
                                 <button class="delete-btn delete-card-btn" data-index="${i}">
                                     <i data-lucide="trash-2"></i>
