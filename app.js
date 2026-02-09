@@ -240,7 +240,30 @@ const Store = {
                 Store.cart = [];
             }
         }
-        await Store.fetchProducts();
+        // Load local products immediately so the page renders instantly
+        Store.loadLocalProducts();
+        // Fetch remote products in the background (non-blocking)
+        Store.fetchProducts().then(() => {
+            Router.handleRoute();
+            Store.updateCartUI();
+        }).catch((e) => { console.warn('[TechR] Background product fetch failed:', e); });
+    },
+
+    loadLocalProducts: () => {
+        Store.syncMode = 'local';
+        const savedProducts = localStorage.getItem('techr_products_v1');
+        if (savedProducts) {
+            try {
+                Store.products = JSON.parse(savedProducts);
+                Store.lastSynced = new Date();
+                return;
+            } catch (e) {
+                console.warn("[TechR] Failed to parse saved products");
+            }
+        }
+        Store.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        Store.persistProducts();
+        Store.lastSynced = new Date();
     },
 
     fetchProducts: async () => {
@@ -278,23 +301,7 @@ const Store = {
             console.warn("[TechR] Firebase unavailable, using local storage");
         }
 
-        // Try loading from localStorage first (persisted local edits)
-        Store.syncMode = 'local';
-        const savedProducts = localStorage.getItem('techr_products_v1');
-        if (savedProducts) {
-            try {
-                Store.products = JSON.parse(savedProducts);
-                Store.lastSynced = new Date();
-                return;
-            } catch (e) {
-                console.warn("[TechR] Failed to parse saved products");
-            }
-        }
-
-        // Fall back to default inventory
-        Store.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        Store.persistProducts();
-        Store.lastSynced = new Date();
+        // Remote sources unavailable; keep current local products
     },
 
     persistProducts: () => {
@@ -2370,8 +2377,8 @@ const Router = {
 };
 
 // --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', async () => {
-    await Store.init();
+document.addEventListener('DOMContentLoaded', () => {
+    Store.init();
     Router.init();
     Router.handleRoute();
     Store.updateCartUI();
