@@ -640,12 +640,12 @@ const Admin = {
 
     toggleProductSelection: (id) => {
         const idx = Admin.selectedProducts.findIndex(sid => matchId(sid, id));
-        if (idx === -1) Admin.selectedProducts.push(id);
+        if (idx === -1) Admin.selectedProducts.push(String(id));
         else Admin.selectedProducts.splice(idx, 1);
     },
 
     selectAllProducts: () => {
-        Admin.selectedProducts = Store.products.map(p => p.id);
+        Admin.selectedProducts = Store.products.map(p => String(p.id));
     },
 
     deselectAllProducts: () => {
@@ -1917,7 +1917,7 @@ const Router = {
         // PRODUCT DETAIL PAGE
         'product': () => {
             const hash = window.location.hash;
-            const idMatch = hash.match(/product\/([^/]+)/);
+            const idMatch = hash.match(/product\/([\w-]+)/);
             const id = idMatch ? idMatch[1] : null;
             const product = id ? Store.products.find(p => matchId(p.id, id)) : null;
             
