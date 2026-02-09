@@ -157,13 +157,11 @@ function initRealtimeSync() {
         }
     }
 
-    // Firebase real-time sync (fallback or alongside)
+    // Firebase real-time sync (primary source of truth for cross-device sync)
     if (firebaseDb) {
         try {
             firebaseDb.collection('products').onSnapshot((snapshot) => {
                 if (snapshot.metadata.hasPendingWrites) return;
-                // Only use Firebase data if not actively using Supabase
-                if (Store.syncMode === 'supabase') return;
                 const products = [];
                 snapshot.forEach(doc => {
                     products.push({ id: doc.id, ...doc.data() });
@@ -172,6 +170,7 @@ function initRealtimeSync() {
                     Store.products = products;
                     Store.syncMode = 'firebase';
                     Store.lastSynced = new Date();
+                    Store.persistProducts();
                     Router.handleRoute();
                     console.log('[TechR] Real-time update received (Firebase)');
                 }
@@ -260,7 +259,38 @@ const Store = {
     },
 
     fetchProducts: async () => {
-        // Try Supabase first
+        // Try Firebase first (primary source of truth for cross-device sync)
+        try {
+            if (firebaseDb) {
+                const snapshot = await withTimeout(firebaseDb.collection('products').get(), 5000);
+                const data = [];
+                snapshot.forEach(doc => {
+                    data.push({ id: doc.id, ...doc.data() });
+                });
+                if (data.length > 0) {
+                    Store.products = data;
+                } else {
+                    // Firebase is available but empty — seed it with defaults
+                    const defaults = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                    const batch = firebaseDb.batch();
+                    defaults.forEach(p => {
+                        const ref = firebaseDb.collection('products').doc(String(p.id));
+                        batch.set(ref, p);
+                    });
+                    await batch.commit();
+                    Store.products = defaults;
+                    console.log('[TechR] Seeded Firebase with default products');
+                }
+                Store.syncMode = 'firebase';
+                Store.lastSynced = new Date();
+                Store.persistProducts();
+                return;
+            }
+        } catch (e) {
+            console.warn("[TechR] Firebase unavailable, trying Supabase");
+        }
+
+        // Try Supabase as fallback
         try {
             if (supabase) {
                 const { data, error } = await withTimeout(supabase.from('products').select('*'), 5000);
@@ -268,30 +298,12 @@ const Store = {
                     Store.products = data;
                     Store.syncMode = 'supabase';
                     Store.lastSynced = new Date();
+                    Store.persistProducts();
                     return;
                 }
             }
         } catch (e) { 
-            console.warn("[TechR] Supabase unavailable, trying Firebase");
-        }
-
-        // Try Firebase as fallback
-        try {
-            if (firebaseDb) {
-                const snapshot = await withTimeout(firebaseDb.collection('products').get(), 5000);
-                if (!snapshot.empty) {
-                    const data = [];
-                    snapshot.forEach(doc => {
-                        data.push({ id: doc.id, ...doc.data() });
-                    });
-                    Store.products = data;
-                    Store.syncMode = 'firebase';
-                    Store.lastSynced = new Date();
-                    return;
-                }
-            }
-        } catch (e) {
-            console.warn("[TechR] Firebase unavailable, using local storage");
+            console.warn("[TechR] Supabase unavailable, using local storage");
         }
 
         // Remote sources unavailable; keep current local products
@@ -302,12 +314,38 @@ const Store = {
         localStorage.setItem('techr_products_v1', JSON.stringify(Store.products));
     },
 
-    resetToDefaults: () => {
+    resetToDefaults: async () => {
         Store.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        Store.syncMode = 'local';
         Store.persistProducts();
         Store.lastSynced = new Date();
-        Toast.success('Products reset to defaults (12 original products restored)');
+
+        // Sync defaults to Firebase so all devices get the reset
+        if (firebaseDb) {
+            try {
+                // Delete all existing products from Firebase
+                const snapshot = await firebaseDb.collection('products').get();
+                const batch = firebaseDb.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+
+                // Write default products to Firebase
+                const writeBatch = firebaseDb.batch();
+                Store.products.forEach(p => {
+                    const ref = firebaseDb.collection('products').doc(String(p.id));
+                    writeBatch.set(ref, p);
+                });
+                await writeBatch.commit();
+                Store.syncMode = 'firebase';
+                Toast.success('Products reset to defaults and synced to Firebase (12 original products restored)');
+            } catch (e) {
+                console.warn('[TechR] Failed to sync defaults to Firebase:', e);
+                Store.syncMode = 'local';
+                Toast.success('Products reset to defaults locally (12 original products restored)');
+            }
+        } else {
+            Store.syncMode = 'local';
+            Toast.success('Products reset to defaults (12 original products restored)');
+        }
         Router.handleRoute();
     },
 
@@ -501,7 +539,7 @@ const Admin = {
                 const imported = JSON.parse(e.target.result);
                 if (!Array.isArray(imported)) { Toast.error('Invalid JSON format: expected an array'); return; }
                 let count = 0;
-                if (firebaseDb && Store.syncMode === 'firebase') {
+                if (firebaseDb) {
                     const batch = firebaseDb.batch();
                     imported.forEach(p => {
                         if (p.name && p.price != null && p.category) {
@@ -541,7 +579,7 @@ const Admin = {
         const clone = JSON.parse(JSON.stringify(product));
         clone.name = product.name + ' (Copy)';
         try {
-            if (firebaseDb && Store.syncMode === 'firebase') {
+            if (firebaseDb) {
                 delete clone.id;
                 await firebaseDb.collection('products').add(clone);
                 await Store.fetchProducts();
@@ -563,7 +601,7 @@ const Admin = {
         if (!confirm('Delete ' + Admin.selectedProducts.length + ' selected products?')) return;
         const count = Admin.selectedProducts.length;
         try {
-            if (firebaseDb && Store.syncMode === 'firebase') {
+            if (firebaseDb) {
                 const batch = firebaseDb.batch();
                 Admin.selectedProducts.forEach(id => {
                     batch.delete(firebaseDb.collection('products').doc(String(id)));
@@ -616,7 +654,7 @@ const Admin = {
         if (isNaN(parsed) || parsed < 0) { Toast.error('Invalid price'); return; }
         product.price = parsed;
         try {
-            if (firebaseDb && Store.syncMode === 'firebase') {
+            if (firebaseDb) {
                 await firebaseDb.collection('products').doc(String(id)).update({ price: parsed });
             }
             Store.persistProducts();
@@ -852,8 +890,18 @@ const Admin = {
             let usedCloud = false;
             let cloudLabel = '';
 
-            // Try Supabase first
-            if (supabase && Store.syncMode === 'supabase') {
+            // Try Firebase first (primary sync for cross-device)
+            if (firebaseDb) {
+                if (editId) {
+                    await firebaseDb.collection('products').doc(String(editId)).update(productData);
+                } else {
+                    await firebaseDb.collection('products').add(productData);
+                }
+                usedCloud = true;
+                cloudLabel = 'Firebase';
+                await Store.fetchProducts();
+            // Try Supabase as fallback
+            } else if (supabase) {
                 if (editId) {
                     const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
                     if (error) throw error;
@@ -864,18 +912,8 @@ const Admin = {
                 usedCloud = true;
                 cloudLabel = 'Supabase';
                 await Store.fetchProducts();
-            // Try Firebase as fallback
-            } else if (firebaseDb && Store.syncMode === 'firebase') {
-                if (editId) {
-                    await firebaseDb.collection('products').doc(String(editId)).update(productData);
-                } else {
-                    await firebaseDb.collection('products').add(productData);
-                }
-                usedCloud = true;
-                cloudLabel = 'Firebase';
-                await Store.fetchProducts();
             } else {
-                // Local storage mode
+                // Local storage mode (no cloud available)
                 if (editId) {
                     const idx = Store.products.findIndex(p => p.id === parseInt(editId));
                     if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
@@ -902,12 +940,12 @@ const Admin = {
         const product = Store.products.find(p => p.id === id);
         const productName = product ? product.name : 'Unknown';
         try {
-            if (supabase && Store.syncMode === 'supabase') {
+            if (firebaseDb) {
+                await firebaseDb.collection('products').doc(String(id)).delete();
+                await Store.fetchProducts();
+            } else if (supabase) {
                 const { error } = await supabase.from('products').delete().eq('id', id);
                 if (error) throw error;
-                await Store.fetchProducts();
-            } else if (firebaseDb && Store.syncMode === 'firebase') {
-                await firebaseDb.collection('products').doc(String(id)).delete();
                 await Store.fetchProducts();
             } else {
                 Store.products = Store.products.filter(p => p.id !== id);
@@ -926,7 +964,7 @@ const Admin = {
         Toast.info('Refreshing products...');
         await Store.fetchProducts();
         Store.lastSynced = new Date();
-        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'supabase' ? 'Supabase Cloud' : Store.syncMode === 'firebase' ? 'Firebase Cloud' : 'Local'));
+        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'firebase' ? 'Firebase Cloud' : Store.syncMode === 'supabase' ? 'Supabase Cloud' : 'Local'));
         Router.handleRoute();
     }
 };
@@ -1415,7 +1453,7 @@ const Router = {
                         <span style="opacity:0.85;font-size:0.85rem;">&mdash; Last synced: ${lastSync}</span>
                     </div>
                     <div style="display:flex;gap:0.5rem;">
-                        ${Store.syncMode === 'local' ? '<button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);font-size:0.8rem;padding:0.35rem 0.75rem;" data-action="reset-defaults">Reset to Defaults</button>' : ''}
+                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);font-size:0.8rem;padding:0.35rem 0.75rem;" data-action="reset-defaults">Reset to Defaults</button>
                     </div>
                 </div>
 
