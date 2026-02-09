@@ -121,9 +121,12 @@ const logger = {
 // --- SUPABASE INIT ---
 let supabase;
 try {
-    if (window.supabase) {
+    // Only init Supabase if key looks like a valid JWT (starts with 'eyJ')
+    if (window.supabase && SUPABASE_KEY && SUPABASE_KEY.startsWith('eyJ')) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         console.log("[TechR] Supabase Online");
+    } else if (window.supabase && SUPABASE_KEY) {
+        console.warn("[TechR] Supabase key format invalid — skipping Supabase init");
     }
 } catch (e) {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
@@ -221,6 +224,13 @@ function withTimeout(promise, ms) {
         timerId = setTimeout(() => reject(new Error('Request timed out')), ms);
     });
     return Promise.race([promise, timeout]).finally(() => clearTimeout(timerId));
+}
+
+// --- ID COMPARISON HELPER ---
+// Firebase document IDs are always strings, but default products use numbers.
+// This helper ensures IDs are compared as strings to avoid type mismatches.
+function matchId(a, b) {
+    return String(a) === String(b);
 }
 
 // --- STORE & STATE ---
@@ -361,9 +371,9 @@ const Store = {
     },
 
     addToCart: (id) => {
-        const product = Store.products.find(p => p.id === id);
+        const product = Store.products.find(p => matchId(p.id, id));
         if (product) {
-            const existing = Store.cart.find(item => item.id === id);
+            const existing = Store.cart.find(item => matchId(item.id, id));
             if (existing) {
                 existing.quantity = (existing.quantity || 1) + 1;
             } else {
@@ -581,7 +591,7 @@ const Admin = {
     },
 
     duplicateProduct: async (id) => {
-        const product = Store.products.find(p => p.id === id);
+        const product = Store.products.find(p => matchId(p.id, id));
         if (!product) return;
         const clone = JSON.parse(JSON.stringify(product));
         clone.name = product.name + ' (Copy)';
@@ -616,7 +626,7 @@ const Admin = {
                 await batch.commit();
                 await Store.fetchProducts();
             } else {
-                Store.products = Store.products.filter(p => !Admin.selectedProducts.includes(p.id));
+                Store.products = Store.products.filter(p => !Admin.selectedProducts.some(sid => matchId(sid, p.id)));
                 Store.persistProducts();
             }
             Admin.logActivity('Bulk deleted ' + count + ' products');
@@ -629,7 +639,7 @@ const Admin = {
     },
 
     toggleProductSelection: (id) => {
-        const idx = Admin.selectedProducts.indexOf(id);
+        const idx = Admin.selectedProducts.findIndex(sid => matchId(sid, id));
         if (idx === -1) Admin.selectedProducts.push(id);
         else Admin.selectedProducts.splice(idx, 1);
     },
@@ -653,7 +663,7 @@ const Admin = {
     },
 
     quickEditPrice: async (id) => {
-        const product = Store.products.find(p => p.id === id);
+        const product = Store.products.find(p => matchId(p.id, id));
         if (!product) return;
         const newPrice = prompt('Enter new price for "' + product.name + '":', product.price);
         if (newPrice === null) return;
@@ -674,7 +684,7 @@ const Admin = {
     },
 
     addNote: (id) => {
-        const product = Store.products.find(p => p.id === id);
+        const product = Store.products.find(p => matchId(p.id, id));
         if (!product) return;
         const existing = Admin.adminNotes[id] || '';
         const note = prompt('Note for "' + product.name + '":', existing);
@@ -856,7 +866,7 @@ const Admin = {
     },
 
     showEditModal: (id) => {
-        const product = Store.products.find(p => p.id === id);
+        const product = Store.products.find(p => matchId(p.id, id));
         if (!product) return;
         document.getElementById('modal-title').textContent = 'Edit Product';
         document.getElementById('product-edit-id').value = id;
@@ -922,7 +932,7 @@ const Admin = {
             } else {
                 // Local storage mode (no cloud available)
                 if (editId) {
-                    const idx = Store.products.findIndex(p => p.id === parseInt(editId));
+                    const idx = Store.products.findIndex(p => matchId(p.id, editId));
                     if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
                 } else {
                     productData.id = Date.now() + Math.floor(Math.random() * 1000);
@@ -944,7 +954,7 @@ const Admin = {
 
     deleteProduct: async (id) => {
         if (!confirm('Delete this product?')) return;
-        const product = Store.products.find(p => p.id === id);
+        const product = Store.products.find(p => matchId(p.id, id));
         const productName = product ? product.name : 'Unknown';
         try {
             if (firebaseDb) {
@@ -955,7 +965,7 @@ const Admin = {
                 if (error) throw error;
                 await Store.fetchProducts();
             } else {
-                Store.products = Store.products.filter(p => p.id !== id);
+                Store.products = Store.products.filter(p => !matchId(p.id, id));
                 Store.persistProducts();
                 Store.lastSynced = new Date();
             }
@@ -1478,7 +1488,7 @@ const Router = {
             `;
 
             const renderProductCard = (p) => {
-                const isSelected = Admin.selectedProducts.includes(p.id);
+                const isSelected = Admin.selectedProducts.some(sid => matchId(sid, p.id));
                 const status = p.status || 'active';
                 const hasNote = Admin.adminNotes[p.id];
                 return `
@@ -1517,7 +1527,7 @@ const Router = {
             };
 
             const renderProductListItem = (p) => {
-                const isSelected = Admin.selectedProducts.includes(p.id);
+                const isSelected = Admin.selectedProducts.some(sid => matchId(sid, p.id));
                 const status = p.status || 'active';
                 return `
                     <div class="admin-product-list-item">
@@ -1907,9 +1917,9 @@ const Router = {
         // PRODUCT DETAIL PAGE
         'product': () => {
             const hash = window.location.hash;
-            const idMatch = hash.match(/product\/(\d+)/);
-            const id = idMatch ? parseInt(idMatch[1]) : null;
-            const product = id ? Store.products.find(p => p.id === id) : null;
+            const idMatch = hash.match(/product\/([^/]+)/);
+            const id = idMatch ? idMatch[1] : null;
+            const product = id ? Store.products.find(p => matchId(p.id, id)) : null;
             
             if (!product) {
                 return `
@@ -1921,7 +1931,7 @@ const Router = {
                 `;
             }
 
-            const related = Store.getProductsByCategory(product.category).filter(p => p.id !== product.id);
+            const related = Store.getProductsByCategory(product.category).filter(p => !matchId(p.id, product.id));
             const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
             const productColors = product.colors && product.colors.length > 0 ? product.colors : [];
             const categoryLabels = { techack: 'Techack Security', techbox: 'TechBox Education', rithim: 'Rithim Clothing', studytech: 'StudyTech AI' };
@@ -2433,10 +2443,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     Admin.showAddModal();
                     break;
                 case 'edit-product':
-                    Admin.showEditModal(parseInt(actionBtn.dataset.productId));
+                    Admin.showEditModal(actionBtn.dataset.productId);
                     break;
                 case 'delete-product':
-                    Admin.deleteProduct(parseInt(actionBtn.dataset.productId));
+                    Admin.deleteProduct(actionBtn.dataset.productId);
                     break;
                 case 'refresh-products':
                     Admin.refreshProducts();
@@ -2491,13 +2501,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     Admin.exportJSON();
                     break;
                 case 'duplicate-product':
-                    Admin.duplicateProduct(parseInt(actionBtn.dataset.productId));
+                    Admin.duplicateProduct(actionBtn.dataset.productId);
                     break;
                 case 'bulk-delete':
                     Admin.bulkDelete();
                     break;
                 case 'toggle-select':
-                    Admin.toggleProductSelection(parseInt(actionBtn.dataset.productId));
+                    Admin.toggleProductSelection(actionBtn.dataset.productId);
                     Router.handleRoute();
                     break;
                 case 'select-all':
@@ -2516,10 +2526,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     Router.handleRoute();
                     break;
                 case 'quick-edit-price':
-                    Admin.quickEditPrice(parseInt(actionBtn.dataset.productId));
+                    Admin.quickEditPrice(actionBtn.dataset.productId);
                     break;
                 case 'add-note':
-                    Admin.addNote(parseInt(actionBtn.dataset.productId));
+                    Admin.addNote(actionBtn.dataset.productId);
                     break;
                 case 'add-category':
                     Admin.addCategory();
@@ -2539,7 +2549,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add to cart button
         const addBtn = e.target.closest('.add-to-cart-btn');
         if (addBtn) {
-            const productId = parseInt(addBtn.dataset.productId);
+            const productId = addBtn.dataset.productId;
             if (productId) {
                 Store.addToCart(productId);
             }
