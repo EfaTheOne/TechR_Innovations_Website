@@ -18,7 +18,14 @@ const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 // For full setup instructions, see FIREBASE_SETUP.md
 // =====================================================
 
-
+const firebaseConfig = {
+  apiKey: "AIzaSyAlTpuOXOY9RD7OWKYOgOT-xiliNSpyEEs",
+  authDomain: "techrinnovationsweb.firebaseapp.com",
+  projectId: "techrinnovationsweb",
+  storageBucket: "techrinnovationsweb.firebasestorage.app",
+  messagingSenderId: "286501983238",
+  appId: "1:286501983238:web:a258b55a93eceda0071f87"
+};
 // =====================================================
 // STRIPE CONFIGURATION
 // Replace the value below with your Stripe Publishable Key.
@@ -2654,6 +2661,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
 
 
 
