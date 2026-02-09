@@ -1332,18 +1332,26 @@ const Router = {
 
         // ADMIN DASHBOARD
         'dashboard': async () => {
-            // Authentication guard: verify user is logged in
+            // Authentication guard: verify user is logged in via Supabase or Firebase
             let isAuthenticated = false;
-            try {
-                if (supabase) {
+            // Check Supabase session
+            if (supabase) {
+                try {
                     const { data: { session } } = await supabase.auth.getSession();
                     if (session) isAuthenticated = true;
+                } catch (e) {
+                    console.warn('[TechR] Supabase session check failed:', e);
                 }
-                if (!isAuthenticated && firebaseAuth && firebaseAuth.currentUser) {
-                    isAuthenticated = true;
+            }
+            // Check Firebase auth (independently, not just as fallback)
+            if (!isAuthenticated && firebaseAuth) {
+                try {
+                    if (firebaseAuth.currentUser) {
+                        isAuthenticated = true;
+                    }
+                } catch (e) {
+                    console.warn('[TechR] Firebase auth check failed:', e);
                 }
-            } catch (e) {
-                console.warn('[TechR] Auth check failed:', e);
             }
             if (!isAuthenticated) {
                 Toast.error('Please log in to access the dashboard');
@@ -2305,37 +2313,55 @@ const Router = {
         const email = document.getElementById('email')?.value;
         const password = document.getElementById('password')?.value;
         if (!email || !password) { Toast.error('Please enter email and password'); return; }
-        try {
-            // Try Supabase auth first
-            if (supabase) {
+
+        let supabaseError = null;
+        let firebaseError = null;
+
+        // Try Supabase auth first
+        if (supabase) {
+            try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (!error) {
                     Toast.success('Welcome back!');
                     window.location.hash = '#dashboard';
                     return;
                 }
-                console.warn('[TechR] Supabase auth failed, trying Firebase');
+                supabaseError = error;
+                console.warn('[TechR] Supabase auth failed, trying Firebase:', error.message);
+            } catch (e) {
+                supabaseError = e;
+                console.warn('[TechR] Supabase auth error, trying Firebase:', e.message);
             }
-            // Try Firebase auth as fallback
-            if (firebaseAuth) {
-                try {
-                    const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-                    if (userCredential.user) {
-                        Toast.success('Welcome back!');
-                        window.location.hash = '#dashboard';
-                        return;
-                    }
-                } catch (fbError) {
-                    if (fbError.code === 'auth/configuration-not-found') {
-                        console.error('[TechR] Firebase Auth not configured — enable Email/Password sign-in in Firebase Console → Authentication → Sign-in method');
-                        Toast.error('Authentication service not configured. Go to Firebase Console → Authentication → Sign-in method and enable Email/Password.');
-                        return;
-                    }
-                    throw fbError;
+        }
+
+        // Try Firebase auth
+        if (firebaseAuth) {
+            try {
+                const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                if (userCredential.user) {
+                    Toast.success('Welcome back!');
+                    window.location.hash = '#dashboard';
+                    return;
                 }
+            } catch (fbError) {
+                firebaseError = fbError;
+                if (fbError.code === 'auth/configuration-not-found') {
+                    console.error('[TechR] Firebase Auth not configured — enable Email/Password sign-in in Firebase Console → Authentication → Sign-in method');
+                }
+                console.warn('[TechR] Firebase auth failed:', fbError.message);
             }
-            Toast.error('Database connection unavailable');
-        } catch(e) { Toast.error('Login failed: ' + e.message); }
+        }
+
+        // Both providers failed — show a meaningful error
+        if (!supabase && !firebaseAuth) {
+            Toast.error('Authentication services not configured. Check your Supabase and Firebase settings.');
+        } else if (supabaseError || firebaseError) {
+            // Show the most relevant error: prefer the last provider tried
+            const err = firebaseError || supabaseError;
+            Toast.error('Login failed: ' + (err.message || 'Invalid email or password'));
+        } else {
+            Toast.error('Authentication service unavailable');
+        }
     },
 
     handleLogout: async () => {
