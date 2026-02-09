@@ -2318,11 +2318,20 @@ const Router = {
             }
             // Try Firebase auth as fallback
             if (firebaseAuth) {
-                const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-                if (userCredential.user) {
-                    Toast.success('Welcome back!');
-                    window.location.hash = '#dashboard';
-                    return;
+                try {
+                    const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                    if (userCredential.user) {
+                        Toast.success('Welcome back!');
+                        window.location.hash = '#dashboard';
+                        return;
+                    }
+                } catch (fbError) {
+                    if (fbError.code === 'auth/configuration-not-found') {
+                        console.error('[TechR] Firebase Auth not configured — enable Email/Password sign-in in Firebase Console → Authentication → Sign-in method');
+                        Toast.error('Authentication service not configured. Go to Firebase Console → Authentication → Sign-in method and enable Email/Password.');
+                        return;
+                    }
+                    throw fbError;
                 }
             }
             Toast.error('Database connection unavailable');
