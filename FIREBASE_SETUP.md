@@ -221,6 +221,12 @@ Click **"Publish"** after updating each set of rules.
 - Check Storage Rules allow reads (Step 7)
 - Look for errors in the browser console
 
+### Login says "Authentication service not configured" or `auth/configuration-not-found`
+- This means Firebase Authentication's Email/Password sign-in provider is not enabled
+- Go to **Firebase Console → Authentication → Sign-in method**
+- Click **"Email/Password"** and toggle the **Enable** switch on, then click **Save**
+- See [Step 6](#step-6-enable-firebase-authentication) for full instructions
+
 ### Login says "Database connection unavailable"
 - Make sure Authentication is enabled with Email/Password (Step 6)
 - Make sure you created a user account in Firebase Auth
