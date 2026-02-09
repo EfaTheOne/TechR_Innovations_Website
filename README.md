@@ -3,7 +3,7 @@
 This is the official website for **TechR Innovations**, a forward-thinking technology company specializing in:
 - **Techack**: Cybersecurity Hardware
 - **TechBox**: STEM Education
-- **Rithim**: Recovery Technology
+- **Rithim**: Casual Streetwear & Apparel
 - **StudyTech**: AI Learning Assistants
 
 ## Deployment
