@@ -4,8 +4,16 @@
 */
 
 // --- CONFIGURATION ---
+// =====================================================
+// SUPABASE CONFIGURATION
+// Replace the placeholder values below with your Supabase project credentials.
+// To get these values:
+//   1. Go to https://supabase.com/dashboard
+//   2. Select your project → Settings → API
+//   3. Copy the "Project URL" and "anon/public" key (a long JWT starting with 'eyJ')
+// =====================================================
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 // =====================================================
 // FIREBASE CONFIGURATION
@@ -121,12 +129,14 @@ const logger = {
 // --- SUPABASE INIT ---
 let supabase;
 try {
-    // Only init Supabase if key looks like a valid JWT (starts with 'eyJ')
+    // Only init Supabase if key looks like a valid JWT (starts with 'eyJ') and is not a placeholder
     if (window.supabase && SUPABASE_KEY && SUPABASE_KEY.startsWith('eyJ')) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         console.log("[TechR] Supabase Online");
-    } else if (window.supabase && SUPABASE_KEY) {
-        console.warn("[TechR] Supabase key format invalid — skipping Supabase init");
+    } else if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.startsWith('YOUR_')) {
+        console.warn("[TechR] Supabase key format invalid — key must be a JWT starting with 'eyJ'. Find your anon key at: Supabase Dashboard → Settings → API");
+    } else {
+        console.info("[TechR] Supabase not configured — replace YOUR_SUPABASE_ANON_KEY in app.js with your project's anon key");
     }
 } catch (e) {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
@@ -197,24 +207,24 @@ function initRealtimeSync() {
 // --- DEFAULT PRODUCTS ---
 const DEFAULT_PRODUCTS = [
     // Techack Products
-    { id: 1, name: "Techack1 Pro", price: 499.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", images: ["https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80", "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Enterprise-grade portable pentesting framework with WiFi 6 and Bluetooth 5.2 capabilities." },
-    { id: 2, name: "Techack1 Lite", price: 299.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", images: ["https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "Compact security testing device for educational and professional use." },
-    { id: 3, name: "Techack Network Probe", price: 149.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", images: ["https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "Passive network analysis tool with real-time packet inspection." },
+    { id: 1, name: "Techack1 Pro", price: 149.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", images: ["https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80", "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Compact portable pen-testing device featuring a CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID. Includes probe request sniffing, auth flood, captive portal, PMKID capture, Pwnagotchi detection, card skimmer detection, and more." },
+    { id: 2, name: "Techack1 MS", price: 29.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", images: ["https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A cost-efficient version of the Techack1 with a smaller form factor and fewer features. Great for beginners learning about security testing and wireless protocols." },
+    { id: 3, name: "TechBot4", price: 219.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", images: ["https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display (320x240), MicroSD card slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi security analysis and network monitoring." },
     
     // TechBox Products
-    { id: 4, name: "TechBox Starter Kit", price: 79.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", images: ["https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", "https://images.unsplash.com/photo-1553406830-ef2f0c93b5c4?w=800&q=80"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "Complete STEM electronics kit with Arduino-compatible microcontroller and 50+ components." },
-    { id: 5, name: "TechBox Advanced", price: 149.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", images: ["https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Advanced robotics and IoT development platform with sensor arrays." },
-    { id: 6, name: "TechBox Classroom (10-Pack)", price: 599.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", images: ["https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Bulk educational kit package for schools and coding bootcamps." },
+    { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", images: ["https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", "https://images.unsplash.com/photo-1553406830-ef2f0c93b5c4?w=800&q=80"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "DIY macropad kit with 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040 microcontroller. Learn PCB design, soldering, and custom firmware programming. Includes 3D-printable case files." },
+    { id: 5, name: "NFC Hacker Card Kit", price: 34.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", images: ["https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Custom NFC-enabled PCB business card kit. Design and build your own programmable business card with embedded NFC chip and QR code. A hands-on introduction to PCB design and NFC technology." },
+    { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", images: ["https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Introductory electronics and soldering kit with a microcontroller, LEDs, resistors, and basic components. Perfect for students getting started with hardware projects and learning to build circuits." },
     
     // Rithim Products
-    { id: 7, name: "Rithim Classic Tee", price: 34.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80", "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&q=80"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Premium cotton crew neck tee with embroidered Rithim logo. Available in all sizes." },
-    { id: 8, name: "Rithim Hoodie", price: 64.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80", "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=800&q=80"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Heavyweight fleece hoodie with kangaroo pocket and Rithim branding. Perfect for everyday wear." },
-    { id: 9, name: "Rithim Joggers", price: 49.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", images: ["https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80"], colors: ["#2d3436", "#636e72", "#b2bec3"], category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Soft cotton blend." },
+    { id: 7, name: "Rithim Classic Tee", price: 29.99, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80", "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&q=80"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Cotton crew neck tee with printed Rithim logo. Comfortable everyday fit available in multiple colors and sizes." },
+    { id: 8, name: "Rithim Hoodie", price: 49.99, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80", "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=800&q=80"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Fleece hoodie with kangaroo pocket and Rithim branding. A cozy go-to for casual everyday wear." },
+    { id: 9, name: "Rithim Joggers", price: 39.99, image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", images: ["https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80"], colors: ["#2d3436", "#636e72", "#b2bec3"], category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Cotton-polyester blend for all-day comfort." },
 
     // StudyTech Products
-    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 19.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", images: ["https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80"], colors: ["#5e5ce6"], category: "studytech", desc: "AI-powered personalized learning assistant with adaptive curriculum." },
-    { id: 11, name: "StudyTech AI Tutor - Annual", price: 149.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", images: ["https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80"], colors: ["#5e5ce6", "#a29bfe"], category: "studytech", desc: "Full year of AI tutoring with advanced analytics and progress tracking." },
-    { id: 12, name: "StudyTech Enterprise", price: 999.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", images: ["https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#5e5ce6", "#2d3436"], category: "studytech", desc: "Enterprise learning platform license for up to 100 students." }
+    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 9.99, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", images: ["https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80"], colors: ["#5e5ce6"], category: "studytech", desc: "AI-powered study assistant that helps with homework, explains concepts, and creates practice problems. Covers math, science, and more." },
+    { id: 11, name: "StudyTech AI Tutor - Annual", price: 79.99, image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80", images: ["https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80"], colors: ["#5e5ce6", "#a29bfe"], category: "studytech", desc: "Full year of AI tutoring access with progress tracking and personalized study plans. Save compared to monthly billing." },
+    { id: 12, name: "StudyTech School License", price: 299.99, image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80", images: ["https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#5e5ce6", "#2d3436"], category: "studytech", desc: "School license for up to 30 students with a teacher dashboard for tracking class progress and assigning AI-guided practice." }
 ];
 
 // --- TIMEOUT HELPER ---
@@ -480,7 +490,7 @@ const Admin = {
     filterPriceMax: '',
     siteSettings: {
         title: 'TechR Innovations',
-        description: 'Pioneering the intersection of cybersecurity, advanced education, and clothing.',
+        description: 'Building hands-on security hardware, maker kits, apparel, and AI-powered learning tools.',
         email: 'contact@techr.com'
     },
     activeTab: 'overview',
@@ -1043,20 +1053,20 @@ const Components = {
     StatsSection: () => `
         <div class="stats-grid reveal">
             <div class="stat-item">
-                <div class="stat-value">500+</div>
-                <div class="stat-label">Enterprise Clients</div>
+                <div class="stat-value">4</div>
+                <div class="stat-label">Product Lines</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">50K+</div>
-                <div class="stat-label">Devices Deployed</div>
+                <div class="stat-value">10+</div>
+                <div class="stat-label">Hardware Projects Built</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">99.9%</div>
-                <div class="stat-label">Uptime SLA</div>
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Designed In-House</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">24/7</div>
-                <div class="stat-label">Support Available</div>
+                <div class="stat-value">Open</div>
+                <div class="stat-label">Source Community</div>
             </div>
         </div>
     `
@@ -1072,7 +1082,7 @@ const Router = {
                     The Future of<br><span style="color: var(--accent);">Technology</span> is Here.
                 </h1>
                 <p class="reveal" style="font-size: 1.35rem; margin-top: 0; max-width: 650px;">
-                    TechR Innovations delivers enterprise-grade hardware, software, and apparel solutions for cybersecurity, education, clothing, and AI-powered learning.
+                    TechR Innovations builds hands-on hardware, security tools, educational kits, apparel, and AI-powered learning — all designed and created by makers, for makers.
                 </p>
                 <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
                     <a href="#techack" class="btn btn-primary btn-lg">Explore Products</a>
@@ -1088,21 +1098,21 @@ const Router = {
                             <i data-lucide="shield" style="color: var(--color-techack);"></i>
                         </div>
                         <h3 style="color: var(--color-techack);">Techack Security</h3>
-                        <p>Advanced penetration testing hardware for red team operations and security assessments.</p>
+                        <p>Portable pen-testing hardware and security tools designed for learning and hands-on security research.</p>
                     </a>
                     <a href="#techbox" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 159, 10, 0.1);">
                             <i data-lucide="box" style="color: var(--color-techbox);"></i>
                         </div>
                         <h3 style="color: var(--color-techbox);">TechBox EDU</h3>
-                        <p>STEM learning kits and educational platforms for the next generation of engineers.</p>
+                        <p>DIY electronics kits and maker projects that teach PCB design, soldering, and microcontroller programming.</p>
                     </a>
                     <a href="#rithim" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 55, 95, 0.1);">
                             <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                         </div>
                         <h3 style="color: var(--color-rithim);">Rithim Clothing</h3>
-                        <p>Premium apparel and streetwear with signature Rithim branding and quality craftsmanship.</p>
+                        <p>Casual apparel and streetwear with Rithim branding — tees, hoodies, and joggers.</p>
                     </a>
                 </div>
                 
@@ -1112,7 +1122,7 @@ const Router = {
                             <i data-lucide="brain" style="color: var(--color-studytech);"></i>
                         </div>
                         <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
-                        <p>AI-powered adaptive learning assistants that personalize education at scale.</p>
+                        <p>An AI-powered study assistant that helps students learn, practice, and track their progress.</p>
                     </a>
                 </div>
             </div>
@@ -1121,8 +1131,8 @@ const Router = {
 
             <div class="container">
                 <div class="cta-section reveal">
-                    <h2>Ready to Transform Your Operations?</h2>
-                    <p>Join 500+ enterprises already using TechR solutions.</p>
+                    <h2>Ready to Build Something Cool?</h2>
+                    <p>Check out our maker tools, security hardware, and learning kits.</p>
                     <a href="#techack" class="btn btn-primary btn-lg">Browse All Products</a>
                 </div>
             </div>
@@ -1134,16 +1144,16 @@ const Router = {
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-techack">Cybersecurity</span>
+                        <span class="badge badge-techack">Security Hardware</span>
                         <h1 style="color: var(--color-techack);">Techack</h1>
-                        <p>Enterprise-grade penetration testing and security assessment hardware for professionals.</p>
+                        <p>Portable pen-testing devices and security tools built for hands-on learning and wireless security research.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('shield-check', 'Military-Grade Security', 'Hardware encryption and secure boot protect your operations.', 'color-techack')}
-                        ${Components.FeatureCard('wifi', 'Wireless Penetration', 'WiFi 6 and Bluetooth 5.2 support for comprehensive testing.', 'color-techack')}
-                        ${Components.FeatureCard('cpu', 'High Performance', 'Quad-core processor handles complex security operations.', 'color-techack')}
-                        ${Components.FeatureCard('lock', 'Compliance Ready', 'Meets PCI-DSS, HIPAA, and SOC 2 requirements.', 'color-techack')}
+                        ${Components.FeatureCard('shield-check', 'Pen-Testing Ready', 'WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact devices.', 'color-techack')}
+                        ${Components.FeatureCard('wifi', 'Wireless Analysis', 'WiFi probe sniffing, PMKID capture, captive portals, and access point scanning.', 'color-techack')}
+                        ${Components.FeatureCard('cpu', 'Custom Hardware', 'Custom-designed PCBs with ESP32 and CC1101 modules built for security research.', 'color-techack')}
+                        ${Components.FeatureCard('lock', 'Learn Security', 'Great for students and hobbyists learning about wireless protocols and network security.', 'color-techack')}
                     </div>
 
                     <h2 class="reveal" style="margin-top: 4rem;">Techack Products</h2>
@@ -1152,9 +1162,9 @@ const Router = {
                     </div>
 
                     <div class="cta-section reveal" style="margin-top: 4rem;">
-                        <h2>Need Custom Security Solutions?</h2>
-                        <p>Contact our enterprise team for custom configurations and volume pricing.</p>
-                        <a href="#admin" class="btn btn-primary">Contact Sales</a>
+                        <h2>Need a Custom Build?</h2>
+                        <p>Reach out if you're interested in custom configurations or bulk orders.</p>
+                        <a href="#admin" class="btn btn-primary">Contact Us</a>
                     </div>
                 </div>
             `;
@@ -1166,16 +1176,16 @@ const Router = {
             return `
                 <div class="division-hero container">
                     <div class="division-header reveal">
-                        <span class="badge badge-techbox">STEM Education</span>
+                        <span class="badge badge-techbox">Maker & STEM Kits</span>
                         <h1 style="color: var(--color-techbox);">TechBox</h1>
-                        <p>Comprehensive STEM education kits designed for learners of all ages.</p>
+                        <p>DIY electronics kits and maker projects for learning PCB design, soldering, and microcontroller programming.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('book-open', 'Curriculum Aligned', 'Content aligned with national STEM education standards.', 'color-techbox')}
-                        ${Components.FeatureCard('users', 'Classroom Ready', 'Bulk packages designed for educational institutions.', 'color-techbox')}
-                        ${Components.FeatureCard('code', 'Learn to Code', 'From block coding to Python, grow with the platform.', 'color-techbox')}
-                        ${Components.FeatureCard('trophy', 'Competition Ready', 'Prepares students for robotics and coding competitions.', 'color-techbox')}
+                        ${Components.FeatureCard('book-open', 'Learn by Building', 'Hands-on kits that teach real hardware skills through project-based learning.', 'color-techbox')}
+                        ${Components.FeatureCard('users', 'Great for Students', 'Perfect for beginners and students exploring electronics and embedded systems.', 'color-techbox')}
+                        ${Components.FeatureCard('code', 'Real Hardware', 'Work with actual microcontrollers, LEDs, NFC chips, and PCB designs.', 'color-techbox')}
+                        ${Components.FeatureCard('trophy', 'Build Your Portfolio', 'Create finished projects you can show off and use every day.', 'color-techbox')}
                     </div>
 
                     <h2 class="reveal" style="margin-top: 4rem;">TechBox Products</h2>
@@ -1184,9 +1194,9 @@ const Router = {
                     </div>
 
                     <div class="cta-section reveal" style="margin-top: 4rem;">
-                        <h2>Educator Discounts Available</h2>
-                        <p>Schools and educational institutions receive special pricing.</p>
-                        <a href="#admin" class="btn btn-primary">Apply for Edu Discount</a>
+                        <h2>Student or Educator?</h2>
+                        <p>Get in touch for group pricing on kits and maker projects.</p>
+                        <a href="#admin" class="btn btn-primary">Contact Us</a>
                     </div>
                 </div>
             `;
@@ -1200,14 +1210,14 @@ const Router = {
                     <div class="division-header reveal">
                         <span class="badge badge-rithim">Fashion & Apparel</span>
                         <h1 style="color: var(--color-rithim);">Rithim</h1>
-                        <p>Premium apparel designed for style, comfort, and everyday confidence.</p>
+                        <p>Casual apparel designed for comfort and everyday style.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('shirt', 'Signature Style', 'Bold designs with the iconic Rithim branding you love.', 'color-rithim')}
-                        ${Components.FeatureCard('heart', 'Premium Comfort', 'Soft fabrics and tailored fits for all-day wearability.', 'color-rithim')}
-                        ${Components.FeatureCard('star', 'Quality Craftsmanship', 'Durable construction with attention to every detail.', 'color-rithim')}
-                        ${Components.FeatureCard('palette', 'Versatile Collection', 'From casual tees to cozy hoodies, find your perfect look.', 'color-rithim')}
+                        ${Components.FeatureCard('shirt', 'Rithim Style', 'Clean designs with the Rithim brand look.', 'color-rithim')}
+                        ${Components.FeatureCard('heart', 'Comfortable Fit', 'Soft fabrics and relaxed fits for all-day wear.', 'color-rithim')}
+                        ${Components.FeatureCard('star', 'Quality Materials', 'Cotton and cotton-blend fabrics built to last.', 'color-rithim')}
+                        ${Components.FeatureCard('palette', 'Multiple Colors', 'Tees, hoodies, and joggers in a range of colors.', 'color-rithim')}
                     </div>
 
                     <h2 class="reveal" style="margin-top: 4rem;">Rithim Collection</h2>
@@ -1232,24 +1242,24 @@ const Router = {
                     <div class="division-header reveal">
                         <span class="badge badge-studytech">AI & EdTech</span>
                         <h1 style="color: var(--color-studytech);">StudyTech</h1>
-                        <p>AI-powered personalized learning that adapts to every student.</p>
+                        <p>An AI-powered study assistant that helps students learn and practice at their own pace.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('brain', 'Adaptive AI', 'Machine learning algorithms personalize every lesson.', 'color-studytech')}
-                        ${Components.FeatureCard('bar-chart-3', 'Progress Tracking', 'Detailed analytics for students, parents, and educators.', 'color-studytech')}
-                        ${Components.FeatureCard('globe', 'Any Subject', 'From mathematics to languages, comprehensive coverage.', 'color-studytech')}
-                        ${Components.FeatureCard('zap', 'Instant Feedback', 'Real-time explanations and guided problem solving.', 'color-studytech')}
+                        ${Components.FeatureCard('brain', 'AI-Powered Help', 'Get explanations, practice problems, and study guidance from an AI tutor.', 'color-studytech')}
+                        ${Components.FeatureCard('bar-chart-3', 'Track Your Progress', 'See how you\'re improving over time with simple progress reports.', 'color-studytech')}
+                        ${Components.FeatureCard('globe', 'Multiple Subjects', 'Covers math, science, and other core school subjects.', 'color-studytech')}
+                        ${Components.FeatureCard('zap', 'Instant Feedback', 'Get real-time help and explanations as you work through problems.', 'color-studytech')}
                     </div>
 
                     <h2 class="reveal" style="margin-top: 4rem;">StudyTech Subscriptions</h2>
                     <div class="pricing-grid" style="margin-top: 2rem;">
                         <div class="pricing-card reveal">
                             <h3>Monthly</h3>
-                            <div class="price">$19.99<span>/mo</span></div>
+                            <div class="price">$9.99<span>/mo</span></div>
                             <ul class="pricing-features">
-                                <li><i data-lucide="check"></i> Unlimited AI tutoring sessions</li>
-                                <li><i data-lucide="check"></i> All subjects included</li>
+                                <li><i data-lucide="check"></i> AI tutoring sessions</li>
+                                <li><i data-lucide="check"></i> Core subjects included</li>
                                 <li><i data-lucide="check"></i> Progress tracking</li>
                                 <li><i data-lucide="check"></i> Cancel anytime</li>
                             </ul>
@@ -1257,25 +1267,25 @@ const Router = {
                         </div>
                         <div class="pricing-card featured reveal">
                             <h3>Annual</h3>
-                            <div class="price">$149.99<span>/yr</span></div>
+                            <div class="price">$79.99<span>/yr</span></div>
                             <ul class="pricing-features">
                                 <li><i data-lucide="check"></i> Everything in Monthly</li>
-                                <li><i data-lucide="check"></i> Advanced analytics</li>
+                                <li><i data-lucide="check"></i> Progress reports</li>
                                 <li><i data-lucide="check"></i> Priority support</li>
-                                <li><i data-lucide="check"></i> Save $89.89/year</li>
+                                <li><i data-lucide="check"></i> Save $39.89/year</li>
                             </ul>
                             <button class="btn btn-primary add-to-cart-btn" data-product-id="11" style="width: 100%;">Subscribe Annually</button>
                         </div>
                         <div class="pricing-card reveal">
-                            <h3>Enterprise</h3>
-                            <div class="price">$999.99<span>/yr</span></div>
+                            <h3>School License</h3>
+                            <div class="price">$299.99<span>/yr</span></div>
                             <ul class="pricing-features">
-                                <li><i data-lucide="check"></i> Up to 100 students</li>
-                                <li><i data-lucide="check"></i> Admin dashboard</li>
-                                <li><i data-lucide="check"></i> Custom curriculum</li>
-                                <li><i data-lucide="check"></i> Dedicated support</li>
+                                <li><i data-lucide="check"></i> Up to 30 students</li>
+                                <li><i data-lucide="check"></i> Teacher dashboard</li>
+                                <li><i data-lucide="check"></i> Class progress tracking</li>
+                                <li><i data-lucide="check"></i> Email support</li>
                             </ul>
-                            <button class="btn btn-secondary add-to-cart-btn" data-product-id="12" style="width: 100%;">Get Enterprise</button>
+                            <button class="btn btn-secondary add-to-cart-btn" data-product-id="12" style="width: 100%;">Get School License</button>
                         </div>
                     </div>
                 </div>
@@ -2130,12 +2140,13 @@ const Router = {
                         <div class="about-founder-info">
                             <span class="badge" style="background: rgba(41, 151, 255, 0.15); color: var(--accent); margin-bottom: 0.75rem; display: inline-block;">Founder & CEO</span>
                             <h2>Ryan Pegg</h2>
-                            <p class="about-founder-tagline">Young entrepreneur, hardware hacker, and innovator passionate about building the future of technology.</p>
+                            <p class="about-founder-tagline">Young entrepreneur, hardware hacker, and maker passionate about building cool tech projects.</p>
                             <p class="about-founder-bio">
-                                Ryan is the driving force behind TechR Innovations. With deep expertise in cybersecurity hardware, embedded systems, 
-                                and a creative vision for tech-forward fashion, he founded TechR to bring together his passions for hacking, education, 
-                                and style into one unified brand. From designing custom penetration testing devices like the Techack1 to creating 
-                                STEM education kits and the Rithim clothing line, Ryan embodies the spirit of a modern maker and entrepreneur.
+                                Ryan is the driving force behind TechR Innovations. With a passion for cybersecurity hardware, embedded systems, 
+                                and hands-on building, he founded TechR to bring together his interests in hacking, education, 
+                                and style into one brand. From designing custom pen-testing devices like the Techack1 to creating 
+                                maker kits like the Tech_Pad macropad and the Rithim clothing line, Ryan is a self-taught maker and entrepreneur
+                                who loves learning by building.
                             </p>
                             <div class="about-founder-links">
                                 <a href="https://github.com/EfaTheOne" target="_blank" rel="noopener noreferrer" class="founder-social-link">
@@ -2149,21 +2160,21 @@ const Router = {
                 <div class="about-section reveal">
                     <h2>Our Story</h2>
                     <p>
-                        TechR Innovations was born from a passion for hands-on technology and the belief that innovation should be accessible to everyone. 
-                        What started as personal hardware hacking projects — building custom macropads, NFC hacking cards, and penetration testing 
-                        devices — evolved into a full-fledged company spanning four distinct businesses. Ryan's journey from building his first 
-                        Tech_Pad to creating the Techack1 Pro pentesting framework is the foundation of everything TechR stands for: curiosity, 
-                        craftsmanship, and relentless innovation.
+                        TechR Innovations grew out of a passion for hands-on technology and the belief that you learn best by building things yourself. 
+                        What started as personal hardware hacking projects — building custom macropads, NFC business cards, and pen-testing 
+                        devices — evolved into a growing brand spanning four distinct product lines. Ryan's journey from building his first 
+                        Tech_Pad macropad to designing the Techack1 Pro pen-testing device is the foundation of everything TechR stands for: curiosity, 
+                        making, and learning by doing.
                     </p>
                 </div>
 
                 <div class="about-section reveal">
                     <h2>Our Mission</h2>
                     <p>
-                        Our mission is to empower individuals and organizations with tools that make a real difference. Whether it's 
-                        protecting digital infrastructure with Techack, inspiring the next generation of engineers with TechBox, 
-                        expressing identity through Rithim clothing, or personalizing education with StudyTech AI — every product 
-                        we create is designed to push boundaries and unlock potential.
+                        Our mission is to create tools and products that inspire learning and creativity. Whether it's 
+                        exploring network security with Techack, learning electronics with TechBox kits, 
+                        expressing your style through Rithim clothing, or getting study help with StudyTech AI — every product 
+                        we make is about hands-on learning and building something real.
                     </p>
                 </div>
 
@@ -2172,22 +2183,22 @@ const Router = {
                     <div class="about-division-card" style="border-color: var(--color-techack);">
                         <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
                         <h3 style="color: var(--color-techack);">Techack</h3>
-                        <p>Enterprise-grade penetration testing hardware. From the Techack1 Pro to network probes, we build the tools security professionals trust.</p>
+                        <p>Portable pen-testing hardware for learning about wireless security. From the Techack1 Pro to the TechBot4, we build tools for hands-on security research.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-techbox);">
                         <i data-lucide="box" style="width: 32px; height: 32px; color: var(--color-techbox);"></i>
                         <h3 style="color: var(--color-techbox);">TechBox</h3>
-                        <p>STEM education kits that make learning electronics, coding, and robotics fun and accessible for students of all ages.</p>
+                        <p>DIY electronics and maker kits including macropads, NFC cards, and starter bundles for learning PCB design and microcontroller programming.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-rithim);">
                         <i data-lucide="shirt" style="width: 32px; height: 32px; color: var(--color-rithim);"></i>
                         <h3 style="color: var(--color-rithim);">Rithim</h3>
-                        <p>Premium streetwear and apparel that merges tech culture with bold fashion. Express your identity with style.</p>
+                        <p>Casual streetwear and apparel with Rithim branding. Tees, hoodies, and joggers for everyday wear.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-studytech);">
                         <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
                         <h3 style="color: var(--color-studytech);">StudyTech</h3>
-                        <p>AI-powered adaptive learning that personalizes education at scale for students, parents, and institutions.</p>
+                        <p>AI-powered study assistant that helps students learn, practice, and track their progress across core subjects.</p>
                     </div>
                 </div>
 

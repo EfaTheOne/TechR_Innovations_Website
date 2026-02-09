@@ -3,7 +3,7 @@
 This is the official website for **TechR Innovations**, a forward-thinking technology company specializing in:
 - **Techack**: Cybersecurity Hardware
 - **TechBox**: STEM Education
-- **Rithim**: Recovery Technology
+- **Rithim**: Casual Streetwear & Apparel
 - **StudyTech**: AI Learning Assistants
 
 ## Deployment
@@ -17,7 +17,11 @@ Simply open `index.html` in any web browser.
 This app supports **dual-cloud sync** for real-time data and image uploads across all devices:
 
 **Supabase** (Primary database):
-- Already configured in `app.js` — update `SUPABASE_URL` and `SUPABASE_KEY` with your Supabase project credentials
+1. Create a Supabase project at [supabase.com/dashboard](https://supabase.com/dashboard)
+2. Go to **Settings → API** in your project dashboard
+3. Copy the **Project URL** and paste it as `SUPABASE_URL` in `app.js`
+4. Copy the **anon/public** key (a long string starting with `eyJ`) and paste it as `SUPABASE_KEY` in `app.js`
+5. Create a `products` table in your Supabase database
 
 **Firebase** (Image storage & sync fallback):
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
