@@ -4,8 +4,16 @@
 */
 
 // --- CONFIGURATION ---
+// =====================================================
+// SUPABASE CONFIGURATION
+// Replace the placeholder values below with your Supabase project credentials.
+// To get these values:
+//   1. Go to https://supabase.com/dashboard
+//   2. Select your project → Settings → API
+//   3. Copy the "Project URL" and "anon/public" key (a long JWT starting with 'eyJ')
+// =====================================================
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 // =====================================================
 // FIREBASE CONFIGURATION
@@ -121,12 +129,14 @@ const logger = {
 // --- SUPABASE INIT ---
 let supabase;
 try {
-    // Only init Supabase if key looks like a valid JWT (starts with 'eyJ')
+    // Only init Supabase if key looks like a valid JWT (starts with 'eyJ') and is not a placeholder
     if (window.supabase && SUPABASE_KEY && SUPABASE_KEY.startsWith('eyJ')) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         console.log("[TechR] Supabase Online");
-    } else if (window.supabase && SUPABASE_KEY) {
-        console.warn("[TechR] Supabase key format invalid — skipping Supabase init");
+    } else if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.startsWith('YOUR_')) {
+        console.warn("[TechR] Supabase key format invalid — key must be a JWT starting with 'eyJ'. Find your anon key at: Supabase Dashboard → Settings → API");
+    } else {
+        console.info("[TechR] Supabase not configured — replace YOUR_SUPABASE_ANON_KEY in app.js with your project's anon key");
     }
 } catch (e) {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
