@@ -398,6 +398,9 @@ function generateStoragePath(originalName) {
     return `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
 }
 
+// Default image display mode
+const DEFAULT_IMAGE_FIT = 'cover';
+
 // --- ADMIN PRODUCT MANAGEMENT ---
 const Admin = {
     filterSearch: '',
@@ -822,7 +825,7 @@ const Admin = {
         document.getElementById('product-desc').value = product.desc;
         document.getElementById('product-colors').value = (product.colors || []).join(', ');
         const fitSelect = document.getElementById('product-image-fit');
-        if (fitSelect) fitSelect.value = product.image_fit || 'cover';
+        if (fitSelect) fitSelect.value = product.image_fit || DEFAULT_IMAGE_FIT;
         Admin.pendingImages = (product.images || []).filter(img => img !== product.image);
         Admin.renderAdditionalPreviews();
         Admin.previewImage(product.image);
@@ -847,7 +850,7 @@ const Admin = {
             image: mainImage,
             images: allImages,
             colors: colors,
-            image_fit: document.getElementById('product-image-fit').value || 'cover',
+            image_fit: document.getElementById('product-image-fit').value || DEFAULT_IMAGE_FIT,
             desc: document.getElementById('product-desc').value
         };
 
@@ -927,7 +930,7 @@ const Components = {
     ProductCard: (p) => `
         <div class="product-card reveal">
             <a href="#product/${p.id}" style="text-decoration: none; color: inherit;">
-                <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy" style="object-fit: ${p.image_fit || 'cover'};">
+                <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy" style="object-fit: ${p.image_fit || DEFAULT_IMAGE_FIT};">
                 <div class="product-content">
                     <h3>${p.name}</h3>
                     <p class="product-desc">${p.desc}</p>
@@ -1424,7 +1427,7 @@ const Router = {
                             <input type="checkbox" class="admin-checkbox" data-action="toggle-select" data-product-id="${p.id}" ${isSelected ? 'checked' : ''}>
                             <span class="drag-handle" title="Drag to reorder">⠿</span>
                         </div>
-                        <img src="${p.image}" alt="${p.name}" class="admin-product-img" style="object-fit: ${p.image_fit || 'cover'};">
+                        <img src="${p.image}" alt="${p.name}" class="admin-product-img" style="object-fit: ${p.image_fit || DEFAULT_IMAGE_FIT};">
                         <div class="admin-product-info">
                             <h3>${p.name}</h3>
                             <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
@@ -1883,7 +1886,7 @@ const Router = {
                     <div class="product-detail reveal">
                         <div class="product-detail-gallery">
                             <div class="product-detail-main-image">
-                                <img id="product-main-img" src="${productImages[0]}" alt="${product.name}" style="object-fit: ${product.image_fit || 'cover'};">
+                                <img id="product-main-img" src="${productImages[0]}" alt="${product.name}" style="object-fit: ${product.image_fit || DEFAULT_IMAGE_FIT};">
                             </div>
                             ${productImages.length > 1 ? `
                                 <div class="product-detail-thumbnails">
