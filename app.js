@@ -16,25 +16,6 @@ const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 
 // =====================================================
-// FIREBASE CONFIGURATION
-// Replace the placeholder values below with your Firebase project config.
-// To get these values:
-//   1. Go to https://console.firebase.google.com
-//   2. Select your project → Project Settings (gear icon)
-//   3. Scroll to "Your apps" → select your web app
-//   4. Copy the config values shown there
-// For full setup instructions, see FIREBASE_SETUP.md
-// =====================================================
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAlTpuOXOY9RD7OWKYOgOT-xiliNSpyEEs",
-  authDomain: "techrinnovationsweb.firebaseapp.com",
-  projectId: "techrinnovationsweb",
-  storageBucket: "techrinnovationsweb.firebasestorage.app",
-  messagingSenderId: "286501983238",
-  appId: "1:286501983238:web:a258b55a93eceda0071f87"
-};
-// =====================================================
 // STRIPE CONFIGURATION
 // Replace the value below with your Stripe Publishable Key.
 // Find it at: https://dashboard.stripe.com/apikeys
@@ -142,22 +123,6 @@ try {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
 }
 
-// --- FIREBASE INIT ---
-let firebaseDb;
-let firebaseStorage;
-let firebaseAuth;
-try {
-    if (window.firebase && firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('YOUR_')) {
-        firebase.initializeApp(firebaseConfig);
-        firebaseDb = firebase.firestore();
-        firebaseStorage = firebase.storage();
-        firebaseAuth = firebase.auth();
-        console.log("[TechR] Firebase Online");
-    }
-} catch (e) {
-    console.warn("[TechR] Firebase Init Failed");
-}
-
 // --- REAL-TIME SYNC ---
 function initRealtimeSync() {
     // Supabase real-time sync
@@ -174,32 +139,6 @@ function initRealtimeSync() {
             console.log('[TechR] Supabase real-time sync enabled');
         } catch(e) {
             console.warn('[TechR] Supabase real-time sync unavailable');
-        }
-    }
-
-    // Firebase real-time sync (primary source of truth for cross-device sync)
-    if (firebaseDb) {
-        try {
-            firebaseDb.collection('products').onSnapshot((snapshot) => {
-                if (snapshot.metadata.hasPendingWrites) return;
-                const products = [];
-                snapshot.forEach(doc => {
-                    products.push({ id: doc.id, ...doc.data() });
-                });
-                if (products.length > 0) {
-                    Store.products = products;
-                    Store.syncMode = 'firebase';
-                    Store.lastSynced = new Date();
-                    Store.persistProducts();
-                    Router.handleRoute();
-                    console.log('[TechR] Real-time update received (Firebase)');
-                }
-            }, (error) => {
-                console.warn('[TechR] Firebase real-time sync error:', error);
-            });
-            console.log('[TechR] Firebase real-time sync enabled');
-        } catch(e) {
-            console.warn('[TechR] Firebase real-time sync unavailable');
         }
     }
 }
@@ -237,7 +176,7 @@ function withTimeout(promise, ms) {
 }
 
 // --- ID COMPARISON HELPER ---
-// Firebase document IDs are always strings, but default products use numbers.
+// Database IDs may be strings or numbers depending on the source.
 // This helper ensures IDs are compared as strings to avoid type mismatches.
 function matchId(a, b) {
     return String(a) === String(b);
@@ -247,7 +186,7 @@ function matchId(a, b) {
 const Store = {
     products: [],
     cart: [],
-    syncMode: 'local', // 'supabase', 'firebase', or 'local'
+    syncMode: 'local', // 'supabase' or 'local'
     lastSynced: null,
 
     init: async () => {
@@ -286,38 +225,7 @@ const Store = {
     },
 
     fetchProducts: async () => {
-        // Try Firebase first (primary source of truth for cross-device sync)
-        try {
-            if (firebaseDb) {
-                const snapshot = await withTimeout(firebaseDb.collection('products').get(), 5000);
-                const data = [];
-                snapshot.forEach(doc => {
-                    data.push({ id: doc.id, ...doc.data() });
-                });
-                if (data.length > 0) {
-                    Store.products = data;
-                } else {
-                    // Firebase is available but empty — seed it with defaults
-                    const defaults = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-                    const batch = firebaseDb.batch();
-                    defaults.forEach(p => {
-                        const ref = firebaseDb.collection('products').doc(String(p.id));
-                        batch.set(ref, p);
-                    });
-                    await batch.commit();
-                    Store.products = defaults;
-                    console.log('[TechR] Seeded Firebase with default products');
-                }
-                Store.syncMode = 'firebase';
-                Store.lastSynced = new Date();
-                Store.persistProducts();
-                return;
-            }
-        } catch (e) {
-            console.warn("[TechR] Firebase unavailable, trying Supabase");
-        }
-
-        // Try Supabase as fallback
+        // Try Supabase (primary source of truth for cross-device sync)
         try {
             if (supabase) {
                 const { data, error } = await withTimeout(supabase.from('products').select('*'), 5000);
@@ -333,7 +241,7 @@ const Store = {
             console.warn("[TechR] Supabase unavailable, using local storage");
         }
 
-        // Remote sources unavailable; keep current local products
+        // Remote source unavailable; keep current local products
     },
 
     persistProducts: () => {
@@ -346,26 +254,28 @@ const Store = {
         Store.persistProducts();
         Store.lastSynced = new Date();
 
-        // Sync defaults to Firebase so all devices get the reset
-        if (firebaseDb) {
+        // Sync defaults to Supabase so all devices get the reset
+        if (supabase) {
             try {
-                // Delete all existing products from Firebase
-                const snapshot = await firebaseDb.collection('products').get();
-                const batch = firebaseDb.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
+                // Delete all existing products from Supabase
+                const { data: existing } = await supabase.from('products').select('id');
+                if (existing && existing.length > 0) {
+                    const ids = existing.map(p => p.id);
+                    await supabase.from('products').delete().in('id', ids);
+                }
 
-                // Write default products to Firebase
-                const writeBatch = firebaseDb.batch();
-                Store.products.forEach(p => {
-                    const ref = firebaseDb.collection('products').doc(String(p.id));
-                    writeBatch.set(ref, p);
+                // Write default products to Supabase
+                const defaults = Store.products.map(p => {
+                    const { id, ...rest } = p;
+                    return rest;
                 });
-                await writeBatch.commit();
-                Store.syncMode = 'firebase';
-                Toast.success('Products reset to defaults and synced to Firebase (12 original products restored)');
+                const { error } = await supabase.from('products').insert(defaults);
+                if (error) throw error;
+                await Store.fetchProducts();
+                Store.syncMode = 'supabase';
+                Toast.success('Products reset to defaults and synced to Supabase (12 original products restored)');
             } catch (e) {
-                console.warn('[TechR] Failed to sync defaults to Firebase:', e);
+                console.warn('[TechR] Failed to sync defaults to Supabase:', e);
                 Store.syncMode = 'local';
                 Toast.success('Products reset to defaults locally (12 original products restored)');
             }
@@ -478,7 +388,7 @@ window.Store = Store;
 function generateStoragePath(originalName) {
     const parts = originalName.split('.');
     const ext = (parts.length > 1 ? parts.pop() : 'img').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-    return `products/${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
+    return `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
 }
 
 // --- ADMIN PRODUCT MANAGEMENT ---
@@ -566,18 +476,15 @@ const Admin = {
                 const imported = JSON.parse(e.target.result);
                 if (!Array.isArray(imported)) { Toast.error('Invalid JSON format: expected an array'); return; }
                 let count = 0;
-                if (firebaseDb) {
-                    const batch = firebaseDb.batch();
-                    imported.forEach(p => {
-                        if (p.name && p.price != null && p.category) {
-                            if (!p.status) p.status = 'active';
-                            const docRef = firebaseDb.collection('products').doc();
-                            const { id, ...productData } = p;
-                            batch.set(docRef, productData);
-                            count++;
-                        }
+                if (supabase) {
+                    const validProducts = imported.filter(p => p.name && p.price != null && p.category).map(p => {
+                        const { id, ...productData } = p;
+                        if (!productData.status) productData.status = 'active';
+                        return productData;
                     });
-                    await batch.commit();
+                    const { error } = await supabase.from('products').insert(validProducts);
+                    if (error) throw error;
+                    count = validProducts.length;
                     await Store.fetchProducts();
                 } else {
                     imported.forEach(p => {
@@ -606,9 +513,10 @@ const Admin = {
         const clone = JSON.parse(JSON.stringify(product));
         clone.name = product.name + ' (Copy)';
         try {
-            if (firebaseDb) {
+            if (supabase) {
                 delete clone.id;
-                await firebaseDb.collection('products').add(clone);
+                const { error } = await supabase.from('products').insert([clone]);
+                if (error) throw error;
                 await Store.fetchProducts();
             } else {
                 clone.id = Date.now() + Math.floor(Math.random() * 1000);
@@ -628,12 +536,10 @@ const Admin = {
         if (!confirm('Delete ' + Admin.selectedProducts.length + ' selected products?')) return;
         const count = Admin.selectedProducts.length;
         try {
-            if (firebaseDb) {
-                const batch = firebaseDb.batch();
-                Admin.selectedProducts.forEach(id => {
-                    batch.delete(firebaseDb.collection('products').doc(String(id)));
-                });
-                await batch.commit();
+            if (supabase) {
+                const ids = Admin.selectedProducts.map(id => parseInt(id)).filter(id => !isNaN(id));
+                const { error } = await supabase.from('products').delete().in('id', ids);
+                if (error) throw error;
                 await Store.fetchProducts();
             } else {
                 Store.products = Store.products.filter(p => !Admin.selectedProducts.some(sid => matchId(sid, p.id)));
@@ -681,8 +587,9 @@ const Admin = {
         if (isNaN(parsed) || parsed < 0) { Toast.error('Invalid price'); return; }
         product.price = parsed;
         try {
-            if (firebaseDb) {
-                await firebaseDb.collection('products').doc(String(id)).update({ price: parsed });
+            if (supabase) {
+                const { error } = await supabase.from('products').update({ price: parsed }).eq('id', parseInt(id));
+                if (error) throw error;
             }
             Store.persistProducts();
             Admin.logActivity('Quick-edited price of ' + product.name + ' to $' + parsed.toFixed(2));
@@ -757,7 +664,7 @@ const Admin = {
         }
     },
 
-    handleFileUpload: (files) => {
+    handleFileUpload: async (files) => {
         if (!files || files.length === 0) return;
         const file = files[0];
         if (!file.type.startsWith('image/')) {
@@ -769,35 +676,34 @@ const Admin = {
             return;
         }
 
-        if (firebaseStorage) {
-            // Upload to Firebase Storage for cross-device sync
+        if (supabase) {
+            // Upload to Supabase Storage for cross-device sync
             const fileName = generateStoragePath(file.name);
-            const storageRef = firebaseStorage.ref(fileName);
-            const uploadTask = storageRef.put(file);
             Toast.info('Uploading image...');
-            uploadTask.on('state_changed',
-                null,
-                (error) => {
-                    console.error('[TechR] Firebase upload failed, falling back to base64:', error);
-                    // Fallback to base64 if Firebase Storage fails
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const dataUrl = e.target.result;
-                        const urlInput = document.getElementById('product-image');
-                        if (urlInput) urlInput.value = dataUrl;
-                        Admin.previewImage(dataUrl);
-                        Toast.success('Image saved locally');
-                    };
-                    reader.readAsDataURL(file);
-                },
-                async () => {
-                    const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+            try {
+                const { data, error } = await supabase.storage.from('products').upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+                if (error) throw error;
+                const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
+                const downloadURL = urlData.publicUrl;
+                const urlInput = document.getElementById('product-image');
+                if (urlInput) urlInput.value = downloadURL;
+                Admin.previewImage(downloadURL);
+                Toast.success('Image uploaded to cloud');
+            } catch (uploadError) {
+                console.error('[TechR] Supabase upload failed, falling back to base64:', uploadError);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
                     const urlInput = document.getElementById('product-image');
-                    if (urlInput) urlInput.value = downloadURL;
-                    Admin.previewImage(downloadURL);
-                    Toast.success('Image uploaded to cloud');
-                }
-            );
+                    if (urlInput) urlInput.value = dataUrl;
+                    Admin.previewImage(dataUrl);
+                    Toast.success('Image saved locally');
+                };
+                reader.readAsDataURL(file);
+            }
         } else {
             // Fallback: base64 for local-only mode
             const reader = new FileReader();
@@ -819,27 +725,25 @@ const Admin = {
             if (!file.type.startsWith('image/')) return;
             if (file.size > 5 * 1024 * 1024) return;
 
-            if (firebaseStorage) {
+            if (supabase) {
                 const fileName = generateStoragePath(file.name);
-                const storageRef = firebaseStorage.ref(fileName);
-                const uploadTask = storageRef.put(file);
-                uploadTask.on('state_changed',
-                    null,
-                    (error) => {
-                        console.error('[TechR] Additional image upload failed, falling back to base64:', error);
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            Admin.pendingImages.push(e.target.result);
-                            Admin.renderAdditionalPreviews();
-                        };
-                        reader.readAsDataURL(file);
-                    },
-                    async () => {
-                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                        Admin.pendingImages.push(downloadURL);
+                supabase.storage.from('products').upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                }).then(({ data, error }) => {
+                    if (error) throw error;
+                    const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
+                    Admin.pendingImages.push(urlData.publicUrl);
+                    Admin.renderAdditionalPreviews();
+                }).catch((uploadError) => {
+                    console.error('[TechR] Additional image upload failed, falling back to base64:', uploadError);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        Admin.pendingImages.push(e.target.result);
                         Admin.renderAdditionalPreviews();
-                    }
-                );
+                    };
+                    reader.readAsDataURL(file);
+                });
             } else {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -917,18 +821,8 @@ const Admin = {
             let usedCloud = false;
             let cloudLabel = '';
 
-            // Try Firebase first (primary sync for cross-device)
-            if (firebaseDb) {
-                if (editId) {
-                    await firebaseDb.collection('products').doc(String(editId)).update(productData);
-                } else {
-                    await firebaseDb.collection('products').add(productData);
-                }
-                usedCloud = true;
-                cloudLabel = 'Firebase';
-                await Store.fetchProducts();
-            // Try Supabase as fallback
-            } else if (supabase) {
+            // Try Supabase (primary sync for cross-device)
+            if (supabase) {
                 if (editId) {
                     const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
                     if (error) throw error;
@@ -967,10 +861,7 @@ const Admin = {
         const product = Store.products.find(p => matchId(p.id, id));
         const productName = product ? product.name : 'Unknown';
         try {
-            if (firebaseDb) {
-                await firebaseDb.collection('products').doc(String(id)).delete();
-                await Store.fetchProducts();
-            } else if (supabase) {
+            if (supabase) {
                 const { error } = await supabase.from('products').delete().eq('id', id);
                 if (error) throw error;
                 await Store.fetchProducts();
@@ -991,7 +882,7 @@ const Admin = {
         Toast.info('Refreshing products...');
         await Store.fetchProducts();
         Store.lastSynced = new Date();
-        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'firebase' ? 'Firebase Cloud' : Store.syncMode === 'supabase' ? 'Supabase Cloud' : 'Local'));
+        Toast.success('Products refreshed! Mode: ' + (Store.syncMode === 'supabase' ? 'Supabase Cloud' : 'Local'));
         Router.handleRoute();
     }
 };
@@ -1085,7 +976,7 @@ const Router = {
                     I'm Ryan Pegg, founder of TechR Innovations. I design and build pen-testing hardware, maker kits, apparel, and AI-powered learning tools — all from the ground up.
                 </p>
                 <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                    <a href="#techack" class="btn btn-primary btn-lg">Explore Products</a>
+                    <a href="#studytech" class="btn btn-primary btn-lg">Explore Products</a>
                     <a href="#checkout" class="btn btn-secondary btn-lg">View Cart (<span id="cart-count">${Store.cart.reduce((s, i) => s + (i.quantity || 1), 0)}</span>)</a>
                 </div>
             </div>
@@ -1093,12 +984,12 @@ const Router = {
             <div class="container" style="padding-bottom: 4rem;">
                 <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">My Product Lines</h2>
                 <div class="grid-3">
-                    <a href="#techack" class="card reveal" style="text-decoration: none;">
-                        <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
-                            <i data-lucide="shield" style="color: var(--color-techack);"></i>
+                    <a href="#studytech" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(94, 92, 230, 0.1);">
+                            <i data-lucide="brain" style="color: var(--color-studytech);"></i>
                         </div>
-                        <h3 style="color: var(--color-techack);">Techack Security</h3>
-                        <p>Portable pen-testing hardware I designed for wireless security research — WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities.</p>
+                        <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
+                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress more effectively.</p>
                     </a>
                     <a href="#techbox" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 159, 10, 0.1);">
@@ -1107,22 +998,22 @@ const Router = {
                         <h3 style="color: var(--color-techbox);">TechBox EDU</h3>
                         <p>DIY electronics kits based on projects I've built — macropads, NFC cards, and starter bundles for learning PCB design and soldering.</p>
                     </a>
-                    <a href="#rithim" class="card reveal" style="text-decoration: none;">
+                    <a href="#techack" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
+                            <i data-lucide="shield" style="color: var(--color-techack);"></i>
+                        </div>
+                        <h3 style="color: var(--color-techack);">Techack Security</h3>
+                        <p>Portable pen-testing hardware I designed for wireless security research — WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities.</p>
+                    </a>
+                </div>
+                
+                <div class="grid-3" style="margin-top: 2rem;">
+                    <a href="#rithim" class="card reveal" style="text-decoration: none; grid-column: span 1;">
                         <div class="card-icon" style="background: rgba(255, 55, 95, 0.1);">
                             <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                         </div>
                         <h3 style="color: var(--color-rithim);">Rithim Clothing</h3>
                         <p>Casual streetwear and apparel under my Rithim brand — tees, hoodies, and joggers designed for comfort and everyday style.</p>
-                    </a>
-                </div>
-                
-                <div class="grid-3" style="margin-top: 2rem;">
-                    <a href="#studytech" class="card reveal" style="text-decoration: none; grid-column: span 1;">
-                        <div class="card-icon" style="background: rgba(94, 92, 230, 0.1);">
-                            <i data-lucide="brain" style="color: var(--color-studytech);"></i>
-                        </div>
-                        <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
-                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress more effectively.</p>
                     </a>
                 </div>
             </div>
@@ -1133,7 +1024,7 @@ const Router = {
                 <div class="cta-section reveal">
                     <h2>Ready to Build Something Cool?</h2>
                     <p>Explore my maker tools, security hardware, and learning kits.</p>
-                    <a href="#techack" class="btn btn-primary btn-lg">Browse All Products</a>
+                    <a href="#studytech" class="btn btn-primary btn-lg">Browse All Products</a>
                 </div>
             </div>
         `,
@@ -1332,7 +1223,7 @@ const Router = {
 
         // ADMIN DASHBOARD
         'dashboard': async () => {
-            // Authentication guard: verify user is logged in via Supabase or Firebase
+            // Authentication guard: verify user is logged in via Supabase
             let isAuthenticated = false;
             // Check Supabase session
             if (supabase) {
@@ -1341,16 +1232,6 @@ const Router = {
                     if (session) isAuthenticated = true;
                 } catch (e) {
                     console.warn('[TechR] Supabase session check failed:', e);
-                }
-            }
-            // Check Firebase auth (independently, not just as fallback)
-            if (!isAuthenticated && firebaseAuth) {
-                try {
-                    if (firebaseAuth.currentUser) {
-                        isAuthenticated = true;
-                    }
-                } catch (e) {
-                    console.warn('[TechR] Firebase auth check failed:', e);
                 }
             }
             if (!isAuthenticated) {
@@ -1395,7 +1276,7 @@ const Router = {
             const activeCount = allProducts.filter(p => (p.status || 'active') === 'active').length;
             const lowStockCount = 0;
             const syncIcon = Store.syncMode !== 'local' ? 'cloud' : 'hard-drive';
-            const syncLabel = Store.syncMode === 'supabase' ? 'Supabase Cloud' : Store.syncMode === 'firebase' ? 'Firebase Cloud' : 'Local Storage';
+            const syncLabel = Store.syncMode === 'supabase' ? 'Supabase Cloud' : 'Local Storage';
             const syncColor = Store.syncMode !== 'local' ? 'rgba(52, 199, 89, 0.95)' : 'rgba(255, 159, 10, 0.95)';
             const lastSync = Store.lastSynced ? Store.lastSynced.toLocaleTimeString() : 'Never';
             const tab = Admin.activeTab || 'overview';
@@ -2175,25 +2056,25 @@ const Router = {
 
                 <div class="about-divisions-grid reveal">
                     <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Product Lines</h2>
-                    <div class="about-division-card" style="border-color: var(--color-techack);">
-                        <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
-                        <h3 style="color: var(--color-techack);">Techack</h3>
-                        <p>Portable pen-testing hardware I designed for wireless security research. The Techack1 features WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz capabilities.</p>
+                    <div class="about-division-card" style="border-color: var(--color-studytech);">
+                        <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
+                        <h3 style="color: var(--color-studytech);">StudyTech</h3>
+                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress across core subjects.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-techbox);">
                         <i data-lucide="box" style="width: 32px; height: 32px; color: var(--color-techbox);"></i>
                         <h3 style="color: var(--color-techbox);">TechBox</h3>
                         <p>DIY electronics kits based on projects I've built — including the Tech_Pad macropad and NFC hacker card. Designed for learning PCB design, soldering, and microcontroller programming.</p>
                     </div>
+                    <div class="about-division-card" style="border-color: var(--color-techack);">
+                        <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
+                        <h3 style="color: var(--color-techack);">Techack</h3>
+                        <p>Portable pen-testing hardware I designed for wireless security research. The Techack1 features WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz capabilities.</p>
+                    </div>
                     <div class="about-division-card" style="border-color: var(--color-rithim);">
                         <i data-lucide="shirt" style="width: 32px; height: 32px; color: var(--color-rithim);"></i>
                         <h3 style="color: var(--color-rithim);">Rithim</h3>
                         <p>My casual streetwear and apparel line. Tees, hoodies, and joggers with clean Rithim branding, designed for comfort and everyday wear.</p>
-                    </div>
-                    <div class="about-division-card" style="border-color: var(--color-studytech);">
-                        <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
-                        <h3 style="color: var(--color-studytech);">StudyTech</h3>
-                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress across core subjects.</p>
                     </div>
                 </div>
 
@@ -2300,10 +2181,7 @@ const Router = {
         const password = document.getElementById('password')?.value;
         if (!email || !password) { Toast.error('Please enter email and password'); return; }
 
-        let supabaseError = null;
-        let firebaseError = null;
-
-        // Try Supabase auth first
+        // Try Supabase auth
         if (supabase) {
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -2312,47 +2190,17 @@ const Router = {
                     window.location.hash = '#dashboard';
                     return;
                 }
-                supabaseError = error;
-                console.warn('[TechR] Supabase auth failed, trying Firebase:', error.message);
+                Toast.error('Login failed: ' + (error.message || 'Invalid email or password'));
             } catch (e) {
-                supabaseError = e;
-                console.warn('[TechR] Supabase auth error, trying Firebase:', e.message);
+                Toast.error('Login failed: ' + (e.message || 'Authentication error'));
             }
-        }
-
-        // Try Firebase auth
-        if (firebaseAuth) {
-            try {
-                const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-                if (userCredential.user) {
-                    Toast.success('Welcome back!');
-                    window.location.hash = '#dashboard';
-                    return;
-                }
-            } catch (fbError) {
-                firebaseError = fbError;
-                if (fbError.code === 'auth/configuration-not-found') {
-                    console.error('[TechR] Firebase Auth not configured — enable Email/Password sign-in in Firebase Console → Authentication → Sign-in method');
-                }
-                console.warn('[TechR] Firebase auth failed:', fbError.message);
-            }
-        }
-
-        // Both providers failed — show a meaningful error
-        if (!supabase && !firebaseAuth) {
-            Toast.error('Authentication services not configured. Check your Supabase and Firebase settings.');
-        } else if (supabaseError || firebaseError) {
-            // Show the most relevant error: prefer the last provider tried
-            const err = firebaseError || supabaseError;
-            Toast.error('Login failed: ' + (err.message || 'Invalid email or password'));
         } else {
-            Toast.error('Authentication service unavailable');
+            Toast.error('Authentication not configured. Set up Supabase in app.js.');
         }
     },
 
     handleLogout: async () => {
         if (supabase) { try { await supabase.auth.signOut(); } catch(e) {} }
-        if (firebaseAuth) { try { await firebaseAuth.signOut(); } catch(e) {} }
         Toast.info('Signed out');
         window.location.hash = '#admin';
     },
