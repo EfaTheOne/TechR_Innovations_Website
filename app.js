@@ -2143,18 +2143,15 @@ const Router = {
                 <div class="about-founder-section reveal">
                     <div class="about-founder-card">
                         <div class="about-founder-photo">
-                            <img src="https://avatars.githubusercontent.com/u/100300869?v=4" alt="Ryan Pegg - Founder">
+                            <img src="https://ca.linkedin.com/in/ryan-pegg-bbb031279?trk=public_profile_browsemap" alt="Ryan Pegg - Founder">
                         </div>
                         <div class="about-founder-info">
                             <span class="badge" style="background: rgba(41, 151, 255, 0.15); color: var(--accent); margin-bottom: 0.75rem; display: inline-block;">Founder & CEO</span>
                             <h2>Ryan Pegg</h2>
-                            <p class="about-founder-tagline">Self-taught hardware designer, maker, and the founder of TechR Innovations.</p>
+                            <p class="about-founder-tagline">Hardware & Software hobbist and founder of TechR Innovations.</p>
                             <p class="about-founder-bio">
-                                I founded TechR Innovations to bring together my interests in cybersecurity hardware, embedded systems, 
-                                and hands-on learning into one brand. I've taught myself PCB design, soldering, 3D printing, and 
-                                microcontroller programming through building real projects — from custom pen-testing devices like the 
-                                Techack1 to maker kits like the Tech_Pad macropad and NFC business cards. Every product I offer is 
-                                something I've personally designed and built, and I'm working toward a career in IT and engineering.
+                                I founded TechR Innovations to grow my skills and share them to others, and them excited about engineering,
+                                electronics and creative thinking. I make these products in my free time alongside high school and long-distance running.
                             </p>
                             <div class="about-founder-links">
                                 <a href="https://github.com/EfaTheOne" target="_blank" rel="noopener noreferrer" class="founder-social-link">
@@ -2170,23 +2167,11 @@ const Router = {
                     <p>
                         TechR started with my first hardware project — the Tech_Pad1, a macropad I designed with 6 keys, 2 NeoPixels, 
                         and a Seeed XIAO RP2040. Designing the PCB, routing the connections, and 3D printing the case taught me 
-                        the fundamentals of hardware development. From there, I went on to build an NFC hacker business card, then 
+                        the fundamentals of hardware development. From there, I went on to build an NFC business card, then 
                         the Techack1 — a portable pen-testing device featuring WiFi probe sniffing, Bluetooth analysis, and a CC1101 
-                        module for sub-GHz communication. My latest project, the TechBot4, is an ESP32-based Marauder-style device 
-                        with a custom PCB and enclosure. Each project has expanded my skill set, and TechR Innovations grew from 
-                        that momentum.
+                        module for sub-GHz communication. 
                     </p>
-                </div>
-
-                <div class="about-section reveal">
-                    <h2>My Mission</h2>
-                    <p>
-                        I believe the most effective way to learn is through building. My goal with TechR is to create tools and 
-                        products that encourage hands-on learning and creativity. Whether it's exploring network security with 
-                        Techack, learning electronics through TechBox kits, expressing personal style with Rithim clothing, or 
-                        improving study habits with StudyTech AI — every product I create is rooted in practical, project-based learning.
-                    </p>
-                </div>
+                </d>
 
                 <div class="about-divisions-grid reveal">
                     <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Product Lines</h2>
@@ -2718,6 +2703,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
 
 
 
