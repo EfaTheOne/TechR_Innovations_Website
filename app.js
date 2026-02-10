@@ -258,7 +258,11 @@ const Store = {
         if (supabase) {
             try {
                 // Delete all existing products from Supabase
-                await supabase.from('products').delete().neq('id', 0);
+                const { data: existing } = await supabase.from('products').select('id');
+                if (existing && existing.length > 0) {
+                    const ids = existing.map(p => p.id);
+                    await supabase.from('products').delete().in('id', ids);
+                }
 
                 // Write default products to Supabase
                 const defaults = Store.products.map(p => {
@@ -533,7 +537,8 @@ const Admin = {
         const count = Admin.selectedProducts.length;
         try {
             if (supabase) {
-                const { error } = await supabase.from('products').delete().in('id', Admin.selectedProducts.map(id => parseInt(id)));
+                const ids = Admin.selectedProducts.map(id => parseInt(id)).filter(id => !isNaN(id));
+                const { error } = await supabase.from('products').delete().in('id', ids);
                 if (error) throw error;
                 await Store.fetchProducts();
             } else {
