@@ -13,7 +13,7 @@
 //   3. Copy the "Project URL" and "anon/public" key (a long JWT starting with 'eyJ')
 // =====================================================
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 
 // =====================================================
 // FIREBASE CONFIGURATION
@@ -2718,6 +2718,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
 
 
 
