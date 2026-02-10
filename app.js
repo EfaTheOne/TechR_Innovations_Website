@@ -973,7 +973,7 @@ const Router = {
                     Designing<br><span style="color: var(--accent);">Technology,</span> for the Future.
                 </h1>
                 <p class="reveal" style="font-size: 1.35rem; margin-top: 0; max-width: 650px;">
-                    I'm Ryan Pegg, founder of TechR Innovations. I design and build pen-testing hardware, maker kits, apparel, and AI-powered learning tools — all from the ground up.
+                    I'm Ryan Pegg, founder of TechR Innovations. I design and build hardware and software to help sharpen engineering and technical skills.
                 </p>
                 <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
                     <a href="#studytech" class="btn btn-primary btn-lg">Explore Products</a>
@@ -2551,6 +2551,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
 
 
 
