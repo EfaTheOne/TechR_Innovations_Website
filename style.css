@@ -808,6 +808,30 @@ label {
     color: var(--accent);
 }
 
+/* Card & Division Logo Images */
+.card-logo {
+    margin-bottom: 1.5rem;
+}
+
+.card-logo img {
+    max-width: 120px;
+    max-height: 56px;
+    object-fit: contain;
+}
+
+.division-logo {
+    max-width: 200px;
+    max-height: 80px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+}
+
+.about-division-logo {
+    max-width: 100px;
+    max-height: 40px;
+    object-fit: contain;
+}
+
 /* 3-Column Grid */
 .grid-3 {
     display: grid;
