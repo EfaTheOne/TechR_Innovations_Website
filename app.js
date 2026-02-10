@@ -1058,11 +1058,11 @@ const Components = {
             </div>
             <div class="stat-item">
                 <div class="stat-value">10+</div>
-                <div class="stat-label">Projects I've Built</div>
+                <div class="stat-label">Projects Built</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value">100%</div>
-                <div class="stat-label">Designed by Me</div>
+                <div class="stat-label">Designed In-House</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value">Open</div>
@@ -1079,10 +1079,10 @@ const Router = {
         '/': () => `
             <div class="fullscreen-section container">
                 <h1 class="reveal" style="margin-bottom: 1.5rem;">
-                    I Build <span style="color: var(--accent);">Cool Tech.</span>
+                    Building the Future of<br><span style="color: var(--accent);">Technology,</span> by Hand.
                 </h1>
                 <p class="reveal" style="font-size: 1.35rem; margin-top: 0; max-width: 650px;">
-                    I'm Ryan — I design pen-testing hardware, maker kits, and all kinds of hands-on projects. I love learning by building, and TechR is where I put it all together.
+                    I'm Ryan Pegg, founder of TechR Innovations. I design and build pen-testing hardware, maker kits, apparel, and AI-powered learning tools — all from the ground up.
                 </p>
                 <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
                     <a href="#techack" class="btn btn-primary btn-lg">Explore Products</a>
@@ -1091,28 +1091,28 @@ const Router = {
             </div>
             
             <div class="container" style="padding-bottom: 4rem;">
-                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">What I'm Working On</h2>
+                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">My Product Lines</h2>
                 <div class="grid-3">
                     <a href="#techack" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
                             <i data-lucide="shield" style="color: var(--color-techack);"></i>
                         </div>
                         <h3 style="color: var(--color-techack);">Techack Security</h3>
-                        <p>My pen-testing devices — WiFi sniffing, Bluetooth analysis, sub-GHz, all packed into pocket-sized boards I designed myself.</p>
+                        <p>Portable pen-testing hardware I designed for wireless security research — WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities.</p>
                     </a>
                     <a href="#techbox" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 159, 10, 0.1);">
                             <i data-lucide="box" style="color: var(--color-techbox);"></i>
                         </div>
                         <h3 style="color: var(--color-techbox);">TechBox EDU</h3>
-                        <p>DIY kits based on projects I've actually built — macropads, NFC cards, and starter bundles to learn PCB design and soldering.</p>
+                        <p>DIY electronics kits based on projects I've built — macropads, NFC cards, and starter bundles for learning PCB design and soldering.</p>
                     </a>
                     <a href="#rithim" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 55, 95, 0.1);">
                             <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                         </div>
                         <h3 style="color: var(--color-rithim);">Rithim Clothing</h3>
-                        <p>My clothing line — casual streetwear with the Rithim brand. Tees, hoodies, and joggers that I actually wear.</p>
+                        <p>Casual streetwear and apparel under my Rithim brand — tees, hoodies, and joggers designed for comfort and everyday style.</p>
                     </a>
                 </div>
                 
@@ -1122,7 +1122,7 @@ const Router = {
                             <i data-lucide="brain" style="color: var(--color-studytech);"></i>
                         </div>
                         <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
-                        <p>An AI study tool I'm building to help students learn and practice — because studying should be smarter, not harder.</p>
+                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress more effectively.</p>
                     </a>
                 </div>
             </div>
@@ -1132,7 +1132,7 @@ const Router = {
             <div class="container">
                 <div class="cta-section reveal">
                     <h2>Ready to Build Something Cool?</h2>
-                    <p>Check out my maker tools, security hardware, and learning kits.</p>
+                    <p>Explore my maker tools, security hardware, and learning kits.</p>
                     <a href="#techack" class="btn btn-primary btn-lg">Browse All Products</a>
                 </div>
             </div>
@@ -2136,8 +2136,8 @@ const Router = {
         'about': () => `
             <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
                 <div class="about-hero reveal">
-                    <h1>Hey, I'm <span style="color: var(--accent);">Ryan.</span></h1>
-                    <p>I build hardware, break things to learn how they work, and turn my projects into products.</p>
+                    <h1>About <span style="color: var(--accent);">Ryan Pegg</span></h1>
+                    <p>Founder of TechR Innovations — designing hardware, building products, and learning through every project.</p>
                 </div>
 
                 <div class="about-founder-section reveal">
@@ -2148,13 +2148,13 @@ const Router = {
                         <div class="about-founder-info">
                             <span class="badge" style="background: rgba(41, 151, 255, 0.15); color: var(--accent); margin-bottom: 0.75rem; display: inline-block;">Founder & CEO</span>
                             <h2>Ryan Pegg</h2>
-                            <p class="about-founder-tagline">Self-taught maker, hardware hacker, and the person behind everything TechR.</p>
+                            <p class="about-founder-tagline">Self-taught hardware designer, maker, and the founder of TechR Innovations.</p>
                             <p class="about-founder-bio">
-                                I started TechR because I love building things — pen-testing devices, custom PCBs, macropads, NFC business cards, 
-                                you name it. I taught myself PCB design, soldering, 3D printing, and embedded programming just by 
-                                jumping into projects. I'm big on learning by doing, and that's basically what TechR is all about. 
-                                Every product I sell is something I've designed and built myself. I'm also really into cybersecurity 
-                                and want to use these skills to land an IT or engineering job someday.
+                                I founded TechR Innovations to bring together my interests in cybersecurity hardware, embedded systems, 
+                                and hands-on learning into one brand. I've taught myself PCB design, soldering, 3D printing, and 
+                                microcontroller programming through building real projects — from custom pen-testing devices like the 
+                                Techack1 to maker kits like the Tech_Pad macropad and NFC business cards. Every product I offer is 
+                                something I've personally designed and built, and I'm working toward a career in IT and engineering.
                             </p>
                             <div class="about-founder-links">
                                 <a href="https://github.com/EfaTheOne" target="_blank" rel="noopener noreferrer" class="founder-social-link">
@@ -2168,53 +2168,54 @@ const Router = {
                 <div class="about-section reveal">
                     <h2>My Story</h2>
                     <p>
-                        It all started with the Tech_Pad1 — a macropad I built with 6 keys, 2 NeoPixels, and a Seeed XIAO RP2040. 
-                        Learning how to design the PCB, route the connections, and 3D print the case was a huge learning moment for me. 
-                        From there I got hooked. I built an NFC hacker business card with a QR code to my LinkedIn, then moved on to the 
-                        Techack1 — a portable pen-testing device with WiFi sniffing, Bluetooth analysis, and a CC1101 module for sub-GHz. 
-                        Then came the TechBot4, which is basically my take on an ESP32 Marauder with a custom PCB and 3D-printed case. 
-                        Each project taught me something new, and TechR grew out of all of that.
+                        TechR started with my first hardware project — the Tech_Pad1, a macropad I designed with 6 keys, 2 NeoPixels, 
+                        and a Seeed XIAO RP2040. Designing the PCB, routing the connections, and 3D printing the case taught me 
+                        the fundamentals of hardware development. From there, I went on to build an NFC hacker business card, then 
+                        the Techack1 — a portable pen-testing device featuring WiFi probe sniffing, Bluetooth analysis, and a CC1101 
+                        module for sub-GHz communication. My latest project, the TechBot4, is an ESP32-based Marauder-style device 
+                        with a custom PCB and enclosure. Each project has expanded my skill set, and TechR Innovations grew from 
+                        that momentum.
                     </p>
                 </div>
 
                 <div class="about-section reveal">
-                    <h2>What Drives Me</h2>
+                    <h2>My Mission</h2>
                     <p>
-                        I believe the best way to learn is to just build stuff. Not watch tutorials forever — actually get your hands 
-                        dirty, make mistakes, and figure things out. That's my whole philosophy. Whether it's designing a security tool, 
-                        putting together a maker kit, or creating a clothing brand, I want everything I make to feel real and hands-on. 
-                        If I can inspire someone else to pick up a soldering iron or design their first PCB, that's a win.
+                        I believe the most effective way to learn is through building. My goal with TechR is to create tools and 
+                        products that encourage hands-on learning and creativity. Whether it's exploring network security with 
+                        Techack, learning electronics through TechBox kits, expressing personal style with Rithim clothing, or 
+                        improving study habits with StudyTech AI — every product I create is rooted in practical, project-based learning.
                     </p>
                 </div>
 
                 <div class="about-divisions-grid reveal">
-                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Projects</h2>
+                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Product Lines</h2>
                     <div class="about-division-card" style="border-color: var(--color-techack);">
                         <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
                         <h3 style="color: var(--color-techack);">Techack</h3>
-                        <p>My pen-testing hardware line. The Techack1 does WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz — all on a board I designed from scratch.</p>
+                        <p>Portable pen-testing hardware I designed for wireless security research. The Techack1 features WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz capabilities.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-techbox);">
                         <i data-lucide="box" style="width: 32px; height: 32px; color: var(--color-techbox);"></i>
                         <h3 style="color: var(--color-techbox);">TechBox</h3>
-                        <p>DIY kits based on real projects I've built — like the Tech_Pad macropad and NFC hacker card. Great for anyone who wants to learn PCB design and soldering.</p>
+                        <p>DIY electronics kits based on projects I've built — including the Tech_Pad macropad and NFC hacker card. Designed for learning PCB design, soldering, and microcontroller programming.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-rithim);">
                         <i data-lucide="shirt" style="width: 32px; height: 32px; color: var(--color-rithim);"></i>
                         <h3 style="color: var(--color-rithim);">Rithim</h3>
-                        <p>My clothing brand. Casual streetwear — tees, hoodies, and joggers with the Rithim look. Simple, clean, and comfortable.</p>
+                        <p>My casual streetwear and apparel line. Tees, hoodies, and joggers with clean Rithim branding, designed for comfort and everyday wear.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-studytech);">
                         <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
                         <h3 style="color: var(--color-studytech);">StudyTech</h3>
-                        <p>An AI-powered study assistant I'm developing to help students learn and track their progress across core subjects.</p>
+                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress across core subjects.</p>
                     </div>
                 </div>
 
                 <div class="about-section reveal">
-                    <h2>Get In Touch</h2>
+                    <h2>Contact</h2>
                     <p>
-                        Want to chat about a project, ask about my hardware, or just say what's up? I'd love to hear from you.
+                        For questions about products, partnership inquiries, or general feedback, feel free to reach out.
                     </p>
                     <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -2233,8 +2234,8 @@ const Router = {
                 </div>
 
                 <div class="cta-section reveal" style="margin-top: 2rem;">
-                    <h2>Want to See What I've Built?</h2>
-                    <p>Check out my projects and see what TechR is all about.</p>
+                    <h2>Explore My Work</h2>
+                    <p>Browse the full range of TechR products and projects.</p>
                     <a href="#techack" class="btn btn-primary btn-lg">Browse Products</a>
                 </div>
             </div>
