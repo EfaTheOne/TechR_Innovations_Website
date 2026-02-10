@@ -8,10 +8,10 @@ I design and build everything from pen-testing tools to macropads to NFC busines
 
 ## What I Build
 
-- **Techack** — Cybersecurity hardware. The [Techack1 Pro](https://github.com/EfaTheOne/Techack1) is a portable pen-testing device with a CC1101 module, WiFi, Bluetooth, and USB HID. The [Techack1 MS](https://github.com/EfaTheOne/Techack1MS) is the budget-friendly version. The [TechBot4](https://github.com/EfaTheOne/TechBot4) is an ESP32-based Marauder-compatible tool with a 2.0" IPS display.
-- **TechBox** — STEM education kits. The [Tech_Pad Macropad](https://github.com/EfaTheOne/Tech_Pad1) is a DIY 6-key macropad with NeoPixels and a Seeed XIAO RP2040. The [NFC Hacker Card](https://github.com/EfaTheOne/NFC_Hacker_card) is a custom PCB business card with embedded NFC.
-- **Rithim** — Casual streetwear and apparel.
 - **StudyTech** — AI-powered learning tools for students and schools.
+- **TechBox** — STEM education kits. The [Tech_Pad Macropad](https://github.com/EfaTheOne/Tech_Pad1) is a DIY 6-key macropad with NeoPixels and a Seeed XIAO RP2040. The [NFC Hacker Card](https://github.com/EfaTheOne/NFC_Hacker_card) is a custom PCB business card with embedded NFC.
+- **Techack** — Cybersecurity hardware. The [Techack1 Pro](https://github.com/EfaTheOne/Techack1) is a portable pen-testing device with a CC1101 module, WiFi, Bluetooth, and USB HID. The [Techack1 MS](https://github.com/EfaTheOne/Techack1MS) is the budget-friendly version. The [TechBot4](https://github.com/EfaTheOne/TechBot4) is an ESP32-based Marauder-compatible tool with a 2.0" IPS display.
+- **Rithim** — Casual streetwear and apparel.
 
 ---
 

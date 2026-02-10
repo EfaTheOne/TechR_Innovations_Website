@@ -976,7 +976,7 @@ const Router = {
                     I'm Ryan Pegg, founder of TechR Innovations. I design and build pen-testing hardware, maker kits, apparel, and AI-powered learning tools — all from the ground up.
                 </p>
                 <div class="reveal" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                    <a href="#techack" class="btn btn-primary btn-lg">Explore Products</a>
+                    <a href="#studytech" class="btn btn-primary btn-lg">Explore Products</a>
                     <a href="#checkout" class="btn btn-secondary btn-lg">View Cart (<span id="cart-count">${Store.cart.reduce((s, i) => s + (i.quantity || 1), 0)}</span>)</a>
                 </div>
             </div>
@@ -984,12 +984,12 @@ const Router = {
             <div class="container" style="padding-bottom: 4rem;">
                 <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">My Product Lines</h2>
                 <div class="grid-3">
-                    <a href="#techack" class="card reveal" style="text-decoration: none;">
-                        <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
-                            <i data-lucide="shield" style="color: var(--color-techack);"></i>
+                    <a href="#studytech" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(94, 92, 230, 0.1);">
+                            <i data-lucide="brain" style="color: var(--color-studytech);"></i>
                         </div>
-                        <h3 style="color: var(--color-techack);">Techack Security</h3>
-                        <p>Portable pen-testing hardware I designed for wireless security research — WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities.</p>
+                        <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
+                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress more effectively.</p>
                     </a>
                     <a href="#techbox" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 159, 10, 0.1);">
@@ -998,22 +998,22 @@ const Router = {
                         <h3 style="color: var(--color-techbox);">TechBox EDU</h3>
                         <p>DIY electronics kits based on projects I've built — macropads, NFC cards, and starter bundles for learning PCB design and soldering.</p>
                     </a>
-                    <a href="#rithim" class="card reveal" style="text-decoration: none;">
+                    <a href="#techack" class="card reveal" style="text-decoration: none;">
+                        <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
+                            <i data-lucide="shield" style="color: var(--color-techack);"></i>
+                        </div>
+                        <h3 style="color: var(--color-techack);">Techack Security</h3>
+                        <p>Portable pen-testing hardware I designed for wireless security research — WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities.</p>
+                    </a>
+                </div>
+                
+                <div class="grid-3" style="margin-top: 2rem;">
+                    <a href="#rithim" class="card reveal" style="text-decoration: none; grid-column: span 1;">
                         <div class="card-icon" style="background: rgba(255, 55, 95, 0.1);">
                             <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                         </div>
                         <h3 style="color: var(--color-rithim);">Rithim Clothing</h3>
                         <p>Casual streetwear and apparel under my Rithim brand — tees, hoodies, and joggers designed for comfort and everyday style.</p>
-                    </a>
-                </div>
-                
-                <div class="grid-3" style="margin-top: 2rem;">
-                    <a href="#studytech" class="card reveal" style="text-decoration: none; grid-column: span 1;">
-                        <div class="card-icon" style="background: rgba(94, 92, 230, 0.1);">
-                            <i data-lucide="brain" style="color: var(--color-studytech);"></i>
-                        </div>
-                        <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
-                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress more effectively.</p>
                     </a>
                 </div>
             </div>
@@ -1024,7 +1024,7 @@ const Router = {
                 <div class="cta-section reveal">
                     <h2>Ready to Build Something Cool?</h2>
                     <p>Explore my maker tools, security hardware, and learning kits.</p>
-                    <a href="#techack" class="btn btn-primary btn-lg">Browse All Products</a>
+                    <a href="#studytech" class="btn btn-primary btn-lg">Browse All Products</a>
                 </div>
             </div>
         `,
@@ -2063,33 +2063,33 @@ const Router = {
                     <h2>My Mission</h2>
                     <p>
                         I believe the most effective way to learn is through building. My goal with TechR is to create tools and 
-                        products that encourage hands-on learning and creativity. Whether it's exploring network security with 
-                        Techack, learning electronics through TechBox kits, expressing personal style with Rithim clothing, or 
-                        improving study habits with StudyTech AI — every product I create is rooted in practical, project-based learning.
+                        products that encourage hands-on learning and creativity. Whether it's improving study habits with StudyTech AI,
+                        learning electronics through TechBox kits, exploring network security with 
+                        Techack, or expressing personal style with Rithim clothing — every product I create is rooted in practical, project-based learning.
                     </p>
                 </div>
 
                 <div class="about-divisions-grid reveal">
                     <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Product Lines</h2>
-                    <div class="about-division-card" style="border-color: var(--color-techack);">
-                        <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
-                        <h3 style="color: var(--color-techack);">Techack</h3>
-                        <p>Portable pen-testing hardware I designed for wireless security research. The Techack1 features WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz capabilities.</p>
+                    <div class="about-division-card" style="border-color: var(--color-studytech);">
+                        <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
+                        <h3 style="color: var(--color-studytech);">StudyTech</h3>
+                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress across core subjects.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-techbox);">
                         <i data-lucide="box" style="width: 32px; height: 32px; color: var(--color-techbox);"></i>
                         <h3 style="color: var(--color-techbox);">TechBox</h3>
                         <p>DIY electronics kits based on projects I've built — including the Tech_Pad macropad and NFC hacker card. Designed for learning PCB design, soldering, and microcontroller programming.</p>
                     </div>
+                    <div class="about-division-card" style="border-color: var(--color-techack);">
+                        <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack);"></i>
+                        <h3 style="color: var(--color-techack);">Techack</h3>
+                        <p>Portable pen-testing hardware I designed for wireless security research. The Techack1 features WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz capabilities.</p>
+                    </div>
                     <div class="about-division-card" style="border-color: var(--color-rithim);">
                         <i data-lucide="shirt" style="width: 32px; height: 32px; color: var(--color-rithim);"></i>
                         <h3 style="color: var(--color-rithim);">Rithim</h3>
                         <p>My casual streetwear and apparel line. Tees, hoodies, and joggers with clean Rithim branding, designed for comfort and everyday wear.</p>
-                    </div>
-                    <div class="about-division-card" style="border-color: var(--color-studytech);">
-                        <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech);"></i>
-                        <h3 style="color: var(--color-studytech);">StudyTech</h3>
-                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress across core subjects.</p>
                     </div>
                 </div>
 
