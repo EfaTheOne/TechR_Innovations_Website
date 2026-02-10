@@ -398,6 +398,9 @@ function generateStoragePath(originalName) {
     return `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
 }
 
+// Default image display mode
+const DEFAULT_IMAGE_FIT = 'cover';
+
 // --- ADMIN PRODUCT MANAGEMENT ---
 const Admin = {
     filterSearch: '',
@@ -683,6 +686,10 @@ const Admin = {
             return;
         }
 
+        // Reset file input so the same file can be re-selected
+        const fileInput = document.getElementById('product-image-file');
+        if (fileInput) fileInput.value = '';
+
         if (supabase) {
             // Upload to Supabase Storage for cross-device sync
             const fileName = generateStoragePath(file.name);
@@ -709,6 +716,9 @@ const Admin = {
                     Admin.previewImage(dataUrl);
                     Toast.success('Image saved locally');
                 };
+                reader.onerror = () => {
+                    Toast.error('Failed to read image file');
+                };
                 reader.readAsDataURL(file);
             }
         } else {
@@ -721,6 +731,9 @@ const Admin = {
                 Admin.previewImage(dataUrl);
                 Toast.success('Image uploaded successfully');
             };
+            reader.onerror = () => {
+                Toast.error('Failed to read image file');
+            };
             reader.readAsDataURL(file);
         }
     },
@@ -728,9 +741,17 @@ const Admin = {
     handleAdditionalImages: (files) => {
         if (!files || files.length === 0) return;
         const container = document.getElementById('additional-images-preview');
+
+        // Reset file input so the same files can be re-selected
+        const fileInput = document.getElementById('product-additional-images');
+        if (fileInput) fileInput.value = '';
+
         Array.from(files).forEach(file => {
             if (!file.type.startsWith('image/')) return;
-            if (file.size > 5 * 1024 * 1024) return;
+            if (file.size > 5 * 1024 * 1024) {
+                Toast.error(`${file.name} exceeds 5MB limit`);
+                return;
+            }
 
             if (supabase) {
                 const fileName = generateStoragePath(file.name);
@@ -749,6 +770,9 @@ const Admin = {
                         Admin.pendingImages.push(e.target.result);
                         Admin.renderAdditionalPreviews();
                     };
+                    reader.onerror = () => {
+                        Toast.error('Failed to read image file');
+                    };
                     reader.readAsDataURL(file);
                 });
             } else {
@@ -756,6 +780,9 @@ const Admin = {
                 reader.onload = (e) => {
                     Admin.pendingImages.push(e.target.result);
                     Admin.renderAdditionalPreviews();
+                };
+                reader.onerror = () => {
+                    Toast.error('Failed to read image file');
                 };
                 reader.readAsDataURL(file);
             }
@@ -797,6 +824,8 @@ const Admin = {
         document.getElementById('product-image').value = product.image;
         document.getElementById('product-desc').value = product.desc;
         document.getElementById('product-colors').value = (product.colors || []).join(', ');
+        const fitSelect = document.getElementById('product-image-fit');
+        if (fitSelect) fitSelect.value = product.image_fit || DEFAULT_IMAGE_FIT;
         Admin.pendingImages = (product.images || []).filter(img => img !== product.image);
         Admin.renderAdditionalPreviews();
         Admin.previewImage(product.image);
@@ -821,6 +850,7 @@ const Admin = {
             image: mainImage,
             images: allImages,
             colors: colors,
+            image_fit: document.getElementById('product-image-fit').value || DEFAULT_IMAGE_FIT,
             desc: document.getElementById('product-desc').value
         };
 
@@ -900,7 +930,7 @@ const Components = {
     ProductCard: (p) => `
         <div class="product-card reveal">
             <a href="#product/${p.id}" style="text-decoration: none; color: inherit;">
-                <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy">
+                <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy" style="object-fit: ${p.image_fit || DEFAULT_IMAGE_FIT};">
                 <div class="product-content">
                     <h3>${p.name}</h3>
                     <p class="product-desc">${p.desc}</p>
@@ -1397,7 +1427,7 @@ const Router = {
                             <input type="checkbox" class="admin-checkbox" data-action="toggle-select" data-product-id="${p.id}" ${isSelected ? 'checked' : ''}>
                             <span class="drag-handle" title="Drag to reorder">⠿</span>
                         </div>
-                        <img src="${p.image}" alt="${p.name}" class="admin-product-img">
+                        <img src="${p.image}" alt="${p.name}" class="admin-product-img" style="object-fit: ${p.image_fit || DEFAULT_IMAGE_FIT};">
                         <div class="admin-product-info">
                             <h3>${p.name}</h3>
                             <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
@@ -1784,6 +1814,13 @@ const Router = {
                                         <span style="color:var(--text-secondary);font-size:0.85rem;align-self:center;">or paste URL below</span>
                                     </div>
                                     <input type="text" id="product-image" placeholder="https://images.unsplash.com/... or upload above" required>
+                                    <div style="margin-top:0.5rem;">
+                                        <label for="product-image-fit" style="font-size:0.85rem;color:var(--text-secondary);">Image Display Mode</label>
+                                        <select id="product-image-fit" style="margin-top:0.25rem;">
+                                            <option value="cover">Cover (fill &amp; crop)</option>
+                                            <option value="contain">Contain (fit whole image)</option>
+                                        </select>
+                                    </div>
                                     <img id="image-preview" class="image-preview" style="display:none;">
                                 </div>
                             </div>
@@ -1849,7 +1886,7 @@ const Router = {
                     <div class="product-detail reveal">
                         <div class="product-detail-gallery">
                             <div class="product-detail-main-image">
-                                <img id="product-main-img" src="${productImages[0]}" alt="${product.name}">
+                                <img id="product-main-img" src="${productImages[0]}" alt="${product.name}" style="object-fit: ${product.image_fit || DEFAULT_IMAGE_FIT};">
                             </div>
                             ${productImages.length > 1 ? `
                                 <div class="product-detail-thumbnails">
@@ -2551,6 +2588,37 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.location.hash === '#dashboard') {
             if (e.ctrlKey && e.key === 'n') { e.preventDefault(); Admin.showAddModal(); }
             if (e.key === 'Escape') { Admin.closeModal(); }
+        }
+    });
+
+    // Drag-and-drop support for image upload areas
+    document.addEventListener('dragover', (e) => {
+        const uploadArea = e.target.closest('.image-upload-area');
+        if (uploadArea) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        }
+    });
+    document.addEventListener('dragleave', (e) => {
+        const uploadArea = e.target.closest('.image-upload-area');
+        if (uploadArea) {
+            uploadArea.classList.remove('drag-over');
+        }
+    });
+    document.addEventListener('drop', (e) => {
+        const uploadArea = e.target.closest('.image-upload-area');
+        if (uploadArea) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Determine if this is the main image or additional images upload area
+                if (uploadArea.querySelector('#product-image')) {
+                    Admin.handleFileUpload(files);
+                } else if (uploadArea.querySelector('#product-additional-images')) {
+                    Admin.handleAdditionalImages(files);
+                }
+            }
         }
     });
 
