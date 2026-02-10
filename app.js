@@ -13,7 +13,7 @@
 //   3. Copy the "Project URL" and "anon/public" key (a long JWT starting with 'eyJ')
 // =====================================================
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
 
 // =====================================================
 // STRIPE CONFIGURATION
@@ -146,13 +146,13 @@ function initRealtimeSync() {
 // --- DEFAULT PRODUCTS ---
 const DEFAULT_PRODUCTS = [
     // Techack Products
-    { id: 1, name: "Techack1 Pro", price: 149.99, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", images: ["https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80", "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Compact portable pen-testing device featuring a CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID. Includes probe request sniffing, auth flood, captive portal, PMKID capture, Pwnagotchi detection, card skimmer detection, and more." },
-    { id: 2, name: "Techack1 MS", price: 29.99, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", images: ["https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A cost-efficient version of the Techack1 with a smaller form factor and fewer features. Great for beginners learning about security testing and wireless protocols." },
-    { id: 3, name: "TechBot4", price: 219.99, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", images: ["https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display (320x240), MicroSD card slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi security analysis and network monitoring." },
+    { id: 1, name: "Techack1", price: 180, image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", images: ["https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80", "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Compact portable pen-testing device featuring a CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID. Includes probe request sniffing, auth flood, captive portal, PMKID capture, Pwnagotchi detection, card skimmer detection, and more." },
+    { id: 2, name: "Techack1MS", price: 50, image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", images: ["https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80", "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A cost-efficient version of the Techack1 with a smaller form factor and fewer features. Great for beginners learning about security testing and wireless protocols." },
+    { id: 3, name: "TechackX1", price: 40, image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", images: ["https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80", "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display (320x240), MicroSD card slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi security analysis and network monitoring." },
     
     // TechBox Products
     { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", images: ["https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", "https://images.unsplash.com/photo-1553406830-ef2f0c93b5c4?w=800&q=80"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "DIY macropad kit with 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040 microcontroller. Learn PCB design, soldering, and custom firmware programming. Includes 3D-printable case files." },
-    { id: 5, name: "NFC Hacker Card Kit", price: 34.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", images: ["https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Custom NFC-enabled PCB business card kit. Design and build your own programmable business card with embedded NFC chip and QR code. A hands-on introduction to PCB design and NFC technology." },
+    { id: 5, name: "Automatic Plant Waterer", price: 49.99, image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", images: ["https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&q=80", "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Custom NFC-enabled PCB business card kit. Design and build your own programmable business card with embedded NFC chip and QR code. A hands-on introduction to PCB design and NFC technology." },
     { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80", images: ["https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Introductory electronics and soldering kit with a microcontroller, LEDs, resistors, and basic components. Perfect for students getting started with hardware projects and learning to build circuits." },
     
     // Rithim Products
@@ -2024,18 +2024,15 @@ const Router = {
                 <div class="about-founder-section reveal">
                     <div class="about-founder-card">
                         <div class="about-founder-photo">
-                            <img src="https://avatars.githubusercontent.com/u/100300869?v=4" alt="Ryan Pegg - Founder">
+                            <img src="https://ca.linkedin.com/in/ryan-pegg-bbb031279?trk=public_profile_browsemap" alt="Ryan Pegg - Founder">
                         </div>
                         <div class="about-founder-info">
                             <span class="badge" style="background: rgba(41, 151, 255, 0.15); color: var(--accent); margin-bottom: 0.75rem; display: inline-block;">Founder & CEO</span>
                             <h2>Ryan Pegg</h2>
-                            <p class="about-founder-tagline">Self-taught hardware designer, maker, and the founder of TechR Innovations.</p>
+                            <p class="about-founder-tagline">Hardware & Software hobbist and founder of TechR Innovations.</p>
                             <p class="about-founder-bio">
-                                I founded TechR Innovations to bring together my interests in cybersecurity hardware, embedded systems, 
-                                and hands-on learning into one brand. I've taught myself PCB design, soldering, 3D printing, and 
-                                microcontroller programming through building real projects — from custom pen-testing devices like the 
-                                Techack1 to maker kits like the Tech_Pad macropad and NFC business cards. Every product I offer is 
-                                something I've personally designed and built, and I'm working toward a career in IT and engineering.
+                                I founded TechR Innovations to grow my skills and share them to others, and them excited about engineering,
+                                electronics and creative thinking. I make these products in my free time alongside high school and long-distance running.
                             </p>
                             <div class="about-founder-links">
                                 <a href="https://github.com/EfaTheOne" target="_blank" rel="noopener noreferrer" class="founder-social-link">
@@ -2051,23 +2048,11 @@ const Router = {
                     <p>
                         TechR started with my first hardware project — the Tech_Pad1, a macropad I designed with 6 keys, 2 NeoPixels, 
                         and a Seeed XIAO RP2040. Designing the PCB, routing the connections, and 3D printing the case taught me 
-                        the fundamentals of hardware development. From there, I went on to build an NFC hacker business card, then 
+                        the fundamentals of hardware development. From there, I went on to build an NFC business card, then 
                         the Techack1 — a portable pen-testing device featuring WiFi probe sniffing, Bluetooth analysis, and a CC1101 
-                        module for sub-GHz communication. My latest project, the TechBot4, is an ESP32-based Marauder-style device 
-                        with a custom PCB and enclosure. Each project has expanded my skill set, and TechR Innovations grew from 
-                        that momentum.
+                        module for sub-GHz communication. 
                     </p>
-                </div>
-
-                <div class="about-section reveal">
-                    <h2>My Mission</h2>
-                    <p>
-                        I believe the most effective way to learn is through building. My goal with TechR is to create tools and 
-                        products that encourage hands-on learning and creativity. Whether it's improving study habits with StudyTech AI,
-                        learning electronics through TechBox kits, exploring network security with 
-                        Techack, or expressing personal style with Rithim clothing — every product I create is rooted in practical, project-based learning.
-                    </p>
-                </div>
+                </d>
 
                 <div class="about-divisions-grid reveal">
                     <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Product Lines</h2>
@@ -2566,6 +2551,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
+
+
 
 
 
