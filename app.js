@@ -13,7 +13,7 @@
 //   3. Copy the "Project URL" and "anon/public" key (a long JWT starting with 'eyJ')
 // =====================================================
 const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_xLh_U2MxD-UatsepDCDAUg_9pix1V4f';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtZ2l5bHdycGtudWZkZGR3Y2J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MjI0NDEsImV4cCI6MjA4NTk5ODQ0MX0.oeRBTZszpvu263vr43LRYJ0nF1HsEJD8HeMnYv_6uew';
 
 // =====================================================
 // STRIPE CONFIGURATION
@@ -2551,6 +2551,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
 
 
 
