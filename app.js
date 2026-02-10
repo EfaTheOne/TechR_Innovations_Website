@@ -970,7 +970,7 @@ const Router = {
         '/': () => `
             <div class="fullscreen-section container">
                 <h1 class="reveal" style="margin-bottom: 1.5rem;">
-                    Building the Future of<br><span style="color: var(--accent);">Technology,</span> by Hand.
+                    Designing<br><span style="color: var(--accent);">Technology,</span> for the Future.
                 </h1>
                 <p class="reveal" style="font-size: 1.35rem; margin-top: 0; max-width: 650px;">
                     I'm Ryan Pegg, founder of TechR Innovations. I design and build pen-testing hardware, maker kits, apparel, and AI-powered learning tools — all from the ground up.
@@ -989,21 +989,21 @@ const Router = {
                             <i data-lucide="brain" style="color: var(--color-studytech);"></i>
                         </div>
                         <h3 style="color: var(--color-studytech);">StudyTech AI</h3>
-                        <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress more effectively.</p>
+                        <p>An AI-powered study assistant I'm developing to help students learn and practice without distractions.</p>
                     </a>
                     <a href="#techbox" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(255, 159, 10, 0.1);">
                             <i data-lucide="box" style="color: var(--color-techbox);"></i>
                         </div>
                         <h3 style="color: var(--color-techbox);">TechBox EDU</h3>
-                        <p>DIY electronics kits based on projects I've built — macropads, NFC cards, and starter bundles for learning PCB design and soldering.</p>
+                        <p>DIY electronics kits to encourage kids and teens to get a head start in engineering.</p>
                     </a>
                     <a href="#techack" class="card reveal" style="text-decoration: none;">
                         <div class="card-icon" style="background: rgba(52, 199, 89, 0.1);">
                             <i data-lucide="shield" style="color: var(--color-techack);"></i>
                         </div>
                         <h3 style="color: var(--color-techack);">Techack Security</h3>
-                        <p>Portable pen-testing hardware I designed for wireless security research — WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities.</p>
+                        <p>Portable pen-testing hardware I designed for wireless security research.</p>
                     </a>
                 </div>
                 
@@ -1013,7 +1013,7 @@ const Router = {
                             <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                         </div>
                         <h3 style="color: var(--color-rithim);">Rithim Clothing</h3>
-                        <p>Casual streetwear and apparel under my Rithim brand — tees, hoodies, and joggers designed for comfort and everyday style.</p>
+                        <p>Recovery clothing that makes stretching and recovery comfortable.</p>
                     </a>
                 </div>
             </div>
@@ -2551,6 +2551,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
+
 
 
 
