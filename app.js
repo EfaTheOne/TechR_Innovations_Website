@@ -1,34 +1,24 @@
-/* 
+/*
    TechR Innovations - Protocol: STRUCTURE v10.0
    Engine: Professional, Debuggable, Secure
 */
 
 // --- CONFIGURATION ---
-// =====================================================
-// SUPABASE CONFIGURATION
-// Replace the placeholder values below with your Supabase project credentials.
-// To get these values:
-//   1. Go to https://supabase.com/dashboard
-//   2. Select your project → Settings → API
-//   3. Copy the "Project URL" and "anon/public" key (a long JWT starting with 'eyJ')
-// =====================================================
-const SUPABASE_URL = 'https://vmgiylwrpknufdddwcbw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtZ2l5bHdycGtudWZkZGR3Y2J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MjI0NDEsImV4cCI6MjA4NTk5ODQ0MX0.oeRBTZszpvu263vr43LRYJ0nF1HsEJD8HeMnYv_6uew';
+const CONFIG = {
+    // SUPABASE CONFIGURATION
+    // Replace with your Supabase project credentials (https://supabase.com/dashboard)
+    SUPABASE_URL: 'https://vmgiylwrpknufdddwcbw.supabase.co',
+    SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtZ2l5bHdycGtudWZkZGR3Y2J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MjI0NDEsImV4cCI6MjA4NTk5ODQ0MX0.oeRBTZszpvu263vr43LRYJ0nF1HsEJD8HeMnYv_6uew',
 
-// =====================================================
-// STRIPE CONFIGURATION
-// Replace the value below with your Stripe Publishable Key.
-// Find it at: https://dashboard.stripe.com/apikeys
-// Use 'pk_test_...' for testing, 'pk_live_...' for production.
-// Your Secret Key (sk_...) should NEVER be placed here.
-// It belongs on your backend server only.
-// =====================================================
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51MycO7Fe1hSNms1qzqy4TaiRu1XWGvKbHcdOXz0cnJgJTzpgf4hZaw86sEf1PMiSYe6X5FL9Pf7zRaz3e6oef8V000uVMlo2fe';
+    // STRIPE CONFIGURATION
+    // Replace with your Stripe Publishable Key (https://dashboard.stripe.com/apikeys)
+    STRIPE_PUBLISHABLE_KEY: 'pk_test_51MycO7Fe1hSNms1qzqy4TaiRu1XWGvKbHcdOXz0cnJgJTzpgf4hZaw86sEf1PMiSYe6X5FL9Pf7zRaz3e6oef8V000uVMlo2fe'
+};
 
 // --- TOAST NOTIFICATIONS ---
 const Toast = {
     container: null,
-    
+
     init: () => {
         if (!Toast.container) {
             Toast.container = document.createElement('div');
@@ -37,7 +27,7 @@ const Toast = {
             document.body.appendChild(Toast.container);
         }
     },
-    
+
     show: (message, type = 'info', duration = 4000) => {
         Toast.init();
         const toast = document.createElement('div');
@@ -58,13 +48,13 @@ const Toast = {
         `;
         toast.textContent = message;
         Toast.container.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease forwards';
             setTimeout(() => toast.remove(), 300);
         }, duration);
     },
-    
+
     success: (msg) => Toast.show(msg, 'success'),
     error: (msg) => Toast.show(msg, 'error'),
     info: (msg) => Toast.show(msg, 'info')
@@ -78,7 +68,7 @@ const PayButton = {
         btn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Processing...';
         if (window.lucide) lucide.createIcons();
     },
-    
+
     setReady: (btn, amount) => {
         if (!btn) return;
         btn.disabled = false;
@@ -110,14 +100,11 @@ const logger = {
 // --- SUPABASE INIT ---
 let supabase;
 try {
-    // Only init Supabase if key looks like a valid JWT (starts with 'eyJ') and is not a placeholder
-    if (window.supabase && SUPABASE_KEY && SUPABASE_KEY.startsWith('eyJ')) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    if (window.supabase && CONFIG.SUPABASE_KEY && CONFIG.SUPABASE_KEY.startsWith('eyJ')) {
+        supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
         console.log("[TechR] Supabase Online");
-    } else if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.startsWith('YOUR_')) {
-        console.warn("[TechR] Supabase key format invalid — key must be a JWT starting with 'eyJ'. Find your anon key at: Supabase Dashboard → Settings → API");
-    } else {
-        console.info("[TechR] Supabase not configured — replace YOUR_SUPABASE_ANON_KEY in app.js with your project's anon key");
+    } else if (window.supabase && CONFIG.SUPABASE_KEY && !CONFIG.SUPABASE_KEY.startsWith('YOUR_')) {
+        console.warn("[TechR] Supabase key format invalid");
     }
 } catch (e) {
     console.warn("[TechR] Supabase Init Failed - using fallback data");
@@ -128,14 +115,66 @@ function initRealtimeSync() {
     // Supabase real-time sync
     if (supabase) {
         try {
+            // Product sync
             supabase.channel('products-changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
-                    console.log('[TechR] Real-time update received (Supabase)');
+                    console.log('[TechR] Real-time products update');
                     await Store.fetchProducts();
                     Router.handleRoute();
-                    Toast.info('Products updated in real-time');
+                    Toast.info('Products updated');
                 })
                 .subscribe();
+
+            // Activity Log sync
+            supabase.channel('activity-changes')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_log' }, async (payload) => {
+                    console.log('[TechR] Real-time activity update');
+                    const logItem = { ...payload.new };
+                    // Format ISO timestamp from DB to local string for UI
+                    if (logItem.timestamp && logItem.timestamp.includes('T')) {
+                        try {
+                            logItem.timestamp = new Date(logItem.timestamp).toLocaleString();
+                        } catch(e) {}
+                    }
+                    Admin.activityLog.unshift(logItem);
+                    if (Admin.activityLog.length > 100) Admin.activityLog.pop();
+                    Admin.addNotification(`Activity: ${payload.new.action}`);
+                    Router.handleRoute();
+                })
+                .subscribe();
+
+            // Admin Notes sync
+            supabase.channel('notes-changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'admin_notes' }, async (payload) => {
+                    console.log('[TechR] Real-time notes update');
+                    if (payload.eventType === 'DELETE') {
+                        delete Admin.adminNotes[payload.old.product_id];
+                    } else {
+                        Admin.adminNotes[payload.new.product_id] = payload.new.note;
+                    }
+                    Router.handleRoute();
+                })
+                .subscribe();
+
+            // Site Settings sync
+            supabase.channel('settings-changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, async (payload) => {
+                    console.log('[TechR] Real-time settings update');
+                    Admin.siteSettings = { ...Admin.siteSettings, ...payload.new };
+                    Router.handleRoute();
+                })
+                .subscribe();
+
+            // Team sync
+            supabase.channel('team-changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'team' }, async () => {
+                    console.log('[TechR] Real-time team update');
+                    const { data: teamData } = await supabase.from('team').select('*');
+                    if (teamData) Admin.team = teamData;
+                    Router.handleRoute();
+                })
+                .subscribe();
+
             console.log('[TechR] Supabase real-time sync enabled');
         } catch(e) {
             console.warn('[TechR] Supabase real-time sync unavailable');
@@ -151,12 +190,12 @@ const DEFAULT_PRODUCTS = [
     { id: 1, name: "Techack1", price: 180, image: "images/techack1.png", images: ["images/techack1.png", "images/techack1-alt.png"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Compact portable pen-testing device featuring a CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID. Includes probe request sniffing, auth flood, captive portal, PMKID capture, Pwnagotchi detection, card skimmer detection, and more." },
     { id: 2, name: "Techack1MS", price: 50, image: "images/techack1ms.png", images: ["images/techack1ms.png"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A cost-efficient version of the Techack1 with a smaller form factor and fewer features. Great for beginners learning about security testing and wireless protocols." },
     { id: 3, name: "TechackX1", price: 40, image: "images/techackx1.jpg", images: ["images/techackx1.jpg", "images/techackx1-logo.png"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display (320x240), MicroSD card slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi security analysis and network monitoring." },
-    
+
     // TechBox Products
     { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "images/techbox-macropad.png", images: ["images/techbox-macropad.png"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "DIY macropad kit with 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040 microcontroller. Learn PCB design, soldering, and custom firmware programming. Includes 3D-printable case files." },
     { id: 5, name: "Automatic Plant Waterer", price: 49.99, image: "images/techprod.png", images: ["images/techprod.png"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Custom NFC-enabled PCB business card kit. Design and build your own programmable business card with embedded NFC chip and QR code. A hands-on introduction to PCB design and NFC technology." },
     { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "images/techbox-starter.png", images: ["images/techbox-starter.png"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Introductory electronics and soldering kit with a microcontroller, LEDs, resistors, and basic components. Perfect for students getting started with hardware projects and learning to build circuits." },
-    
+
     // Rithim Products
     { id: 7, name: "Rithim Classic Tee", price: 29.99, image: "images/rithim-classic-tee.png", images: ["images/rithim-classic-tee.png"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Cotton crew neck tee with printed Rithim logo. Comfortable everyday fit available in multiple colors and sizes." },
     { id: 8, name: "Rithim Hoodie", price: 49.99, image: "images/rithim-hoodie.png", images: ["images/rithim-hoodie.png"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Fleece hoodie with kangaroo pocket and Rithim branding. A cozy go-to for casual everyday wear." },
@@ -191,6 +230,161 @@ function handleLogoError(img, fallbackDisplay) {
     if (fallback) fallback.style.display = fallbackDisplay || 'flex';
 }
 
+// --- AI LAB ENGINE ---
+const AI = {
+    provider: 'openai',
+    model: 'gpt-4o',
+    chatHistory: [],
+
+    init: () => {
+        const savedProvider = localStorage.getItem('techr_ai_provider');
+        if (savedProvider) AI.provider = savedProvider;
+
+        const savedModel = localStorage.getItem('techr_ai_model');
+        if (savedModel) AI.model = savedModel;
+
+        const savedHistory = localStorage.getItem('techr_ai_history');
+        if (savedHistory) {
+            try {
+                AI.chatHistory = JSON.parse(savedHistory);
+            } catch (e) {
+                AI.chatHistory = [];
+            }
+        }
+    },
+
+    getKeys: () => ({
+        openai: localStorage.getItem('techr_openai_key') || '',
+        anthropic: localStorage.getItem('techr_anthropic_key') || ''
+    }),
+
+    saveKeys: (openai, anthropic) => {
+        if (openai !== undefined) localStorage.setItem('techr_openai_key', openai);
+        if (anthropic !== undefined) localStorage.setItem('techr_anthropic_key', anthropic);
+    },
+
+    getModels: () => {
+        return AI.provider === 'openai'
+            ? ['gpt-4o', 'gpt-4o-mini', 'o1-preview']
+            : ['claude-3-5-sonnet-20240620', 'claude-3-opus-20240229', 'claude-3-haiku-20240307'];
+    },
+
+    escapeHTML: (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    },
+
+    formatMarkdown: (text) => {
+        // First escape HTML to prevent XSS
+        const safeText = AI.escapeHTML(text);
+
+        // Robust basic markdown formatting for the chat UI
+        return safeText
+            // Code blocks
+            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+            // Bold & Italic
+            .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            // Headers
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+            // Lists
+            .replace(/^\s*-\s+(.*$)/gm, '<li>$1</li>')
+            .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+            // Inline code
+            .replace(/`(.*?)`/g, '<code>$1</code>')
+            // Newlines
+            .replace(/\n/g, '<br>');
+    },
+
+    sendMessage: async (prompt) => {
+        const keys = AI.getKeys();
+        const apiKey = AI.provider === 'openai' ? keys.openai : keys.anthropic;
+
+        if (!apiKey) {
+            throw new Error(`Please enter your ${AI.provider === 'openai' ? 'OpenAI' : 'Anthropic'} API key in settings.`);
+        }
+
+        AI.chatHistory.push({ role: 'user', content: prompt });
+        AI.saveHistory();
+        Router.handleRoute(); // Refresh UI to show user message
+
+        try {
+            let responseText = "";
+            if (AI.provider === 'openai') {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: AI.model,
+                        messages: AI.chatHistory.map(m => ({ role: m.role, content: m.content }))
+                    })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                responseText = data.choices[0].message.content;
+            } else {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: AI.model,
+                        max_tokens: 1024,
+                        messages: AI.chatHistory.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content }))
+                    })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                responseText = data.content[0].text;
+            }
+
+            AI.chatHistory.push({ role: 'assistant', content: responseText });
+            AI.saveHistory();
+            Router.handleRoute();
+        } catch (error) {
+            let errorMsg = error.message;
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                errorMsg = "Network error or CORS block. AI APIs often block direct browser requests for security. You may need a proxy or to use an environment that allows cross-origin requests.";
+            }
+            AI.chatHistory.push({ role: 'assistant', content: `Error: ${errorMsg}` });
+            AI.saveHistory();
+            Router.handleRoute();
+            throw error;
+        }
+    },
+
+    saveHistory: () => {
+        localStorage.setItem('techr_ai_history', JSON.stringify(AI.chatHistory));
+    },
+
+    clearHistory: () => {
+        AI.chatHistory = [];
+        AI.saveHistory();
+        Router.handleRoute();
+    },
+
+    downloadChat: () => {
+        const content = AI.chatHistory.map(m => `### ${m.role === 'user' ? 'User' : 'Assistant'}\n\n${m.content}\n\n---`).join('\n\n');
+        const blob = new Blob([content], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `studytech-chat-${new Date().toISOString().slice(0,10)}.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+};
+
 // --- STORE & STATE ---
 const Store = {
     products: [],
@@ -210,7 +404,8 @@ const Store = {
         // Load local products immediately so the page renders instantly
         Store.loadLocalProducts();
         // Fetch remote products in the background (non-blocking)
-        Store.fetchProducts().then(() => {
+        Store.fetchProducts().then(async () => {
+            await Store.fetchAdminData();
             Router.handleRoute();
             Store.updateCartUI();
         }).catch((e) => { console.warn('[TechR] Background product fetch failed:', e); });
@@ -246,11 +441,52 @@ const Store = {
                     return;
                 }
             }
-        } catch (e) { 
+        } catch (e) {
             console.warn("[TechR] Supabase unavailable, using local storage");
         }
 
         // Remote source unavailable; keep current local products
+    },
+
+    fetchAdminData: async () => {
+        if (!supabase) {
+            Admin.team = [
+                { id: 1, name: 'Jules TechR', role: 'Lead Engineer', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jules' },
+                { id: 2, name: 'Sarah Chen', role: 'Security Analyst', status: 'away', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
+                { id: 3, name: 'Mike Rivera', role: 'Product Designer', status: 'offline', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' }
+            ];
+            return;
+        }
+        try {
+            // Fetch activity log
+            const { data: logs } = await supabase.from('activity_log').select('*').order('timestamp', { ascending: false }).limit(100);
+            if (logs) Admin.activityLog = logs;
+
+            // Fetch admin notes
+            const { data: notes } = await supabase.from('admin_notes').select('*');
+            if (notes) {
+                notes.forEach(n => Admin.adminNotes[n.product_id] = n.note);
+            }
+
+            // Fetch site settings
+            const { data: settings } = await supabase.from('site_settings').select('*').limit(1);
+            if (settings && settings[0]) {
+                const { id, ...rest } = settings[0];
+                Admin.siteSettings = { ...Admin.siteSettings, ...rest };
+            }
+
+            // Fetch team
+            const { data: teamData } = await supabase.from('team').select('*');
+            if (teamData && teamData.length > 0) {
+                Admin.team = teamData;
+            } else {
+                Admin.team = [
+                    { id: 1, name: 'Jules TechR', role: 'Lead Engineer', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jules' },
+                    { id: 2, name: 'Sarah Chen', role: 'Security Analyst', status: 'away', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
+                    { id: 3, name: 'Mike Rivera', role: 'Product Designer', status: 'offline', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' }
+                ];
+            }
+        } catch(e) { console.warn('Failed to fetch admin data', e); }
     },
 
     persistProducts: () => {
@@ -310,7 +546,7 @@ const Store = {
             }
             Store.persist();
             Store.updateCartUI();
-            
+
             // Button feedback
             const btns = document.querySelectorAll(`button[data-product-id="${id}"]`);
             btns.forEach(b => {
@@ -365,7 +601,7 @@ const Store = {
         const badge = document.getElementById('cart-badge');
         const cartCount = document.getElementById('cart-count');
         const totalItems = Store.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-        
+
         if (badge) {
             if (totalItems > 0) {
                 badge.textContent = totalItems;
@@ -374,7 +610,7 @@ const Store = {
                 badge.style.display = 'none';
             }
         }
-        
+
         if (cartCount) {
             cartCount.textContent = totalItems;
         }
@@ -422,6 +658,7 @@ const Admin = {
     activityLog: [],
     adminNotes: {},
     adminTheme: 'dark',
+    team: [],
     showNotifications: false,
     notifications: [],
     sessionStart: null,
@@ -429,10 +666,27 @@ const Admin = {
 
     pendingImages: [],
 
-    logActivity: (action) => {
-        Admin.activityLog.unshift({ action, timestamp: new Date().toLocaleString() });
-        if (Admin.activityLog.length > 100) Admin.activityLog.pop();
-        Admin.addNotification(action);
+    logActivity: async (action) => {
+        // Optimistic local update only if NOT using Supabase (to avoid duplicates from real-time listener)
+        if (!supabase) {
+            const item = { action, timestamp: new Date().toLocaleString() };
+            Admin.activityLog.unshift(item);
+            if (Admin.activityLog.length > 100) Admin.activityLog.pop();
+            Admin.addNotification(action);
+            Router.handleRoute();
+        } else {
+            try {
+                const item = { action, timestamp: new Date().toISOString() };
+                await supabase.from('activity_log').insert([item]);
+            } catch(e) {
+                console.warn('Failed to sync activity log', e);
+                // Fallback to local if sync fails
+                const item = { action, timestamp: new Date().toLocaleString() };
+                Admin.activityLog.unshift(item);
+                Admin.addNotification(action);
+                Router.handleRoute();
+            }
+        }
     },
 
     addNotification: (message) => {
@@ -612,17 +866,29 @@ const Admin = {
         }
     },
 
-    addNote: (id) => {
+    addNote: async (id) => {
         const product = Store.products.find(p => matchId(p.id, id));
         if (!product) return;
         const existing = Admin.adminNotes[id] || '';
         const note = prompt('Note for "' + product.name + '":', existing);
         if (note === null) return;
-        if (note.trim()) {
-            Admin.adminNotes[id] = note.trim();
+
+        const trimmedNote = note.trim();
+        if (trimmedNote) {
+            Admin.adminNotes[id] = trimmedNote;
             Admin.logActivity('Added note to ' + product.name);
+            if (supabase) {
+                try {
+                    await supabase.from('admin_notes').upsert([{ product_id: id, note: trimmedNote }]);
+                } catch(e) { console.warn('Sync failed', e); }
+            }
         } else {
             delete Admin.adminNotes[id];
+            if (supabase) {
+                try {
+                    await supabase.from('admin_notes').delete().match({ product_id: id });
+                } catch(e) { console.warn('Sync failed', e); }
+            }
         }
         Toast.success('Note saved');
         Router.handleRoute();
@@ -980,6 +1246,100 @@ const Components = {
         </div>
     `,
 
+    AILab: () => {
+        const keys = AI.getKeys();
+        return `
+        <div class="container" style="padding: 2rem 0;">
+            <div class="ai-lab-header">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="badge badge-studytech" style="font-size: 0.8rem;">Experimental</div>
+                    <h1 style="margin: 0; color: var(--color-studytech);">StudyTech <span style="color: white;">AI Lab</span></h1>
+                </div>
+                <p style="color: var(--text-secondary); max-width: 600px; margin-bottom: 2rem;">
+                    A private, client-side AI workspace. Enter your own API keys to interact with frontier models.
+                    Your keys are stored only in your browser's local storage and never touch our servers.
+                </p>
+            </div>
+
+            <div class="ai-lab-grid">
+                <!-- Settings Panel -->
+                <div class="glass-panel ai-settings">
+                    <h3><i data-lucide="settings"></i> Configuration</h3>
+
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <label>AI Provider</label>
+                        <select id="ai-provider" class="form-input">
+                            <option value="openai" ${AI.provider === 'openai' ? 'selected' : ''}>OpenAI (GPT-4o)</option>
+                            <option value="anthropic" ${AI.provider === 'anthropic' ? 'selected' : ''}>Anthropic (Claude 3.5)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="ai-model" class="form-input">
+                            ${AI.getModels().map(m => `<option value="${m}" ${AI.model === m ? 'selected' : ''}>${m}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <div style="position: relative;">
+                            <input type="password" id="ai-api-key" class="form-input" value="${AI.provider === 'openai' ? keys.openai : keys.anthropic}" placeholder="sk-...">
+                            <button id="toggle-key-visibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer;">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Key will be saved locally for this browser.
+                        </p>
+                    </div>
+
+                    <button id="save-ai-settings" class="btn btn-primary" style="width: 100%;">Save Configuration</button>
+
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+                        <h4>Chat Actions</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                            <button id="download-chat" class="btn btn-secondary btn-sm" style="width: 100%;">
+                                <i data-lucide="download"></i> Download as .md
+                            </button>
+                            <button id="clear-chat" class="btn btn-secondary btn-sm" style="width: 100%; color: var(--danger);">
+                                <i data-lucide="trash-2"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Panel -->
+                <div class="glass-panel ai-chat-container">
+                    <div id="ai-chat-messages" class="ai-chat-messages">
+                        ${AI.chatHistory.length === 0 ? `
+                            <div class="ai-empty-state">
+                                <i data-lucide="bot"></i>
+                                <p>Ready for your prompt. Ask me anything about engineering, science, or your study topics.</p>
+                            </div>
+                        ` : AI.chatHistory.map(msg => `
+                            <div class="ai-message ${msg.role}">
+                                <div class="ai-message-header">
+                                    <i data-lucide="${msg.role === 'user' ? 'user' : 'bot'}"></i>
+                                    <span>${msg.role === 'user' ? 'You' : 'StudyTech AI'}</span>
+                                </div>
+                                <div class="ai-message-body">${AI.formatMarkdown(msg.content)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="ai-chat-input-area">
+                        <textarea id="ai-input" placeholder="Enter your prompt here..." rows="1"></textarea>
+                        <button id="ai-send-btn" class="btn btn-primary">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    },
+
 };
 
 // --- ROUTER ---
@@ -999,7 +1359,7 @@ const Router = {
                     <a href="#checkout" class="btn btn-secondary btn-lg">View Cart (<span id="cart-count">${Store.cart.reduce((s, i) => s + (i.quantity || 1), 0)}</span>)</a>
                 </div>
             </div>
-            
+
             <div class="container" style="padding-bottom: 4rem;">
                 <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">My Product Lines</h2>
                 <div class="grid-3">
@@ -1034,7 +1394,7 @@ const Router = {
                         <p>Portable pen-testing hardware I designed for wireless security research.</p>
                     </a>
                 </div>
-                
+
                 <div class="grid-3" style="margin-top: 2rem;">
                     <a href="#rithim" class="card reveal" style="text-decoration: none; grid-column: span 1;">
                         <div class="card-logo">
@@ -1158,6 +1518,10 @@ const Router = {
         },
 
         // STUDYTECH AI DIVISION
+        'studytech-lab': () => {
+            return Components.AILab();
+        },
+
         'studytech': () => {
             const products = Store.getProductsByCategory('studytech');
             return `
@@ -1167,6 +1531,11 @@ const Router = {
                         <span class="badge badge-studytech">AI & EdTech</span>
                         <h1 style="color: var(--color-studytech);">StudyTech</h1>
                         <p>An AI-powered study assistant that helps students learn and practice at their own pace.</p>
+                        <div style="margin-top: 2rem;">
+                            <a href="#studytech-lab" class="btn btn-primary" style="background: var(--color-studytech); border-color: var(--color-studytech);">
+                                <i data-lucide="flask-conical"></i> Enter AI Lab (Beta)
+                            </a>
+                        </div>
                     </div>
 
                     <div class="features-grid">
@@ -1225,7 +1594,7 @@ const Router = {
                     </div>
                     <h2 style="text-align: center;">Staff Portal</h2>
                     <p style="text-align: center;">Access restricted to authorized personnel only.</p>
-                    
+
                     <form id="login-form">
                         <div class="form-group">
                             <label for="email">Email Address</label>
@@ -1240,13 +1609,13 @@ const Router = {
                             Sign In
                         </button>
                     </form>
-                    
+
                     <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-glass);">
                         <p style="font-size: 0.9rem; margin-bottom: 1rem;">Need help?</p>
                         <a href="mailto:support@techr.com" style="color: var(--accent); font-size: 0.9rem;">Contact IT Support</a>
                     </div>
                 </div>
-                
+
                 <div class="card reveal" style="margin-top: 2rem; text-align: center;">
                     <p style="font-size: 0.9rem; margin-bottom: 1rem;">Looking for our products?</p>
                     <a href="#techack" class="btn btn-secondary">Browse Catalog</a>
@@ -1638,6 +2007,58 @@ const Router = {
                 </div>
             `;
 
+            const renderTeamTab = () => `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h3><i data-lucide="users" style="width:20px;height:20px;"></i> Team Management</h3>
+                    <button class="btn btn-primary btn-sm"><i data-lucide="user-plus"></i> Invite Member</button>
+                </div>
+                <div class="admin-team-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                    ${Admin.team.map(m => `
+                        <div class="glass-panel" style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                            <img src="${m.avatar}" style="width: 60px; height: 60px; border-radius: 50%; background: var(--bg-tertiary);" alt="${m.name}">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0;">${m.name}</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.25rem 0;">${m.role}</p>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: ${m.status === 'online' ? 'var(--success)' : m.status === 'away' ? 'var(--warning)' : 'var(--text-secondary)'};"></span>
+                                    <span style="font-size: 0.75rem; text-transform: capitalize; color: var(--text-secondary);">${m.status}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" style="padding: 0.5rem;"><i data-lucide="more-vertical"></i></button>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="glass-panel" style="margin-top: 2rem; padding: 1.5rem;">
+                    <h4><i data-lucide="shield-check"></i> Permissions & Roles</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Manage what each team member can access and modify within the Staff Portal.</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid var(--border-glass);">
+                                <th style="padding: 0.75rem;">Role</th>
+                                <th style="padding: 0.75rem;">Products</th>
+                                <th style="padding: 0.75rem;">Analytics</th>
+                                <th style="padding: 0.75rem;">Settings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.75rem;">Administrator</td>
+                                <td style="padding: 0.75rem; color: var(--success);">Full Access</td>
+                                <td style="padding: 0.75rem; color: var(--success);">Full Access</td>
+                                <td style="padding: 0.75rem; color: var(--success);">Full Access</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.75rem;">Editor</td>
+                                <td style="padding: 0.75rem; color: var(--success);">Full Access</td>
+                                <td style="padding: 0.75rem; color: var(--warning);">View Only</td>
+                                <td style="padding: 0.75rem; color: var(--danger);">No Access</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
             const renderSettingsTab = () => `
                 <div class="admin-settings-section">
                     <h2><i data-lucide="settings" style="width:24px;height:24px;"></i> Site Settings</h2>
@@ -1722,6 +2143,7 @@ const Router = {
                 case 'products': tabContent = renderProductsTab(); break;
                 case 'analytics': tabContent = renderAnalyticsTab(); break;
                 case 'messages': tabContent = renderMessagesTab(); break;
+                case 'team': tabContent = renderTeamTab(); break;
                 case 'activity': tabContent = renderActivityTab(); break;
                 case 'settings': tabContent = renderSettingsTab(); break;
                 default: tabContent = renderOverviewTab();
@@ -1766,6 +2188,7 @@ const Router = {
                         <button class="admin-tab ${tab === 'products' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="products"><i data-lucide="package" style="width:16px;height:16px;"></i> Products</button>
                         <button class="admin-tab ${tab === 'analytics' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="analytics"><i data-lucide="bar-chart-3" style="width:16px;height:16px;"></i> Analytics</button>
                         <button class="admin-tab ${tab === 'messages' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="messages"><i data-lucide="mail" style="width:16px;height:16px;"></i> Messages</button>
+                        <button class="admin-tab ${tab === 'team' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="team"><i data-lucide="users" style="width:16px;height:16px;"></i> Team</button>
                         <button class="admin-tab ${tab === 'activity' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="activity"><i data-lucide="clock" style="width:16px;height:16px;"></i> Activity</button>
                         <button class="admin-tab ${tab === 'settings' ? 'active' : ''}" data-action="switch-admin-tab" data-tab="settings"><i data-lucide="settings" style="width:16px;height:16px;"></i> Settings</button>
                     </div>
@@ -1859,7 +2282,7 @@ const Router = {
             const idMatch = hash.match(/product\/([\w-]+)/);
             const id = idMatch ? idMatch[1] : null;
             const product = id ? Store.products.find(p => matchId(p.id, id)) : null;
-            
+
             if (!product) {
                 return `
                     <div class="container" style="padding-top: calc(var(--header-height) + 4rem); text-align: center;">
@@ -1874,7 +2297,7 @@ const Router = {
             const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
             const productColors = product.colors && product.colors.length > 0 ? product.colors : [];
             const categoryLabels = { techack: 'Techack Security', techbox: 'TechBox Education', rithim: 'Rithim Clothing', studytech: 'StudyTech AI' };
-            
+
             return `
                 <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
                     <div class="product-detail-breadcrumb reveal">
@@ -1884,7 +2307,7 @@ const Router = {
                         <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
                         <span>${product.name}</span>
                     </div>
-                    
+
                     <div class="product-detail reveal">
                         <div class="product-detail-gallery">
                             <div class="product-detail-main-image">
@@ -1914,7 +2337,7 @@ const Router = {
                                 <span class="rating-text">4.0 (12 reviews)</span>
                             </div>
                             <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; color: var(--text-secondary);">${product.desc}</p>
-                            
+
                             ${productColors.length > 0 ? `
                                 <div class="product-detail-colors">
                                     <label>Color</label>
@@ -1925,9 +2348,9 @@ const Router = {
                                     </div>
                                 </div>
                             ` : ''}
-                            
+
                             <div class="price" style="font-size: 2.5rem; margin-bottom: 1.5rem;">$${product.price.toFixed(2)}</div>
-                            
+
                             <div class="product-detail-features">
                                 <div class="detail-feature">
                                     <i data-lucide="truck" style="width: 18px; height: 18px; color: var(--success);"></i>
@@ -1991,7 +2414,7 @@ const Router = {
                     <div class="checkout-container">
                         <h2 class="reveal" style="margin-bottom: 0.5rem;">Secure Checkout</h2>
                         <p class="reveal" style="color: var(--text-secondary); margin-bottom: 2rem;">${itemCount} item${itemCount > 1 ? 's' : ''} in your cart</p>
-                        
+
                         <div class="checkout-steps reveal">
                             <div class="checkout-step active">
                                 <span class="checkout-step-number">1</span>
@@ -2043,7 +2466,7 @@ const Router = {
                                 <span style="font-size: 0.8rem; color: var(--text-secondary);">Payments secured by Stripe</span>
                             </div>
                         </div>
-                        
+
                         <details style="margin-top: 2rem;" class="reveal">
                             <summary style="cursor: pointer; color: var(--text-secondary); font-size: 0.9rem;">Developer Console</summary>
                             <pre id="debug-log" class="debug-log" style="margin-top: 1rem;">Awaiting payment initialization...</pre>
@@ -2086,11 +2509,11 @@ const Router = {
                 <div class="about-section reveal">
                     <h2>My Story</h2>
                     <p>
-                        TechR started with my first hardware project — the Tech_Pad1, a macropad I designed with 6 keys, 2 NeoPixels, 
-                        and a Seeed XIAO RP2040. Designing the PCB, routing the connections, and 3D printing the case taught me 
-                        the fundamentals of hardware development. From there, I went on to build an NFC business card, then 
-                        the Techack1 — a portable pen-testing device featuring WiFi probe sniffing, Bluetooth analysis, and a CC1101 
-                        module for sub-GHz communication. 
+                        TechR started with my first hardware project — the Tech_Pad1, a macropad I designed with 6 keys, 2 NeoPixels,
+                        and a Seeed XIAO RP2040. Designing the PCB, routing the connections, and 3D printing the case taught me
+                        the fundamentals of hardware development. From there, I went on to build an NFC business card, then
+                        the Techack1 — a portable pen-testing device featuring WiFi probe sniffing, Bluetooth analysis, and a CC1101
+                        module for sub-GHz communication.
                     </p>
                 </d>
 
@@ -2210,7 +2633,7 @@ const Router = {
     observeReveal: () => {
         requestAnimationFrame(() => {
             const observer = new IntersectionObserver(entries => {
-                entries.forEach(e => { 
+                entries.forEach(e => {
                     if (e.isIntersecting) {
                         e.target.classList.add('active');
                     }
@@ -2253,7 +2676,7 @@ const Router = {
         const cardContainer = document.getElementById('card-element');
         const cardErrors = document.getElementById('card-errors');
         const payBtn = document.getElementById('pay-btn');
-        
+
         if (!cardContainer || !payBtn) return;
 
         if (!window.Stripe) {
@@ -2263,7 +2686,7 @@ const Router = {
             return;
         }
 
-        if (!STRIPE_PUBLISHABLE_KEY || !STRIPE_PUBLISHABLE_KEY.startsWith('pk_')) {
+        if (!CONFIG.STRIPE_PUBLISHABLE_KEY || !CONFIG.STRIPE_PUBLISHABLE_KEY.startsWith('pk_')) {
             logger.log("Demo mode: Stripe publishable key not configured");
             document.getElementById('card-container').innerHTML = `
                 <div style="background: var(--bg-tertiary); border: 2px dashed var(--border-glass); border-radius: 8px; padding: 2rem; text-align: center;">
@@ -2275,11 +2698,11 @@ const Router = {
                 </div>
             `;
             if (window.lucide) lucide.createIcons();
-            
+
             // Demo mode - simulate payment
             payBtn.addEventListener('click', () => {
                 PayButton.setLoading(payBtn);
-                
+
                 setTimeout(() => {
                     logger.log("Demo payment simulated successfully");
                     Toast.success("Payment successful! Thank you for your order.");
@@ -2292,9 +2715,9 @@ const Router = {
 
         try {
             logger.log("Initializing Stripe Payments...");
-            const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
+            const stripe = window.Stripe(CONFIG.STRIPE_PUBLISHABLE_KEY);
             const elements = stripe.elements();
-            
+
             const style = {
                 base: {
                     color: '#ffffff',
@@ -2321,10 +2744,10 @@ const Router = {
 
             payBtn.addEventListener('click', async () => {
                 PayButton.setLoading(payBtn);
-                
+
                 logger.log("Creating payment token...");
                 const { token, error } = await stripe.createToken(card);
-                
+
                 if (error) {
                     logger.error(error.message);
                     if (cardErrors) cardErrors.textContent = error.message;
@@ -2347,17 +2770,19 @@ const Router = {
         }
     }
 };
+window.Router = Router;
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     Store.init();
+    AI.init();
     Router.init();
     Router.handleRoute();
     Store.updateCartUI();
     initRealtimeSync();
-    
+
     // Event delegation for all interactive elements
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', async (e) => {
         // Data-action buttons (admin dashboard, cart, etc.)
         const actionBtn = e.target.closest('[data-action]');
         if (actionBtn) {
@@ -2389,6 +2814,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (descEl) Admin.siteSettings.description = descEl.value;
                     if (emailEl) Admin.siteSettings.email = emailEl.value;
                     Admin.logActivity('Updated site settings');
+                    if (supabase) {
+                        try {
+                            await supabase.from('site_settings').upsert([{ id: 1, ...Admin.siteSettings }]);
+                        } catch(e) { console.warn('Sync failed', e); }
+                    }
                     Toast.success('Site settings saved!');
                     break;
                 }
@@ -2479,7 +2909,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        
+
         // Remove from cart button
         const removeBtn = e.target.closest('.remove-from-cart-btn');
         if (removeBtn) {
@@ -2489,7 +2919,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        
+
         // Mobile menu toggle
         const mobileMenuBtn = e.target.closest('.mobile-menu-btn');
         if (mobileMenuBtn) {
@@ -2520,8 +2950,60 @@ document.addEventListener('DOMContentLoaded', () => {
             Admin.renderAdditionalPreviews();
             return;
         }
+
+        // --- AI LAB HANDLERS ---
+        const target = e.target;
+        if (target.id === 'save-ai-settings' || target.closest('#save-ai-settings')) {
+            const provider = document.getElementById('ai-provider').value;
+            const model = document.getElementById('ai-model').value;
+            const key = document.getElementById('ai-api-key').value;
+
+            AI.provider = provider;
+            AI.model = model;
+            localStorage.setItem('techr_ai_provider', provider);
+            localStorage.setItem('techr_ai_model', model);
+
+            if (provider === 'openai') AI.saveKeys(key, undefined);
+            else AI.saveKeys(undefined, key);
+
+            Toast.success('AI configuration saved');
+            Router.handleRoute();
+            return;
+        }
+
+        if (target.id === 'ai-send-btn' || target.closest('#ai-send-btn')) {
+            const input = document.getElementById('ai-input');
+            const prompt = input.value.trim();
+            if (prompt) {
+                input.value = '';
+                AI.sendMessage(prompt).catch(err => Toast.error(err.message));
+            }
+            return;
+        }
+
+        if (target.id === 'download-chat' || target.closest('#download-chat')) {
+            AI.downloadChat();
+            return;
+        }
+
+        if (target.id === 'clear-chat' || target.closest('#clear-chat')) {
+            if (confirm('Clear all chat history?')) AI.clearHistory();
+            return;
+        }
+
+        if (target.id === 'toggle-key-visibility' || target.closest('#toggle-key-visibility')) {
+            const input = document.getElementById('ai-api-key');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            const icon = target.closest('#toggle-key-visibility').querySelector('i');
+            if (icon) {
+                const newIcon = input.type === 'password' ? 'eye' : 'eye-off';
+                icon.setAttribute('data-lucide', newIcon);
+                lucide.createIcons();
+            }
+            return;
+        }
     });
-    
+
     // Event delegation for input/change events (search, filter, image preview)
     document.addEventListener('input', (e) => {
         if (e.target.id === 'admin-search') {
@@ -2542,6 +3024,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('change', (e) => {
+        if (e.target.id === 'ai-provider') {
+            AI.provider = e.target.value;
+            AI.model = AI.getModels()[0]; // Default to first model of new provider
+            Router.handleRoute();
+            return;
+        }
         if (e.target.id === 'admin-category-filter') {
             Admin.filterCategory = e.target.value;
             Router.handleRoute();
@@ -2564,7 +3052,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Admin.handleAdditionalImages(e.target.files);
         }
     });
-    
+
     // Form submission handler for login and product forms
     document.addEventListener('submit', (e) => {
         const loginForm = e.target.closest('#login-form');
@@ -2584,9 +3072,14 @@ document.addEventListener('DOMContentLoaded', () => {
             Router.handleLogin();
         }
     });
-    
+
     // Keyboard shortcuts for admin dashboard
     document.addEventListener('keydown', (e) => {
+        if (e.target.id === 'ai-input' && e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('ai-send-btn').click();
+            return;
+        }
         if (window.location.hash === '#dashboard') {
             if (e.ctrlKey && e.key === 'n') { e.preventDefault(); Admin.showAddModal(); }
             if (e.key === 'Escape') { Admin.closeModal(); }
@@ -2626,13 +3119,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("[TechR] Application initialized");
 });
-
-
-
-
-
-
-
-
-
-
