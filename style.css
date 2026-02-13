@@ -1,6 +1,6 @@
-/* 
-  TechR Innovations - "Dark Future" Design System (v10.0) 
-  Native CSS Variables for Zero-Compile Theming 
+/*
+  TechR Innovations - "Dark Future" Design System (v10.0)
+  Native CSS Variables for Zero-Compile Theming
 */
 
 :root {
@@ -1289,17 +1289,17 @@ label {
     .desktop-nav {
         display: none;
     }
-    
+
     .mobile-menu-btn {
         display: flex;
         align-items: center;
         justify-content: center;
     }
-    
+
     h1 {
         font-size: 3rem;
     }
-    
+
     h2 {
         font-size: 2.5rem;
     }
@@ -1309,11 +1309,11 @@ label {
     h1 {
         font-size: 2.25rem;
     }
-    
+
     h2 {
         font-size: 2rem;
     }
-    
+
     .fullscreen-section {
         min-height: auto;
         padding: calc(var(--header-height) + 2rem) 0 4rem;
@@ -1889,7 +1889,7 @@ label {
     .admin-stats {
         grid-template-columns: 1fr;
     }
-    
+
     .dashboard-header {
         flex-direction: column;
         text-align: center;
@@ -2921,36 +2921,186 @@ label {
     .admin-stats-enhanced {
         grid-template-columns: 1fr 1fr;
     }
-    
+
     .admin-product-list-item {
         grid-template-columns: 30px 40px 1fr auto;
         gap: 0.5rem;
     }
-    
+
     .admin-product-list-item .list-category,
     .admin-product-list-item .list-status {
         display: none;
     }
-    
+
     .admin-tabs {
         overflow-x: auto;
         flex-wrap: nowrap;
     }
-    
+
     .analytics-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .filter-panel {
         grid-template-columns: 1fr;
     }
-    
+
     .notification-dropdown {
         width: 280px;
         right: -1rem;
     }
-    
+
     .shortcuts-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* AI Lab Styles */
+.ai-lab-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.ai-lab-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .ai-lab-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ai-settings h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.ai-chat-container {
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.ai-empty-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 2rem;
+}
+
+.ai-empty-state i {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+}
+
+.ai-message {
+    max-width: 85%;
+    padding: 1.25rem;
+    border-radius: 16px;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.ai-message.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(41, 151, 255, 0.15), rgba(41, 151, 255, 0.05));
+    border: 1px solid rgba(41, 151, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.ai-message.assistant {
+    align-self: flex-start;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--border-glass);
+    border-left: 4px solid var(--color-studytech);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.ai-message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.ai-message.user .ai-message-header {
+    color: var(--accent);
+}
+
+.ai-message.assistant .ai-message-header {
+    color: var(--color-studytech);
+}
+
+.ai-message-body {
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.ai-message-body code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.ai-message-body pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.ai-chat-input-area {
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+#ai-input {
+    flex: 1;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: white;
+    resize: none;
+    max-height: 200px;
+    font-family: inherit;
+    transition: var(--transition-fast);
+}
+
+#ai-input:focus {
+    outline: none;
+    border-color: var(--color-studytech);
+    box-shadow: 0 0 0 2px rgba(94, 92, 230, 0.2);
 }
