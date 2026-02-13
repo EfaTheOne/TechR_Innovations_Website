@@ -961,28 +961,42 @@ const Admin = {
         if (supabase) {
             // Upload to Supabase Storage for cross-device sync
             const fileName = generateStoragePath(file.name);
+            console.log('[TechR] Starting upload to Supabase Storage:', fileName);
             Toast.info('Uploading image...');
             try {
                 const { data, error } = await supabase.storage.from('products').upload(fileName, file, {
                     cacheControl: '3600',
                     upsert: false
                 });
-                if (error) throw error;
+
+                if (error) {
+                    console.error('[TechR] Supabase Storage Error:', error);
+                    if (error.message === 'Bucket not found') {
+                        throw new Error('Supabase Storage bucket "products" not found. Please create it in your Supabase dashboard and set it to Public.');
+                    }
+                    throw error;
+                }
+
                 const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
                 const downloadURL = urlData.publicUrl;
+                console.log('[TechR] Upload success. Public URL:', downloadURL);
+
                 const urlInput = document.getElementById('product-image');
                 if (urlInput) urlInput.value = downloadURL;
                 Admin.previewImage(downloadURL);
                 Toast.success('Image uploaded to cloud');
             } catch (uploadError) {
-                console.error('[TechR] Supabase upload failed, falling back to base64:', uploadError);
+                console.warn('[TechR] Cloud upload failed, using local fallback:', uploadError.message);
+                Toast.info('Note: Could not upload to cloud. Saving locally instead.');
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const dataUrl = e.target.result;
+                    console.log('[TechR] Local base64 fallback successful (Length:', dataUrl.length, ')');
                     const urlInput = document.getElementById('product-image');
                     if (urlInput) urlInput.value = dataUrl;
                     Admin.previewImage(dataUrl);
-                    Toast.success('Image saved locally');
+                    Toast.success('Image saved to local state');
                 };
                 reader.onerror = () => {
                     Toast.error('Failed to read image file');
@@ -1107,39 +1121,58 @@ const Admin = {
 
     saveProduct: async () => {
         const editId = document.getElementById('product-edit-id').value;
+        const name = document.getElementById('product-name').value;
+        const price = parseFloat(document.getElementById('product-price').value);
+        const category = document.getElementById('product-category').value;
         const mainImage = document.getElementById('product-image').value;
+        const desc = document.getElementById('product-desc').value;
         const colorsRaw = document.getElementById('product-colors').value;
         const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(c => c) : [];
         const allImages = [mainImage, ...Admin.pendingImages].filter(Boolean);
+
+        if (!name || isNaN(price) || !category) {
+            Toast.error('Please fill in all required fields (Name, Price, Category)');
+            return;
+        }
+
         const productData = {
-            name: document.getElementById('product-name').value,
-            price: parseFloat(document.getElementById('product-price').value),
-            category: document.getElementById('product-category').value,
+            name,
+            price,
+            category,
             image: mainImage,
             images: allImages,
             colors: colors,
             image_fit: document.getElementById('product-image-fit').value || DEFAULT_IMAGE_FIT,
-            desc: document.getElementById('product-desc').value
+            desc
         };
+
+        console.log('[TechR] Attempting to save product:', productData);
 
         try {
             let usedCloud = false;
-            let cloudLabel = '';
 
-            // Try Supabase (primary sync for cross-device)
             if (supabase) {
+                console.log('[TechR] Saving to Supabase...');
+                let dbError;
                 if (editId) {
                     const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
-                    if (error) throw error;
+                    dbError = error;
                 } else {
                     const { error } = await supabase.from('products').insert([productData]);
-                    if (error) throw error;
+                    dbError = error;
+                }
+
+                if (dbError) {
+                    console.error('[TechR] Supabase DB Error:', dbError);
+                    let msg = dbError.message;
+                    if (dbError.code === '42P01') msg = 'Table "products" not found. Please run the SQL setup.';
+                    if (dbError.code === '42703') msg = 'Column mismatch. Ensure "images" and "colors" are TEXT ARRAYS in Supabase.';
+                    if (dbError.message.includes('row-level security')) msg = 'RLS Policy violation. Enable Public Access for the products table.';
+                    throw new Error(msg);
                 }
                 usedCloud = true;
-                cloudLabel = 'Supabase';
-                await Store.fetchProducts();
             } else {
-                // Local storage mode (no cloud available)
+                console.log('[TechR] Saving to Local Storage (Supabase offline)');
                 if (editId) {
                     const idx = Store.products.findIndex(p => matchId(p.id, editId));
                     if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
@@ -1148,15 +1181,23 @@ const Admin = {
                     Store.products.push(productData);
                 }
                 Store.persistProducts();
-                Store.lastSynced = new Date();
             }
+
+            // SUCCESS FLOW
             Admin.closeModal();
-            const modeLabel = usedCloud ? ` (synced to ${cloudLabel})` : ' (saved locally)';
-            const actionMsg = editId ? 'Product updated: ' + productData.name : 'Product added: ' + productData.name;
+            const actionMsg = editId ? 'Product updated: ' + name : 'Product added: ' + name;
             Admin.logActivity(actionMsg);
-            Toast.success((editId ? 'Product updated!' : 'Product added!') + modeLabel);
-            Router.handleRoute();
+            Toast.success(actionMsg + (usedCloud ? ' (Synced to Cloud)' : ' (Saved Locally)'));
+
+            // Refresh in background
+            if (usedCloud) {
+                Store.fetchProducts().then(() => Router.handleRoute());
+            } else {
+                Router.handleRoute();
+            }
+
         } catch(e) {
+            console.error('[TechR] Save Operation Failed:', e);
             Toast.error('Save failed: ' + e.message);
         }
     },
@@ -2657,12 +2698,16 @@ const Router = {
                     window.location.hash = '#dashboard';
                     return;
                 }
-                Toast.error('Login failed: ' + (error.message || 'Invalid email or password'));
+                if (error.message === 'Invalid login credentials') {
+                    Toast.error('Login failed. Make sure you have created this user in your Supabase Auth dashboard.');
+                } else {
+                    Toast.error('Login failed: ' + error.message);
+                }
             } catch (e) {
                 Toast.error('Login failed: ' + (e.message || 'Authentication error'));
             }
         } else {
-            Toast.error('Authentication not configured. Set up Supabase in app.js.');
+            Toast.error('Supabase not connected. Please check your URL and Key in app.js');
         }
     },
 
