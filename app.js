@@ -636,6 +636,35 @@ function generateStoragePath(originalName) {
     return `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
 }
 
+// --- IMAGE UPLOAD HELPERS ---
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read image file'));
+        reader.readAsDataURL(file);
+    });
+}
+
+function verifyImageUrl(url, timeoutMs) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        let settled = false;
+        const settle = (result) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            img.onload = null;
+            img.onerror = null;
+            resolve(result);
+        };
+        img.onload = () => settle(true);
+        img.onerror = () => settle(false);
+        const timer = setTimeout(() => settle(false), timeoutMs || 5000);
+        img.src = url;
+    });
+}
+
 // Default image display mode
 const DEFAULT_IMAGE_FIT = 'cover';
 
@@ -965,14 +994,6 @@ const Admin = {
             Admin.previewImage(url);
         };
 
-        // Helper to read file as base64 data URL
-        const readAsBase64 = () => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = () => reject(new Error('Failed to read image file'));
-            reader.readAsDataURL(file);
-        });
-
         Toast.info('Uploading image...');
 
         if (supabase) {
@@ -988,14 +1009,7 @@ const Admin = {
                 const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
                 const downloadURL = urlData.publicUrl;
                 // Verify the uploaded image is actually accessible
-                const imgCheck = await new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => resolve(true);
-                    img.onerror = () => resolve(false);
-                    img.src = downloadURL;
-                    setTimeout(() => resolve(false), 5000);
-                });
-                if (imgCheck) {
+                if (await verifyImageUrl(downloadURL)) {
                     applyImage(downloadURL);
                     Toast.success('Image uploaded to cloud');
                     return;
@@ -1008,7 +1022,7 @@ const Admin = {
 
         // Fallback: base64 encoding (works with both Supabase DB and local storage)
         try {
-            const dataUrl = await readAsBase64();
+            const dataUrl = await readFileAsBase64(file);
             applyImage(dataUrl);
             Toast.success('Image uploaded successfully');
         } catch (e) {
@@ -1030,14 +1044,6 @@ const Admin = {
                 continue;
             }
 
-            // Helper to read file as base64
-            const readAsBase64 = () => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = () => reject(new Error('Failed to read image file'));
-                reader.readAsDataURL(file);
-            });
-
             let added = false;
 
             if (supabase) {
@@ -1051,15 +1057,7 @@ const Admin = {
                     if (error) throw error;
                     const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
                     const imgUrl = urlData.publicUrl;
-                    // Verify accessibility
-                    const imgCheck = await new Promise((resolve) => {
-                        const img = new Image();
-                        img.onload = () => resolve(true);
-                        img.onerror = () => resolve(false);
-                        img.src = imgUrl;
-                        setTimeout(() => resolve(false), 5000);
-                    });
-                    if (imgCheck) {
+                    if (await verifyImageUrl(imgUrl)) {
                         Admin.pendingImages.push(imgUrl);
                         added = true;
                     } else {
@@ -1072,7 +1070,7 @@ const Admin = {
 
             if (!added) {
                 try {
-                    const dataUrl = await readAsBase64();
+                    const dataUrl = await readFileAsBase64(file);
                     Admin.pendingImages.push(dataUrl);
                 } catch (e) {
                     Toast.error('Failed to read image file');
