@@ -965,7 +965,8 @@ const Admin = {
             try {
                 const { data, error } = await supabase.storage.from('products').upload(fileName, file, {
                     cacheControl: '3600',
-                    upsert: false
+                    upsert: true,
+                    contentType: file.type
                 });
                 if (error) throw error;
                 const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
@@ -1025,7 +1026,8 @@ const Admin = {
                 const fileName = generateStoragePath(file.name);
                 supabase.storage.from('products').upload(fileName, file, {
                     cacheControl: '3600',
-                    upsert: false
+                    upsert: true,
+                    contentType: file.type
                 }).then(({ data, error }) => {
                     if (error) throw error;
                     const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
@@ -1422,30 +1424,83 @@ const Router = {
         'techack': () => {
             const products = Store.getProductsByCategory('techack');
             return `
-                <div class="division-hero container">
-                    <div class="division-header reveal">
-                        <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
-                        <span class="badge badge-techack">Security Hardware</span>
-                        <h1 style="color: var(--color-techack);">Techack</h1>
-                        <p>Portable pen-testing devices and security tools built for hands-on learning and wireless security research.</p>
-                    </div>
+                <div class="techack-page">
+                    <div class="techack-scanlines"></div>
+                    <div class="techack-matrix-rain" id="techack-matrix"></div>
 
-                    <div class="features-grid">
-                        ${Components.FeatureCard('shield-check', 'Pen-Testing Ready', 'WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact devices.', 'color-techack')}
-                        ${Components.FeatureCard('wifi', 'Wireless Analysis', 'WiFi probe sniffing, PMKID capture, captive portals, and access point scanning.', 'color-techack')}
-                        ${Components.FeatureCard('cpu', 'Custom Hardware', 'Custom-designed PCBs with ESP32 and CC1101 modules built for security research.', 'color-techack')}
-                        ${Components.FeatureCard('lock', 'Learn Security', 'Great for students and hobbyists learning about wireless protocols and network security.', 'color-techack')}
-                    </div>
+                    <div class="container" style="position:relative;z-index:2;">
+                        <div class="techack-terminal-header reveal">
+                            <div class="terminal-bar">
+                                <span class="terminal-dot" style="background:#ff5f56;"></span>
+                                <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                                <span class="terminal-dot" style="background:#27c93f;"></span>
+                                <span class="terminal-title">techack@security:~</span>
+                            </div>
+                            <div class="terminal-body">
+                                <p class="terminal-line"><span class="terminal-prompt">$</span> cat /etc/motd</p>
+                                <div class="techack-hero-content">
+                                    <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
+                                    <span class="badge badge-techack" style="font-family:'Space Grotesk',monospace;letter-spacing:2px;">// SECURITY HARDWARE</span>
+                                    <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
+                                    <p class="techack-subtitle">Portable pen-testing devices and security tools built for hands-on learning and wireless security research.</p>
+                                </div>
+                                <p class="terminal-line"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">_</span></p>
+                            </div>
+                        </div>
 
-                    <h2 class="reveal" style="margin-top: 4rem;">Techack Products</h2>
-                    <div class="product-grid" style="margin-top: 2rem;">
-                        ${products.map(p => Components.ProductCard(p)).join('')}
-                    </div>
+                        <div class="techack-features-grid">
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="shield-check"></i></div>
+                                <h3>Pen-Testing Ready</h3>
+                                <p>WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact devices.</p>
+                                <div class="techack-feature-tag">[OFFENSIVE]</div>
+                            </div>
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="wifi"></i></div>
+                                <h3>Wireless Analysis</h3>
+                                <p>WiFi probe sniffing, PMKID capture, captive portals, and access point scanning.</p>
+                                <div class="techack-feature-tag">[WIRELESS]</div>
+                            </div>
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="cpu"></i></div>
+                                <h3>Custom Hardware</h3>
+                                <p>Custom-designed PCBs with ESP32 and CC1101 modules built for security research.</p>
+                                <div class="techack-feature-tag">[HARDWARE]</div>
+                            </div>
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="lock"></i></div>
+                                <h3>Learn Security</h3>
+                                <p>Great for students and hobbyists learning about wireless protocols and network security.</p>
+                                <div class="techack-feature-tag">[LEARN]</div>
+                            </div>
+                        </div>
 
-                    <div class="cta-section reveal" style="margin-top: 4rem;">
-                        <h2>Need a Custom Build?</h2>
-                        <p>Reach out if you're interested in custom configurations or bulk orders.</p>
-                        <a href="#admin" class="btn btn-primary">Contact Us</a>
+                        <div class="techack-products-section reveal">
+                            <div class="techack-section-header">
+                                <span class="terminal-prompt">$</span>
+                                <h2>ls ./products</h2>
+                                <span class="techack-blink">_</span>
+                            </div>
+                            <div class="product-grid" style="margin-top: 2rem;">
+                                ${products.map(p => Components.ProductCard(p)).join('')}
+                            </div>
+                        </div>
+
+                        <div class="techack-cta reveal">
+                            <div class="terminal-bar">
+                                <span class="terminal-dot" style="background:#ff5f56;"></span>
+                                <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                                <span class="terminal-dot" style="background:#27c93f;"></span>
+                                <span class="terminal-title">custom_build.sh</span>
+                            </div>
+                            <div class="techack-cta-body">
+                                <h2>Need a Custom Build?</h2>
+                                <p>Reach out if you're interested in custom configurations or bulk orders.</p>
+                                <a href="#admin" class="btn btn-primary techack-btn">
+                                    <i data-lucide="terminal" style="width:18px;height:18px;"></i> Contact Us
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
