@@ -1461,7 +1461,7 @@ const Router = {
                         <div class="techack-boot-text" id="techack-boot-text"></div>
                     </div>
 
-                    <div class="container" style="position:relative;z-index:2;">
+                    <div class="container" style="position:relative;z-index:2;padding-top:1rem;padding-bottom:4rem;">
                         <div class="techack-terminal-header reveal">
                             <div class="terminal-bar">
                                 <span class="terminal-dot" style="background:#ff5f56;"></span>
@@ -1471,16 +1471,16 @@ const Router = {
                             </div>
                             <div class="terminal-body">
                                 <p class="terminal-line"><span class="terminal-prompt">$</span> sudo ./techack --init --mode=secure</p>
-                                <p class="terminal-line" style="color: rgba(0,255,65,0.35);">[*] Loading kernel modules...</p>
-                                <p class="terminal-line" style="color: rgba(0,255,65,0.35);">[*] Initializing hardware interface...</p>
-                                <p class="terminal-line" style="color: #00ff41;">[+] System ready. Welcome to TECHACK.</p>
-                                <div class="techack-hero-content">
+                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Loading kernel modules...</p>
+                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Initializing hardware interface...</p>
+                                <p class="terminal-line" style="color: #00cc33;">[+] System ready. Welcome to TECHACK.</p>
+                                <div class="techack-hero-content" style="margin-top:1.5rem;">
                                     <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
-                                    <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:2px;">// SECURITY HARDWARE</span>
+                                    <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:3px;">// SECURITY HARDWARE</span>
                                     <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
-                                    <p class="techack-subtitle">> Portable pen-testing devices and security tools built for hands-on learning and wireless security research.</p>
+                                    <p class="techack-subtitle">> Portable pen-testing devices and security tools engineered for hands-on learning and wireless security research.</p>
                                 </div>
-                                <p class="terminal-line"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
+                                <p class="terminal-line" style="margin-top:1.5rem;"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
                                 <div class="techack-access-log">
                                     <span>[${new Date().toISOString()}] CONNECTION ESTABLISHED</span>
                                     <span>[SESSION] Secure tunnel active | AES-256-GCM</span>
@@ -1489,36 +1489,36 @@ const Router = {
                             </div>
                         </div>
 
-                        <div class="techack-ascii-divider">═══════════════════════════════════════════════════════════════════</div>
+                        <div class="techack-ascii-divider">────────────────────────────────────────────────────────────────</div>
 
                         <div class="techack-features-grid">
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="shield-check"></i></div>
-                                <h3>> Pen-Testing Ready</h3>
-                                <p>WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact devices.</p>
+                                <h3>Pen-Testing Ready</h3>
+                                <p>WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact, portable devices.</p>
                                 <div class="techack-feature-tag">[MODULE::OFFENSIVE]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="wifi"></i></div>
-                                <h3>> Wireless Analysis</h3>
-                                <p>WiFi probe sniffing, PMKID capture, captive portals, and access point scanning.</p>
+                                <h3>Wireless Analysis</h3>
+                                <p>WiFi probe sniffing, PMKID capture, captive portals, and access point scanning built-in.</p>
                                 <div class="techack-feature-tag">[MODULE::WIRELESS]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="cpu"></i></div>
-                                <h3>> Custom Hardware</h3>
-                                <p>Custom-designed PCBs with ESP32 and CC1101 modules built for security research.</p>
+                                <h3>Custom Hardware</h3>
+                                <p>Custom-designed PCBs with ESP32 and CC1101 modules purpose-built for security research.</p>
                                 <div class="techack-feature-tag">[MODULE::HARDWARE]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="lock"></i></div>
-                                <h3>> Learn Security</h3>
-                                <p>Great for students and hobbyists learning about wireless protocols and network security.</p>
+                                <h3>Learn Security</h3>
+                                <p>Ideal for students and hobbyists learning wireless protocols, network security, and ethical hacking.</p>
                                 <div class="techack-feature-tag">[MODULE::LEARN]</div>
                             </div>
                         </div>
 
-                        <div class="techack-ascii-divider">═══════════════════════════════════════════════════════════════════</div>
+                        <div class="techack-ascii-divider">────────────────────────────────────────────────────────────────</div>
 
                         <div class="techack-products-section reveal">
                             <div class="techack-section-header">
@@ -2723,7 +2723,7 @@ const Router = {
     },
 
     initTechackEffects: () => {
-        // Matrix Rain Canvas
+        // Matrix Rain Canvas - subtle background effect
         const matrixContainer = document.getElementById('techack-matrix');
         if (matrixContainer) {
             const canvas = document.createElement('canvas');
@@ -2737,22 +2737,22 @@ const Router = {
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
 
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*(){}[]|;:<>?/~`';
+            const chars = '01アイウエオカキクケコサシスセソタチツテト';
             const fontSize = 14;
             const columns = Math.floor(canvas.width / fontSize);
             const drops = Array(columns).fill(1);
 
             const drawMatrix = () => {
-                ctx.fillStyle = 'rgba(0, 9, 0, 0.06)';
+                ctx.fillStyle = 'rgba(3, 10, 6, 0.07)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#00ff41';
+                ctx.fillStyle = '#00cc33';
                 ctx.font = fontSize + 'px Courier New';
-                ctx.globalAlpha = 0.12;
+                ctx.globalAlpha = 0.06;
 
                 for (let i = 0; i < drops.length; i++) {
                     const char = chars[Math.floor(Math.random() * chars.length)];
                     ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.98) {
                         drops[i] = 0;
                     }
                     drops[i]++;
@@ -2760,7 +2760,7 @@ const Router = {
                 ctx.globalAlpha = 1;
             };
 
-            const matrixInterval = setInterval(drawMatrix, 50);
+            const matrixInterval = setInterval(drawMatrix, 60);
 
             // Clean up on route change
             const cleanup = () => {
@@ -2787,7 +2787,7 @@ const Router = {
                 '[OK] Firewall rules applied',
                 '[OK] Encryption layer active (AES-256)',
                 '[OK] Probe request monitor initialized',
-                '=======================================',
+                '─────────────────────────────────────',
                 'root@techack:~# ACCESS GRANTED',
                 'Welcome to TECHACK Security Terminal.',
                 ''
