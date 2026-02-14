@@ -1467,7 +1467,7 @@ const Router = {
                                 <span class="terminal-dot" style="background:#ff5f56;"></span>
                                 <span class="terminal-dot" style="background:#ffbd2e;"></span>
                                 <span class="terminal-dot" style="background:#27c93f;"></span>
-                                <span class="terminal-title">root@techack:~#</span>
+                                <span class="terminal-title">root@techack:~# </span>
                             </div>
                             <div class="terminal-body">
                                 <p class="terminal-line"><span class="terminal-prompt">$</span> sudo ./techack --init --mode=secure</p>
@@ -1483,7 +1483,7 @@ const Router = {
                                 <p class="terminal-line" style="margin-top:1.5rem;"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
                                 <div class="techack-access-log">
                                     <span>[${new Date().toISOString()}] CONNECTION ESTABLISHED</span>
-                                    <span>[SESSION] Secure tunnel active — AES-256-GCM</span>
+                                    <span>[SESSION] Secure tunnel active | AES-256-GCM</span>
                                     <span>[STATUS] All systems operational</span>
                                 </div>
                             </div>
