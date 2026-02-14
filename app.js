@@ -1532,30 +1532,7 @@ const Router = {
                             </div>
                         </div>
 
-                        <div class="techack-ascii-divider">═══════════════════════════════════════════════════════════════════</div>
 
-                        <div class="techack-cta reveal">
-                            <div class="terminal-bar">
-                                <span class="terminal-dot" style="background:#ff5f56;"></span>
-                                <span class="terminal-dot" style="background:#ffbd2e;"></span>
-                                <span class="terminal-dot" style="background:#27c93f;"></span>
-                                <span class="terminal-title">root@techack:~/custom_build.sh</span>
-                            </div>
-                            <div class="techack-cta-body">
-                                <p class="terminal-line" style="text-align:left;margin-bottom:1rem;"><span class="terminal-prompt">$</span> ./request_custom_build.sh</p>
-                                <h2>> NEED A CUSTOM BUILD?</h2>
-                                <p>> Reach out if you're interested in custom configurations or bulk orders.</p>
-                                <a href="#admin" class="btn btn-primary techack-btn">
-                                    <i data-lucide="terminal" style="width:18px;height:18px;"></i> EXECUTE CONTACT
-                                </a>
-                            </div>
-                            <div class="techack-status-bar">
-                                <span><span class="techack-status-dot"></span> SYSTEM ONLINE</span>
-                                <span>UPTIME: 99.97%</span>
-                                <span>ENCRYPTION: AES-256</span>
-                                <span>CONN: SECURE</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             `;

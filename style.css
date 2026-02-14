@@ -3593,86 +3593,6 @@ label {
     box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
 }
 
-/* CTA section - terminal style */
-.techack-cta {
-    margin-top: 4rem;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(0, 255, 65, 0.3);
-    border-radius: 2px;
-    overflow: hidden;
-    background: rgba(0, 8, 2, 0.9);
-}
-
-.techack-cta-body {
-    padding: 2.5rem;
-    text-align: center;
-}
-
-.techack-cta-body h2 {
-    font-family: 'Courier New', monospace;
-    color: #00ff41;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    letter-spacing: 3px;
-    text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-}
-
-.techack-cta-body p {
-    color: rgba(0, 255, 65, 0.45);
-    margin-bottom: 2rem;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-}
-
-.techack-btn {
-    background: rgba(0, 255, 65, 0.1) !important;
-    border: 1px solid #00ff41 !important;
-    color: #00ff41 !important;
-    font-family: 'Courier New', monospace !important;
-    letter-spacing: 3px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    border-radius: 2px;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
-}
-
-.techack-btn:hover {
-    background: rgba(0, 255, 65, 0.2) !important;
-    box-shadow: 0 0 25px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(0, 255, 65, 0.05);
-    text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-}
-
-/* System status bar */
-.techack-status-bar {
-    font-family: 'Courier New', monospace;
-    font-size: 0.65rem;
-    color: rgba(0, 255, 65, 0.3);
-    padding: 0.8rem 1.5rem;
-    border-top: 1px solid rgba(0, 255, 65, 0.1);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.techack-status-bar span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.techack-status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #00ff41;
-    display: inline-block;
-    animation: techack-blink 2s step-end infinite;
-}
 
 /* Mobile responsive */
 @media (max-width: 768px) {
@@ -3689,24 +3609,11 @@ label {
         grid-template-columns: 1fr;
     }
 
-    .techack-cta-body {
-        padding: 1.5rem;
-    }
-
-    .techack-cta-body h2 {
-        font-size: 1.1rem;
-    }
-
     .techack-boot-overlay {
         padding: 1rem;
     }
 
     .techack-boot-text {
         font-size: 0.7rem;
-    }
-
-    .techack-status-bar {
-        flex-direction: column;
-        gap: 0.3rem;
     }
 }
