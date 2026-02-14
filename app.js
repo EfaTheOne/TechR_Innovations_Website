@@ -636,6 +636,35 @@ function generateStoragePath(originalName) {
     return `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${ext}`;
 }
 
+// --- IMAGE UPLOAD HELPERS ---
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read image file'));
+        reader.readAsDataURL(file);
+    });
+}
+
+function verifyImageUrl(url, timeoutMs) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        let settled = false;
+        const settle = (result) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            img.onload = null;
+            img.onerror = null;
+            resolve(result);
+        };
+        img.onload = () => settle(true);
+        img.onerror = () => settle(false);
+        const timer = setTimeout(() => settle(false), timeoutMs || 5000);
+        img.src = url;
+    });
+}
+
 // Default image display mode
 const DEFAULT_IMAGE_FIT = 'cover';
 
@@ -958,10 +987,18 @@ const Admin = {
         const fileInput = document.getElementById('product-image-file');
         if (fileInput) fileInput.value = '';
 
+        // Helper to set the image value and preview
+        const applyImage = (url) => {
+            const urlInput = document.getElementById('product-image');
+            if (urlInput) urlInput.value = url;
+            Admin.previewImage(url);
+        };
+
+        Toast.info('Uploading image...');
+
         if (supabase) {
-            // Upload to Supabase Storage for cross-device sync
+            // Try Supabase Storage for cross-device sync
             const fileName = generateStoragePath(file.name);
-            Toast.info('Uploading image...');
             try {
                 const { data, error } = await supabase.storage.from('products').upload(fileName, file, {
                     cacheControl: '3600',
@@ -971,92 +1008,78 @@ const Admin = {
                 if (error) throw error;
                 const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
                 const downloadURL = urlData.publicUrl;
-                const urlInput = document.getElementById('product-image');
-                if (urlInput) urlInput.value = downloadURL;
-                Admin.previewImage(downloadURL);
-                Toast.success('Image uploaded to cloud');
+                // Verify the uploaded image is actually accessible
+                if (await verifyImageUrl(downloadURL)) {
+                    applyImage(downloadURL);
+                    Toast.success('Image uploaded to cloud');
+                    return;
+                }
+                console.warn('[TechR] Supabase storage URL not accessible, falling back to base64');
             } catch (uploadError) {
                 console.error('[TechR] Supabase upload failed, falling back to base64:', uploadError);
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const dataUrl = e.target.result;
-                    const urlInput = document.getElementById('product-image');
-                    if (urlInput) urlInput.value = dataUrl;
-                    Admin.previewImage(dataUrl);
-                    Toast.success('Image saved locally');
-                };
-                reader.onerror = () => {
-                    Toast.error('Failed to read image file');
-                };
-                reader.readAsDataURL(file);
             }
-        } else {
-            // Fallback: base64 for local-only mode
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const dataUrl = e.target.result;
-                const urlInput = document.getElementById('product-image');
-                if (urlInput) urlInput.value = dataUrl;
-                Admin.previewImage(dataUrl);
-                Toast.success('Image uploaded successfully');
-            };
-            reader.onerror = () => {
-                Toast.error('Failed to read image file');
-            };
-            reader.readAsDataURL(file);
+        }
+
+        // Fallback: base64 encoding (works with both Supabase DB and local storage)
+        try {
+            const dataUrl = await readFileAsBase64(file);
+            applyImage(dataUrl);
+            Toast.success('Image uploaded successfully');
+        } catch (e) {
+            Toast.error('Failed to read image file');
         }
     },
 
-    handleAdditionalImages: (files) => {
+    handleAdditionalImages: async (files) => {
         if (!files || files.length === 0) return;
-        const container = document.getElementById('additional-images-preview');
 
         // Reset file input so the same files can be re-selected
         const fileInput = document.getElementById('product-additional-images');
         if (fileInput) fileInput.value = '';
 
-        Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) return;
+        for (const file of Array.from(files)) {
+            if (!file.type.startsWith('image/')) continue;
             if (file.size > 5 * 1024 * 1024) {
                 Toast.error(`${file.name} exceeds 5MB limit`);
-                return;
+                continue;
             }
+
+            let added = false;
 
             if (supabase) {
                 const fileName = generateStoragePath(file.name);
-                supabase.storage.from('products').upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: true,
-                    contentType: file.type
-                }).then(({ data, error }) => {
+                try {
+                    const { data, error } = await supabase.storage.from('products').upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: true,
+                        contentType: file.type
+                    });
                     if (error) throw error;
                     const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
-                    Admin.pendingImages.push(urlData.publicUrl);
-                    Admin.renderAdditionalPreviews();
-                }).catch((uploadError) => {
+                    const imgUrl = urlData.publicUrl;
+                    if (await verifyImageUrl(imgUrl)) {
+                        Admin.pendingImages.push(imgUrl);
+                        added = true;
+                    } else {
+                        console.warn('[TechR] Additional image URL not accessible, falling back to base64');
+                    }
+                } catch (uploadError) {
                     console.error('[TechR] Additional image upload failed, falling back to base64:', uploadError);
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        Admin.pendingImages.push(e.target.result);
-                        Admin.renderAdditionalPreviews();
-                    };
-                    reader.onerror = () => {
-                        Toast.error('Failed to read image file');
-                    };
-                    reader.readAsDataURL(file);
-                });
-            } else {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    Admin.pendingImages.push(e.target.result);
-                    Admin.renderAdditionalPreviews();
-                };
-                reader.onerror = () => {
-                    Toast.error('Failed to read image file');
-                };
-                reader.readAsDataURL(file);
+                }
             }
-        });
+
+            if (!added) {
+                try {
+                    const dataUrl = await readFileAsBase64(file);
+                    Admin.pendingImages.push(dataUrl);
+                } catch (e) {
+                    Toast.error('Failed to read image file');
+                    continue;
+                }
+            }
+
+            Admin.renderAdditionalPreviews();
+        }
     },
 
     renderAdditionalPreviews: () => {
@@ -1128,29 +1151,35 @@ const Admin = {
             let usedCloud = false;
             let cloudLabel = '';
 
+            // Always update the local products array immediately
+            if (editId) {
+                const idx = Store.products.findIndex(p => matchId(p.id, editId));
+                if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
+            } else {
+                productData.id = Date.now() + Math.floor(Math.random() * 1000);
+                Store.products.push(productData);
+            }
+            // Persist to localStorage right away so changes survive page refresh
+            Store.persistProducts();
+            Store.lastSynced = new Date();
+
             // Try Supabase (primary sync for cross-device)
             if (supabase) {
-                if (editId) {
-                    const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
-                    if (error) throw error;
-                } else {
-                    const { error } = await supabase.from('products').insert([productData]);
-                    if (error) throw error;
+                try {
+                    if (editId) {
+                        const { error } = await supabase.from('products').update(productData).eq('id', parseInt(editId));
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabase.from('products').insert([productData]);
+                        if (error) throw error;
+                    }
+                    usedCloud = true;
+                    cloudLabel = 'Supabase';
+                    // Try to fetch latest from Supabase to stay in sync
+                    try { await Store.fetchProducts(); } catch (e) { /* local update already applied */ }
+                } catch (cloudError) {
+                    console.warn('[TechR] Supabase save failed, changes saved locally:', cloudError);
                 }
-                usedCloud = true;
-                cloudLabel = 'Supabase';
-                await Store.fetchProducts();
-            } else {
-                // Local storage mode (no cloud available)
-                if (editId) {
-                    const idx = Store.products.findIndex(p => matchId(p.id, editId));
-                    if (idx !== -1) Store.products[idx] = { ...Store.products[idx], ...productData };
-                } else {
-                    productData.id = Date.now() + Math.floor(Math.random() * 1000);
-                    Store.products.push(productData);
-                }
-                Store.persistProducts();
-                Store.lastSynced = new Date();
             }
             Admin.closeModal();
             const modeLabel = usedCloud ? ` (synced to ${cloudLabel})` : ' (saved locally)';
