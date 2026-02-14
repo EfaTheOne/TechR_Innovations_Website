@@ -1457,79 +1457,82 @@ const Router = {
                     <div class="techack-scanlines"></div>
                     <div class="techack-matrix-rain" id="techack-matrix"></div>
 
+                    <div class="techack-boot-overlay" id="techack-boot">
+                        <div class="techack-boot-text" id="techack-boot-text"></div>
+                    </div>
+
                     <div class="container" style="position:relative;z-index:2;">
                         <div class="techack-terminal-header reveal">
                             <div class="terminal-bar">
                                 <span class="terminal-dot" style="background:#ff5f56;"></span>
                                 <span class="terminal-dot" style="background:#ffbd2e;"></span>
                                 <span class="terminal-dot" style="background:#27c93f;"></span>
-                                <span class="terminal-title">techack@security:~</span>
+                                <span class="terminal-title">root@techack:~# </span>
                             </div>
                             <div class="terminal-body">
-                                <p class="terminal-line"><span class="terminal-prompt">$</span> cat /etc/motd</p>
+                                <p class="terminal-line"><span class="terminal-prompt">$</span> sudo ./techack --init --mode=secure</p>
+                                <p class="terminal-line" style="color: rgba(0,255,65,0.35);">[*] Loading kernel modules...</p>
+                                <p class="terminal-line" style="color: rgba(0,255,65,0.35);">[*] Initializing hardware interface...</p>
+                                <p class="terminal-line" style="color: #00ff41;">[+] System ready. Welcome to TECHACK.</p>
                                 <div class="techack-hero-content">
                                     <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
-                                    <span class="badge badge-techack" style="font-family:'Space Grotesk',monospace;letter-spacing:2px;">// SECURITY HARDWARE</span>
+                                    <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:2px;">// SECURITY HARDWARE</span>
                                     <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
-                                    <p class="techack-subtitle">Portable pen-testing devices and security tools built for hands-on learning and wireless security research.</p>
+                                    <p class="techack-subtitle">> Portable pen-testing devices and security tools built for hands-on learning and wireless security research.</p>
                                 </div>
-                                <p class="terminal-line"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">_</span></p>
+                                <p class="terminal-line"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
+                                <div class="techack-access-log">
+                                    <span>[${new Date().toISOString()}] CONNECTION ESTABLISHED</span>
+                                    <span>[SESSION] Secure tunnel active | AES-256-GCM</span>
+                                    <span>[STATUS] All systems operational</span>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="techack-ascii-divider">═══════════════════════════════════════════════════════════════════</div>
 
                         <div class="techack-features-grid">
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="shield-check"></i></div>
-                                <h3>Pen-Testing Ready</h3>
+                                <h3>> Pen-Testing Ready</h3>
                                 <p>WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact devices.</p>
-                                <div class="techack-feature-tag">[OFFENSIVE]</div>
+                                <div class="techack-feature-tag">[MODULE::OFFENSIVE]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="wifi"></i></div>
-                                <h3>Wireless Analysis</h3>
+                                <h3>> Wireless Analysis</h3>
                                 <p>WiFi probe sniffing, PMKID capture, captive portals, and access point scanning.</p>
-                                <div class="techack-feature-tag">[WIRELESS]</div>
+                                <div class="techack-feature-tag">[MODULE::WIRELESS]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="cpu"></i></div>
-                                <h3>Custom Hardware</h3>
+                                <h3>> Custom Hardware</h3>
                                 <p>Custom-designed PCBs with ESP32 and CC1101 modules built for security research.</p>
-                                <div class="techack-feature-tag">[HARDWARE]</div>
+                                <div class="techack-feature-tag">[MODULE::HARDWARE]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="lock"></i></div>
-                                <h3>Learn Security</h3>
+                                <h3>> Learn Security</h3>
                                 <p>Great for students and hobbyists learning about wireless protocols and network security.</p>
-                                <div class="techack-feature-tag">[LEARN]</div>
+                                <div class="techack-feature-tag">[MODULE::LEARN]</div>
                             </div>
                         </div>
+
+                        <div class="techack-ascii-divider">═══════════════════════════════════════════════════════════════════</div>
 
                         <div class="techack-products-section reveal">
                             <div class="techack-section-header">
                                 <span class="terminal-prompt">$</span>
-                                <h2>ls ./products</h2>
-                                <span class="techack-blink">_</span>
+                                <h2>cat ./products/inventory.db</h2>
+                                <span class="techack-blink">█</span>
                             </div>
-                            <div class="product-grid" style="margin-top: 2rem;">
+                            <p class="terminal-line" style="margin-bottom:1.5rem;font-size:0.75rem;">[+] Found ${products.length} device(s) in database. Displaying results...</p>
+                            <div class="product-grid" style="margin-top: 1rem;">
                                 ${products.map(p => Components.ProductCard(p)).join('')}
                             </div>
                         </div>
 
-                        <div class="techack-cta reveal">
-                            <div class="terminal-bar">
-                                <span class="terminal-dot" style="background:#ff5f56;"></span>
-                                <span class="terminal-dot" style="background:#ffbd2e;"></span>
-                                <span class="terminal-dot" style="background:#27c93f;"></span>
-                                <span class="terminal-title">custom_build.sh</span>
-                            </div>
-                            <div class="techack-cta-body">
-                                <h2>Need a Custom Build?</h2>
-                                <p>Reach out if you're interested in custom configurations or bulk orders.</p>
-                                <a href="#admin" class="btn btn-primary techack-btn">
-                                    <i data-lucide="terminal" style="width:18px;height:18px;"></i> Contact Us
-                                </a>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             `;
@@ -2711,6 +2714,104 @@ const Router = {
         // Initialize checkout if on that page
         if (hash === 'checkout' && Store.cart.length > 0) {
             setTimeout(() => Router.initCheckout(), 100);
+        }
+
+        // Initialize Techack effects
+        if (hash === 'techack') {
+            setTimeout(() => Router.initTechackEffects(), 50);
+        }
+    },
+
+    initTechackEffects: () => {
+        // Matrix Rain Canvas
+        const matrixContainer = document.getElementById('techack-matrix');
+        if (matrixContainer) {
+            const canvas = document.createElement('canvas');
+            matrixContainer.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const resizeCanvas = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*(){}[]|;:<>?/~`';
+            const fontSize = 14;
+            const columns = Math.floor(canvas.width / fontSize);
+            const drops = Array(columns).fill(1);
+
+            const drawMatrix = () => {
+                ctx.fillStyle = 'rgba(0, 9, 0, 0.06)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00ff41';
+                ctx.font = fontSize + 'px Courier New';
+                ctx.globalAlpha = 0.12;
+
+                for (let i = 0; i < drops.length; i++) {
+                    const char = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+                ctx.globalAlpha = 1;
+            };
+
+            const matrixInterval = setInterval(drawMatrix, 50);
+
+            // Clean up on route change
+            const cleanup = () => {
+                clearInterval(matrixInterval);
+                window.removeEventListener('resize', resizeCanvas);
+                window.removeEventListener('hashchange', cleanup);
+            };
+            window.addEventListener('hashchange', cleanup);
+        }
+
+        // Boot sequence animation
+        const bootOverlay = document.getElementById('techack-boot');
+        const bootText = document.getElementById('techack-boot-text');
+        if (bootOverlay && bootText) {
+            const bootLines = [
+                'TECHACK OS v3.7.1 — Initializing...',
+                '[OK] Loading kernel modules',
+                '[OK] Mounting secure filesystem',
+                '[OK] Starting network daemon',
+                '[OK] Configuring WiFi interface (wlan0)',
+                '[OK] Initializing CC1101 sub-GHz module',
+                '[OK] Bluetooth stack loaded',
+                '[OK] USB HID interface ready',
+                '[OK] Firewall rules applied',
+                '[OK] Encryption layer active (AES-256)',
+                '[OK] Probe request monitor initialized',
+                '=======================================',
+                'root@techack:~# ACCESS GRANTED',
+                'Welcome to TECHACK Security Terminal.',
+                ''
+            ];
+
+            let lineIndex = 0;
+            const typeNextLine = () => {
+                if (lineIndex < bootLines.length) {
+                    bootText.textContent += bootLines[lineIndex] + '\n';
+                    bootText.scrollTop = bootText.scrollHeight;
+                    lineIndex++;
+                    setTimeout(typeNextLine, 80 + Math.random() * 60);
+                } else {
+                    setTimeout(() => {
+                        bootOverlay.classList.add('fade-out');
+                        setTimeout(() => {
+                            if (bootOverlay.parentNode) {
+                                bootOverlay.parentNode.removeChild(bootOverlay);
+                            }
+                        }, 500);
+                    }, 300);
+                }
+            };
+            typeNextLine();
         }
     },
 
