@@ -3636,3 +3636,380 @@ label {
         padding: 1.5rem;
     }
 }
+
+
+/* ═══════════════════════════════════════════════
+   TECHBOX WORKSHOP THEME
+   ═══════════════════════════════════════════════ */
+
+.techbox-workshop {
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 39px,
+            rgba(255, 159, 10, 0.04) 39px,
+            rgba(255, 159, 10, 0.04) 40px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 39px,
+            rgba(255, 159, 10, 0.04) 39px,
+            rgba(255, 159, 10, 0.04) 40px
+        );
+    min-height: 100vh;
+}
+
+.workshop-banner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255, 159, 10, 0.08);
+    border: 1px solid rgba(255, 159, 10, 0.2);
+    border-left: 4px solid var(--color-techbox);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+}
+
+.workshop-banner-icon {
+    flex-shrink: 0;
+}
+
+.workshop-banner-icon i {
+    width: 36px;
+    height: 36px;
+    color: var(--color-techbox);
+}
+
+.workshop-banner h3 {
+    margin: 0 0 0.25rem;
+    color: var(--color-techbox);
+    font-size: 1.1rem;
+}
+
+.workshop-banner p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.workshop-steps {
+    margin: 3rem 0;
+}
+
+.workshop-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.workshop-step {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.workshop-step:hover {
+    border-color: rgba(255, 159, 10, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 159, 10, 0.1);
+}
+
+.workshop-step-number {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 159, 10, 0.12);
+    border: 2px solid var(--color-techbox);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-techbox);
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.workshop-step h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.workshop-step p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .workshop-steps-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .workshop-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .workshop-steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ═══════════════════════════════════════════════
+   STUDYTECH CLASSROOM THEME
+   ═══════════════════════════════════════════════ */
+
+.studytech-classroom {
+    min-height: 100vh;
+}
+
+.chalkboard {
+    background: #2a3a2a;
+    border: 8px solid #5c4033;
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    box-shadow:
+        inset 0 0 60px rgba(0, 0, 0, 0.4),
+        0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    text-align: center;
+}
+
+.chalkboard::before {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 8px;
+    background: #d4a574;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.chalkboard-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.chalk-text {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #e8e8e8;
+    text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.15),
+        1px 1px 0 rgba(0, 0, 0, 0.1);
+    margin: 0.5rem 0;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 2px;
+}
+
+.chalk-subtitle {
+    color: rgba(232, 232, 232, 0.75);
+    font-size: 1.15rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.classroom-subjects {
+    margin: 3rem 0;
+}
+
+.subject-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.subject-card {
+    padding: 2rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border-top: 3px solid var(--color-studytech);
+}
+
+.subject-card:hover {
+    border-color: rgba(94, 92, 230, 0.3);
+    border-top-color: var(--color-studytech);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(94, 92, 230, 0.1);
+}
+
+.subject-card i {
+    margin-bottom: 1rem;
+}
+
+.subject-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.subject-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.classroom-header {
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .subject-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .chalk-text {
+        font-size: 2.2rem;
+    }
+
+    .chalkboard {
+        padding: 2rem 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .subject-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ═══════════════════════════════════════════════
+   RITHIM COMFY CLOTHING BRAND THEME
+   ═══════════════════════════════════════════════ */
+
+.rithim-brand {
+    min-height: 100vh;
+}
+
+.rithim-hero-section {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 55, 95, 0.12) 0%, transparent 60%);
+}
+
+.rithim-hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--color-rithim);
+    margin: 0.5rem 0;
+    letter-spacing: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.rithim-hero-tagline {
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.rithim-vibe-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0 3rem;
+}
+
+.rithim-vibe-card {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.rithim-vibe-card:hover {
+    border-color: rgba(255, 55, 95, 0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(255, 55, 95, 0.08);
+}
+
+.rithim-vibe-card i {
+    margin-bottom: 1rem;
+}
+
+.rithim-vibe-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.rithim-vibe-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.rithim-quote {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 55, 95, 0.05);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 55, 95, 0.1);
+    margin: 2rem 0;
+}
+
+.rithim-quote p {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--text-primary);
+    max-width: 600px;
+    margin: 0 auto 1rem;
+    line-height: 1.7;
+}
+
+.rithim-quote span {
+    color: var(--color-rithim);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.rithim-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem;
+    background: var(--bg-card);
+    border-radius: 24px;
+    border: 1px solid var(--border-glass);
+}
+
+.rithim-cta h2 {
+    margin-bottom: 0.5rem;
+}
+
+.rithim-cta p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .rithim-vibe-section {
+        grid-template-columns: 1fr;
+    }
+
+    .rithim-hero-title {
+        font-size: 2.5rem;
+    }
+
+    .rithim-quote p {
+        font-size: 1rem;
+    }
+}
