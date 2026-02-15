@@ -187,19 +187,19 @@ function initRealtimeSync() {
 // simply replace the corresponding file in images/ (see images/README.md).
 const DEFAULT_PRODUCTS = [
     // Techack Products
-    { id: 1, name: "Techack1", price: 180, image: "images/techack1.png", images: ["images/techack1.png", "images/techack1-alt.png"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "Compact portable pen-testing device featuring a CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID. Includes probe request sniffing, auth flood, captive portal, PMKID capture, Pwnagotchi detection, card skimmer detection, and more." },
-    { id: 2, name: "Techack1MS", price: 50, image: "images/techack1ms.png", images: ["images/techack1ms.png"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A cost-efficient version of the Techack1 with a smaller form factor and fewer features. Great for beginners learning about security testing and wireless protocols." },
-    { id: 3, name: "TechackX1", price: 40, image: "images/techackx1.jpg", images: ["images/techackx1.jpg", "images/techackx1-logo.png"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display (320x240), MicroSD card slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi security analysis and network monitoring." },
+    { id: 1, name: "Techack1", price: 180, image: "images/techack1.png", images: ["images/techack1.png", "images/techack1-alt.png"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "My main pen-testing device — CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID all in one. Does probe request sniffing, auth floods, captive portals, PMKID capture, Pwnagotchi detection, card skimmer detection, and a bunch more." },
+    { id: 2, name: "Techack1MS", price: 50, image: "images/techack1ms.png", images: ["images/techack1ms.png"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A smaller, stripped-down version of the Techack1. Fewer features but still a solid starting point if you're just getting into security testing and wireless stuff." },
+    { id: 3, name: "TechackX1", price: 40, image: "images/techackx1.jpg", images: ["images/techackx1.jpg", "images/techackx1-logo.png"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display, MicroSD slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi analysis and network monitoring." },
 
     // TechBox Products
-    { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "images/techbox-macropad.png", images: ["images/techbox-macropad.png"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "DIY macropad kit with 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040 microcontroller. Learn PCB design, soldering, and custom firmware programming. Includes 3D-printable case files." },
-    { id: 5, name: "Automatic Plant Waterer", price: 49.99, image: "images/techprod.png", images: ["images/techprod.png"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "Custom NFC-enabled PCB business card kit. Design and build your own programmable business card with embedded NFC chip and QR code. A hands-on introduction to PCB design and NFC technology." },
-    { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "images/techbox-starter.png", images: ["images/techbox-starter.png"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Introductory electronics and soldering kit with a microcontroller, LEDs, resistors, and basic components. Perfect for students getting started with hardware projects and learning to build circuits." },
+    { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "images/techbox-macropad.png", images: ["images/techbox-macropad.png"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "Build your own macropad — 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040. You'll learn PCB design, soldering, and firmware programming. 3D-printable case files included." },
+    { id: 5, name: "Automatic Plant Waterer", price: 49.99, image: "images/techprod.png", images: ["images/techprod.png"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "A fun intro to PCB design and embedded systems — build an automatic plant watering system with sensors and a microcontroller. Great first STEM project." },
+    { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "images/techbox-starter.png", images: ["images/techbox-starter.png"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Everything you need to get started — microcontroller, LEDs, resistors, and basic components. A solid first kit for anyone wanting to learn soldering and build their first circuits." },
 
     // Rithim Products
-    { id: 7, name: "Rithim Classic Tee", price: 29.99, image: "images/rithim-classic-tee.png", images: ["images/rithim-classic-tee.png"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Cotton crew neck tee with printed Rithim logo. Comfortable everyday fit available in multiple colors and sizes." },
-    { id: 8, name: "Rithim Hoodie", price: 49.99, image: "images/rithim-hoodie.png", images: ["images/rithim-hoodie.png"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Fleece hoodie with kangaroo pocket and Rithim branding. A cozy go-to for casual everyday wear." },
-    { id: 9, name: "Rithim Joggers", price: 39.99, image: "images/rithim-joggers.png", images: ["images/rithim-joggers.png"], colors: ["#2d3436", "#636e72", "#b2bec3"], category: "rithim", desc: "Comfortable tapered joggers with elasticized cuffs and drawstring waist. Cotton-polyester blend for all-day comfort." },
+    { id: 7, name: "Rithim Classic Tee", price: 29.99, image: "images/rithim-classic-tee.png", images: ["images/rithim-classic-tee.png"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Soft cotton crew neck with the Rithim logo. Relaxed fit that feels great after a run or just hanging out. Comes in multiple colors and sizes." },
+    { id: 8, name: "Rithim Hoodie", price: 49.99, image: "images/rithim-hoodie.png", images: ["images/rithim-hoodie.png"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Cozy fleece hoodie with a kangaroo pocket and Rithim branding. Perfect for throwing on after a race or a long training session." },
+    { id: 9, name: "Rithim Joggers", price: 39.99, image: "images/rithim-joggers.png", images: ["images/rithim-joggers.png"], colors: ["#2d3436", "#636e72", "#b2bec3"], category: "rithim", desc: "Tapered joggers with elasticized cuffs and a drawstring waist. Cotton-polyester blend — super comfortable for recovery days or everyday wear." },
 
     // StudyTech Products
     { id: 10, name: "StudyTech AI Tutor - Monthly", price: 9.99, image: "images/studytech-monthly.png", images: ["images/studytech-monthly.png"], colors: ["#5e5ce6"], category: "studytech", desc: "AI-powered study assistant that helps with homework, explains concepts, and creates practice problems. Covers math, science, and more." },
@@ -1478,7 +1478,7 @@ const Router = {
                                     <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
                                     <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:3px;">// SECURITY HARDWARE</span>
                                     <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
-                                    <p class="techack-subtitle">> Portable pen-testing devices and security tools engineered for hands-on learning and wireless security research.</p>
+                                    <p class="techack-subtitle">> Portable pen-testing hardware I designed for wireless security research and hands-on learning.</p>
                                 </div>
                                 <p class="terminal-line" style="margin-top:1.5rem;"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
                                 <div class="techack-access-log">
@@ -1495,25 +1495,25 @@ const Router = {
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="shield-check"></i></div>
                                 <h3>Pen-Testing Ready</h3>
-                                <p>WiFi sniffing, Bluetooth analysis, and sub-GHz capabilities in compact, portable devices.</p>
+                                <p>WiFi sniffing, Bluetooth analysis, and sub-GHz — all packed into devices small enough to fit in your pocket.</p>
                                 <div class="techack-feature-tag">[MODULE::OFFENSIVE]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="wifi"></i></div>
                                 <h3>Wireless Analysis</h3>
-                                <p>WiFi probe sniffing, PMKID capture, captive portals, and access point scanning built-in.</p>
+                                <p>Probe sniffing, PMKID capture, captive portals, and AP scanning — all baked right into the firmware.</p>
                                 <div class="techack-feature-tag">[MODULE::WIRELESS]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="cpu"></i></div>
                                 <h3>Custom Hardware</h3>
-                                <p>Custom-designed PCBs with ESP32 and CC1101 modules purpose-built for security research.</p>
+                                <p>I designed the PCBs myself using ESP32 and CC1101 modules — built specifically for security research.</p>
                                 <div class="techack-feature-tag">[MODULE::HARDWARE]</div>
                             </div>
                             <div class="techack-feature-card reveal">
                                 <div class="techack-feature-icon"><i data-lucide="lock"></i></div>
                                 <h3>Learn Security</h3>
-                                <p>Ideal for students and hobbyists learning wireless protocols, network security, and ethical hacking.</p>
+                                <p>Great if you're getting into wireless protocols, network security, or ethical hacking and want real hardware to learn on.</p>
                                 <div class="techack-feature-tag">[MODULE::LEARN]</div>
                             </div>
                         </div>
@@ -1545,16 +1545,16 @@ const Router = {
                 <div class="division-hero container">
                     <div class="division-header reveal">
                         <img src="images/techbox-logo.png" alt="TechBox Logo" class="division-logo" onerror="handleLogoError(this)">
-                        <span class="badge badge-techbox">Maker & STEM Kits</span>
+                        <span class="badge badge-techbox">STEM & Maker Kits</span>
                         <h1 style="color: var(--color-techbox);">TechBox</h1>
-                        <p>DIY electronics kits and maker projects for learning PCB design, soldering, and microcontroller programming.</p>
+                        <p>Hands-on electronics kits I put together to help kids and teens get a head start in engineering. Learn to solder, design PCBs, and program microcontrollers by actually building stuff.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('book-open', 'Learn by Building', 'Hands-on kits that teach real hardware skills through project-based learning.', 'color-techbox')}
-                        ${Components.FeatureCard('users', 'Great for Students', 'Perfect for beginners and students exploring electronics and embedded systems.', 'color-techbox')}
-                        ${Components.FeatureCard('code', 'Real Hardware', 'Work with actual microcontrollers, LEDs, NFC chips, and PCB designs.', 'color-techbox')}
-                        ${Components.FeatureCard('trophy', 'Build Your Portfolio', 'Create finished projects you can show off and use every day.', 'color-techbox')}
+                        ${Components.FeatureCard('book-open', 'Learn by Building', 'Every kit is a real project — you learn by making something that actually works.', 'color-techbox')}
+                        ${Components.FeatureCard('users', 'Made for Students', 'Whether you\'re just starting out or already tinkering, these kits meet you where you are.', 'color-techbox')}
+                        ${Components.FeatureCard('code', 'Real Components', 'Microcontrollers, LEDs, NFC chips, and custom PCBs — no toy parts.', 'color-techbox')}
+                        ${Components.FeatureCard('trophy', 'Build Your Portfolio', 'Finish a kit and you\'ve got a real project to show off — stuff that looks great for school or job applications.', 'color-techbox')}
                     </div>
 
                     <h2 class="reveal" style="margin-top: 4rem;">TechBox Products</h2>
@@ -1564,7 +1564,7 @@ const Router = {
 
                     <div class="cta-section reveal" style="margin-top: 4rem;">
                         <h2>Student or Educator?</h2>
-                        <p>Get in touch for group pricing on kits and maker projects.</p>
+                        <p>I offer group pricing for classrooms and STEM programs — reach out and let's work something out.</p>
                         <a href="#admin" class="btn btn-primary">Contact Us</a>
                     </div>
                 </div>
@@ -1578,16 +1578,16 @@ const Router = {
                 <div class="division-hero container">
                     <div class="division-header reveal">
                         <img src="images/rithim-logo.png" alt="Rithim Logo" class="division-logo" onerror="handleLogoError(this)">
-                        <span class="badge badge-rithim">Fashion & Apparel</span>
+                        <span class="badge badge-rithim">Recovery & Comfort Wear</span>
                         <h1 style="color: var(--color-rithim);">Rithim</h1>
-                        <p>Casual apparel designed for comfort and everyday style.</p>
+                        <p>Recovery gear for after the race. I'm a long-distance runner, and I designed Rithim for those moments when you just need to stretch out, cool down, and feel comfortable after a hard session.</p>
                     </div>
 
                     <div class="features-grid">
-                        ${Components.FeatureCard('shirt', 'Rithim Style', 'Clean designs with the Rithim brand look.', 'color-rithim')}
-                        ${Components.FeatureCard('heart', 'Comfortable Fit', 'Soft fabrics and relaxed fits for all-day wear.', 'color-rithim')}
-                        ${Components.FeatureCard('star', 'Quality Materials', 'Cotton and cotton-blend fabrics built to last.', 'color-rithim')}
-                        ${Components.FeatureCard('palette', 'Multiple Colors', 'Tees, hoodies, and joggers in a range of colors.', 'color-rithim')}
+                        ${Components.FeatureCard('shirt', 'Post-Race Comfort', 'Soft, relaxed fits that feel amazing after a long run or workout.', 'color-rithim')}
+                        ${Components.FeatureCard('heart', 'Recovery-First Design', 'Breathable fabrics and loose cuts made for stretching, cooling down, and recovering.', 'color-rithim')}
+                        ${Components.FeatureCard('star', 'Built to Last', 'Cotton and cotton-blend materials that hold up wash after wash.', 'color-rithim')}
+                        ${Components.FeatureCard('palette', 'Multiple Colors', 'Tees, hoodies, and joggers in a range of colors — pick what fits your style.', 'color-rithim')}
                     </div>
 
                     <h2 class="reveal" style="margin-top: 4rem;">Rithim Collection</h2>
@@ -1596,8 +1596,8 @@ const Router = {
                     </div>
 
                     <div class="cta-section reveal" style="margin-top: 4rem;">
-                        <h2>Wear the Brand</h2>
-                        <p>Explore our full clothing line and find pieces that match your vibe.</p>
+                        <h2>Recovery Starts Here</h2>
+                        <p>Whether it's post-race, post-workout, or just a chill day — Rithim's got you covered.</p>
                         <a href="#checkout" class="btn btn-primary">Shop Now</a>
                     </div>
                 </div>
