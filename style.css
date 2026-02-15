@@ -3639,377 +3639,882 @@ label {
 
 
 /* ═══════════════════════════════════════════════
-   TECHBOX WORKSHOP THEME
+   TECHACK v2 — PERSONAL PROJECT PAGE
    ═══════════════════════════════════════════════ */
 
-.techbox-workshop {
+.techack-page-v2 {
+    min-height: 100vh;
+}
+
+.techack-hero-v2 {
+    text-align: center;
+    padding: 2rem 0 3rem;
+}
+
+.techack-hero-desc {
+    max-width: 700px;
+    margin: 1rem auto 0;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.techack-what-section {
+    background: rgba(52, 199, 89, 0.06);
+    border: 1px solid rgba(52, 199, 89, 0.15);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    margin: 2rem 0 3rem;
+}
+
+.techack-what-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+}
+
+.techack-what-section p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin: 0;
+}
+
+.techack-capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.techack-cap-card {
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border-left: 3px solid var(--color-techack);
+}
+
+.techack-cap-card:hover {
+    border-color: rgba(52, 199, 89, 0.3);
+    border-left-color: var(--color-techack);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(52, 199, 89, 0.08);
+}
+
+.techack-cap-card i {
+    margin-bottom: 1rem;
+}
+
+.techack-cap-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.techack-cap-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.techack-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: rgba(52, 199, 89, 0.05);
+    border: 1px solid rgba(52, 199, 89, 0.12);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 2rem 0;
+}
+
+.techack-note p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .techack-capabilities-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .techack-what-section {
+        padding: 1.5rem;
+    }
+}
+
+
+/* ═══════════════════════════════════════════════
+   TECHBOX v2 — STEM WORKSHOP THEME
+   ═══════════════════════════════════════════════ */
+
+.techbox-workshop-v2 {
+    min-height: 100vh;
     background:
         repeating-linear-gradient(
             0deg,
             transparent,
             transparent 39px,
-            rgba(255, 159, 10, 0.04) 39px,
-            rgba(255, 159, 10, 0.04) 40px
+            rgba(255, 159, 10, 0.03) 39px,
+            rgba(255, 159, 10, 0.03) 40px
         ),
         repeating-linear-gradient(
             90deg,
             transparent,
             transparent 39px,
-            rgba(255, 159, 10, 0.04) 39px,
-            rgba(255, 159, 10, 0.04) 40px
+            rgba(255, 159, 10, 0.03) 39px,
+            rgba(255, 159, 10, 0.03) 40px
         );
-    min-height: 100vh;
 }
 
-.workshop-banner {
+.workshop-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 2rem;
+    background: rgba(255, 159, 10, 0.1);
+    border-bottom: 2px solid rgba(255, 159, 10, 0.2);
+    font-size: 0.8rem;
+    color: var(--color-techbox);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.workshop-hero {
+    text-align: center;
+    padding: 2rem 0 2rem;
+}
+
+.workshop-hero-desc {
+    max-width: 700px;
+    margin: 1rem auto 0;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.workbench-section {
+    background: rgba(255, 159, 10, 0.05);
+    border: 1px solid rgba(255, 159, 10, 0.15);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin: 2rem 0 3rem;
+}
+
+.workbench-header {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    background: rgba(255, 159, 10, 0.08);
-    border: 1px solid rgba(255, 159, 10, 0.2);
-    border-left: 4px solid var(--color-techbox);
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin: 2rem 0;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
-.workshop-banner-icon {
-    flex-shrink: 0;
-}
-
-.workshop-banner-icon i {
-    width: 36px;
-    height: 36px;
-    color: var(--color-techbox);
-}
-
-.workshop-banner h3 {
-    margin: 0 0 0.25rem;
-    color: var(--color-techbox);
-    font-size: 1.1rem;
-}
-
-.workshop-banner p {
+.workbench-header h2 {
     margin: 0;
-    color: var(--text-secondary);
-    font-size: 0.95rem;
+    color: var(--color-techbox);
 }
 
-.workshop-steps {
+.workbench-tools {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+}
+
+.tool-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.tool-item:hover {
+    border-color: rgba(255, 159, 10, 0.3);
+    transform: translateY(-2px);
+}
+
+.tool-item i {
+    width: 24px;
+    height: 24px;
+}
+
+.workshop-process {
     margin: 3rem 0;
 }
 
-.workshop-steps-grid {
+.process-timeline {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 0;
 }
 
-.workshop-step {
-    text-align: center;
-    padding: 2rem 1.5rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-glass);
-    border-radius: 16px;
+.process-step {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    border-left: 3px solid rgba(255, 159, 10, 0.2);
     position: relative;
     transition: all 0.3s ease;
 }
 
-.workshop-step:hover {
-    border-color: rgba(255, 159, 10, 0.3);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(255, 159, 10, 0.1);
+.process-step:hover {
+    border-left-color: var(--color-techbox);
+    background: rgba(255, 159, 10, 0.03);
 }
 
-.workshop-step-number {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 159, 10, 0.12);
-    border: 2px solid var(--color-techbox);
+.process-step::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 2.3rem;
+    width: 11px;
+    height: 11px;
+    background: var(--color-techbox);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-techbox);
+    border: 2px solid var(--bg-primary);
+}
+
+.process-number {
     font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgba(255, 159, 10, 0.2);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 48px;
 }
 
-.workshop-step h3 {
-    font-size: 1rem;
+.process-content h3 {
     margin-bottom: 0.5rem;
+    font-size: 1.05rem;
 }
 
-.workshop-step p {
-    font-size: 0.9rem;
+.process-content p {
     color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.7;
     margin: 0;
 }
 
+.workshop-kits-header {
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.workshop-kits-header p {
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0;
+}
+
+.workshop-skills {
+    margin-top: 3rem;
+    padding: 2.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+}
+
+.skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.skill-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: rgba(255, 159, 10, 0.08);
+    border: 1px solid rgba(255, 159, 10, 0.2);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    color: var(--color-techbox);
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
-    .workshop-steps-grid {
-        grid-template-columns: 1fr 1fr;
+    .workshop-top-bar {
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+        padding: 0.5rem 1rem;
+        font-size: 0.7rem;
     }
 
-    .workshop-banner {
-        flex-direction: column;
-        text-align: center;
+    .workbench-tools {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .process-step {
+        padding: 1.25rem 1rem;
+    }
+
+    .workbench-section {
+        padding: 1.5rem;
     }
 }
 
 @media (max-width: 480px) {
-    .workshop-steps-grid {
-        grid-template-columns: 1fr;
+    .workbench-tools {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 
 /* ═══════════════════════════════════════════════
-   STUDYTECH CLASSROOM THEME
+   STUDYTECH v2 — CLASSROOM THEME
    ═══════════════════════════════════════════════ */
 
-.studytech-classroom {
+.studytech-classroom-v2 {
     min-height: 100vh;
 }
 
-.chalkboard {
-    background: #2a3a2a;
-    border: 8px solid #5c4033;
-    border-radius: 8px;
-    padding: 3rem 2rem;
+.classroom-banner-bar {
+    text-align: center;
+    padding: 0.6rem 1rem;
+    background: rgba(94, 92, 230, 0.1);
+    border-bottom: 2px solid rgba(94, 92, 230, 0.15);
+    font-size: 0.85rem;
+    color: var(--color-studytech);
+    font-weight: 500;
+}
+
+.whiteboard {
+    background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+    border: 3px solid #c8c8cc;
+    border-radius: 12px;
+    padding: 3rem 2.5rem;
     box-shadow:
-        inset 0 0 60px rgba(0, 0, 0, 0.4),
-        0 4px 20px rgba(0, 0, 0, 0.3);
+        0 4px 20px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
     position: relative;
     text-align: center;
+    margin-bottom: 3rem;
 }
 
-.chalkboard::before {
-    content: '';
+.whiteboard-markers {
     position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 8px;
-    background: #d4a574;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    bottom: -12px;
+    right: 2rem;
+    display: flex;
+    gap: 6px;
 }
 
-.chalkboard-inner {
+.marker {
+    width: 8px;
+    height: 28px;
+    border-radius: 2px 2px 4px 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.marker-red { background: #e74c3c; }
+.marker-blue { background: #3498db; }
+.marker-green { background: #27ae60; }
+.marker-black { background: #2d3436; }
+
+.whiteboard-inner {
     position: relative;
     z-index: 1;
 }
 
-.chalk-text {
+.whiteboard-title {
     font-size: 3.5rem;
     font-weight: 700;
-    color: #e8e8e8;
-    text-shadow:
-        0 0 8px rgba(255, 255, 255, 0.15),
-        1px 1px 0 rgba(0, 0, 0, 0.1);
+    color: #1a1a2e;
     margin: 0.5rem 0;
     font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: 2px;
 }
 
-.chalk-subtitle {
-    color: rgba(232, 232, 232, 0.75);
-    font-size: 1.15rem;
+.whiteboard-subtitle {
+    color: #555;
+    font-size: 1.1rem;
     margin-top: 0.5rem;
-    font-style: italic;
 }
 
-.classroom-subjects {
-    margin: 3rem 0;
+.whiteboard .division-logo {
+    filter: brightness(0.3);
 }
 
-.subject-cards {
+.notebook-section {
+    margin: 2rem 0 3rem;
+}
+
+.notebook-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.notebook-header h2 {
+    margin: 0;
+}
+
+.notebook-cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
 }
 
-.subject-card {
-    padding: 2rem 1.5rem;
+.notebook-card {
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    position: relative;
+    border-top: 3px solid var(--color-studytech);
+    transition: all 0.3s ease;
+}
+
+.notebook-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(94, 92, 230, 0.08);
+    border-color: rgba(94, 92, 230, 0.25);
+    border-top-color: var(--color-studytech);
+}
+
+.notebook-card-number {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: rgba(94, 92, 230, 0.08);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1;
+}
+
+.notebook-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+}
+
+.notebook-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.classroom-bulletin {
+    background: rgba(94, 92, 230, 0.06);
+    border: 1px solid rgba(94, 92, 230, 0.12);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.bulletin-pin {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 16px;
+    background: var(--color-studytech);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.classroom-bulletin h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.classroom-bulletin p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin: 0;
+}
+
+.classroom-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.classroom-pricing-card {
+    padding: 2rem;
     background: var(--bg-card);
     border: 1px solid var(--border-glass);
     border-radius: 16px;
     text-align: center;
+    position: relative;
     transition: all 0.3s ease;
-    border-top: 3px solid var(--color-studytech);
 }
 
-.subject-card:hover {
-    border-color: rgba(94, 92, 230, 0.3);
-    border-top-color: var(--color-studytech);
+.classroom-pricing-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(94, 92, 230, 0.1);
+    box-shadow: 0 8px 24px rgba(94, 92, 230, 0.08);
 }
 
-.subject-card i {
-    margin-bottom: 1rem;
+.classroom-pricing-featured {
+    border-color: var(--color-studytech);
+    box-shadow: 0 0 0 1px var(--color-studytech);
 }
 
-.subject-card h3 {
-    font-size: 1rem;
+.classroom-pricing-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-studytech);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.classroom-pricing-tag {
+    font-size: 1.2rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
-.subject-card p {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin: 0;
+.classroom-pricing-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-studytech);
+    margin-bottom: 1.5rem;
+    font-family: 'Space Grotesk', sans-serif;
 }
 
-.classroom-header {
-    margin-bottom: 2rem;
+.classroom-pricing-price span {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.classroom-pricing-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    text-align: left;
+}
+
+.classroom-pricing-card ul li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.classroom-pricing-card ul li:last-child {
+    border-bottom: none;
 }
 
 @media (max-width: 768px) {
-    .subject-cards {
-        grid-template-columns: 1fr 1fr;
+    .notebook-cards {
+        grid-template-columns: 1fr;
     }
 
-    .chalk-text {
+    .whiteboard-title {
         font-size: 2.2rem;
     }
 
-    .chalkboard {
+    .whiteboard {
         padding: 2rem 1.25rem;
     }
-}
 
-@media (max-width: 480px) {
-    .subject-cards {
+    .classroom-pricing-grid {
         grid-template-columns: 1fr;
+    }
+
+    .classroom-bulletin {
+        padding: 1.5rem;
     }
 }
 
 
 /* ═══════════════════════════════════════════════
-   RITHIM COMFY CLOTHING BRAND THEME
+   RITHIM v2 — COMFY CLOTHING BRAND THEME
    ═══════════════════════════════════════════════ */
 
-.rithim-brand {
+.rithim-brand-v2 {
     min-height: 100vh;
 }
 
-.rithim-hero-section {
+.rithim-lifestyle-hero {
     background:
-        radial-gradient(ellipse at 50% 0%, rgba(255, 55, 95, 0.12) 0%, transparent 60%);
+        radial-gradient(ellipse at 30% 20%, rgba(255, 55, 95, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(255, 55, 95, 0.06) 0%, transparent 50%);
+    padding: 5rem 1rem 4rem;
 }
 
-.rithim-hero-title {
-    font-size: 4rem;
+.rithim-brand-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.rithim-brand-title {
+    font-size: 5rem;
     font-weight: 700;
     color: var(--color-rithim);
-    margin: 0.5rem 0;
-    letter-spacing: 4px;
+    margin: 0;
+    letter-spacing: 8px;
     font-family: 'Space Grotesk', sans-serif;
+    text-transform: lowercase;
 }
 
-.rithim-hero-tagline {
+.rithim-brand-tagline {
     font-size: 1.3rem;
     color: var(--text-secondary);
     font-style: italic;
-    max-width: 500px;
-    margin: 0 auto;
+    margin: 1rem auto 0;
+    max-width: 400px;
+    letter-spacing: 2px;
 }
 
-.rithim-vibe-section {
+.rithim-hero-divider {
+    width: 60px;
+    height: 2px;
+    background: var(--color-rithim);
+    margin: 2rem auto 0;
+    opacity: 0.5;
+}
+
+.rithim-story-section {
+    padding: 3rem 0;
+}
+
+.rithim-story-text {
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.rithim-story-text h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-rithim);
+}
+
+.rithim-story-text p {
+    color: var(--text-secondary);
+    line-height: 1.9;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+}
+
+.rithim-signature {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--color-rithim);
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+.rithim-pillars {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin: 2rem 0 3rem;
+    gap: 2rem;
+    margin: 1rem 0 3rem;
 }
 
-.rithim-vibe-card {
+.rithim-pillar {
     text-align: center;
     padding: 2.5rem 1.5rem;
     background: var(--bg-card);
     border: 1px solid var(--border-glass);
-    border-radius: 20px;
+    border-radius: 24px;
     transition: all 0.3s ease;
 }
 
-.rithim-vibe-card:hover {
-    border-color: rgba(255, 55, 95, 0.25);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(255, 55, 95, 0.08);
+.rithim-pillar:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(255, 55, 95, 0.06);
+    border-color: rgba(255, 55, 95, 0.2);
 }
 
-.rithim-vibe-card i {
+.rithim-pillar-icon {
+    font-size: 2.5rem;
     margin-bottom: 1rem;
 }
 
-.rithim-vibe-card h3 {
+.rithim-pillar h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.rithim-pillar p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.rithim-collection-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.rithim-collection-label {
+    display: inline-block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--color-rithim);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.rithim-collection-header h2 {
+    margin-bottom: 0.5rem;
+}
+
+.rithim-collection-header p {
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.rithim-lookbook-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.rithim-lookbook-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.rithim-lookbook-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(255, 55, 95, 0.06);
+    border-color: rgba(255, 55, 95, 0.2);
+}
+
+.rithim-lookbook-image {
+    display: block;
+    padding: 2rem;
+    background: rgba(255, 55, 95, 0.03);
+    text-align: center;
+}
+
+.rithim-lookbook-image img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.rithim-lookbook-item:hover .rithim-lookbook-image img {
+    transform: scale(1.05);
+}
+
+.rithim-lookbook-info {
+    padding: 1.5rem;
+}
+
+.rithim-lookbook-info h3 {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
 }
 
-.rithim-vibe-card p {
-    font-size: 0.9rem;
+.rithim-lookbook-info p {
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    margin: 0;
     line-height: 1.6;
+    margin-bottom: 1rem;
 }
 
-.rithim-quote {
+.rithim-lookbook-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.rithim-lookbook-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-rithim);
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.rithim-color-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.rithim-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--border-glass);
+}
+
+.rithim-comfort-banner {
     text-align: center;
-    padding: 3rem 2rem;
-    background: rgba(255, 55, 95, 0.05);
-    border-radius: 20px;
+    margin-top: 4rem;
+    padding: 4rem 2rem;
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 55, 95, 0.06) 0%, transparent 70%);
     border: 1px solid rgba(255, 55, 95, 0.1);
-    margin: 2rem 0;
+    border-radius: 28px;
 }
 
-.rithim-quote p {
-    font-size: 1.2rem;
-    font-style: italic;
-    color: var(--text-primary);
-    max-width: 600px;
-    margin: 0 auto 1rem;
+.rithim-comfort-banner h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.rithim-comfort-banner p {
+    color: var(--text-secondary);
+    max-width: 550px;
+    margin: 0 auto 1.5rem;
     line-height: 1.7;
 }
 
-.rithim-quote span {
-    color: var(--color-rithim);
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-.rithim-cta {
-    text-align: center;
-    margin-top: 4rem;
-    padding: 3rem;
-    background: var(--bg-card);
-    border-radius: 24px;
-    border: 1px solid var(--border-glass);
-}
-
-.rithim-cta h2 {
-    margin-bottom: 0.5rem;
-}
-
-.rithim-cta p {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+.rithim-shop-btn {
+    background: var(--color-rithim) !important;
+    border-color: var(--color-rithim) !important;
+    border-radius: 50px !important;
+    padding: 0.75rem 2.5rem !important;
+    font-size: 1rem !important;
 }
 
 @media (max-width: 768px) {
-    .rithim-vibe-section {
+    .rithim-pillars {
         grid-template-columns: 1fr;
     }
 
-    .rithim-hero-title {
-        font-size: 2.5rem;
+    .rithim-lookbook-grid {
+        grid-template-columns: 1fr;
     }
 
-    .rithim-quote p {
-        font-size: 1rem;
+    .rithim-brand-title {
+        font-size: 3rem;
+        letter-spacing: 4px;
+    }
+
+    .rithim-comfort-banner {
+        padding: 2.5rem 1.5rem;
     }
 }

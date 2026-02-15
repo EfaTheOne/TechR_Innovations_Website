@@ -1453,86 +1453,68 @@ const Router = {
         'techack': () => {
             const products = Store.getProductsByCategory('techack');
             return `
-                <div class="techack-page">
-                    <div class="techack-scanlines"></div>
-                    <div class="techack-matrix-rain" id="techack-matrix"></div>
+                <div class="techack-page-v2">
+                    <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+                        <div class="techack-hero-v2 reveal">
+                            <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
+                            <h1 style="color: var(--color-techack); font-size: 3rem; margin: 0.5rem 0;">Techack</h1>
+                            <p class="techack-hero-desc">So basically, I got really into cybersecurity and wanted my own pen-testing tools — but the ones out there were either way too expensive or didn't do what I wanted. So I just... built my own. Custom PCBs, ESP32 chips, CC1101 modules for sub-GHz, the works. These are the devices I actually use when I'm messing around with wireless security stuff.</p>
+                        </div>
 
-                    <div class="techack-boot-overlay" id="techack-boot">
-                        <div class="techack-boot-text" id="techack-boot-text"></div>
-                    </div>
+                        <div class="techack-what-section reveal">
+                            <h2><i data-lucide="help-circle" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techack);"></i>Wait, what even is this?</h2>
+                            <p>Pen-testing = penetration testing. It's basically trying to hack into systems (with permission) to find security holes before the bad guys do. My Techack devices let you do stuff like scan WiFi networks, capture handshakes, test Bluetooth devices, and play around with sub-GHz radio signals. It's all for learning and research — not for doing anything sketchy.</p>
+                        </div>
 
-                    <div class="container" style="position:relative;z-index:2;padding-top:1rem;padding-bottom:4rem;">
-                        <div class="techack-terminal-header reveal">
-                            <div class="terminal-bar">
-                                <span class="terminal-dot" style="background:#ff5f56;"></span>
-                                <span class="terminal-dot" style="background:#ffbd2e;"></span>
-                                <span class="terminal-dot" style="background:#27c93f;"></span>
-                                <span class="terminal-title">root@techack:~# </span>
+                        <div class="techack-capabilities-grid">
+                            <div class="techack-cap-card reveal">
+                                <i data-lucide="wifi" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
+                                <h3>WiFi Stuff</h3>
+                                <p>Probe request sniffing, deauth detection, PMKID capture, captive portals, AP scanning — pretty much everything you'd want for WiFi security testing. I wrote most of the firmware myself.</p>
                             </div>
-                            <div class="terminal-body">
-                                <p class="terminal-line"><span class="terminal-prompt">$</span> sudo ./techack --init --mode=secure</p>
-                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Loading kernel modules...</p>
-                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Initializing hardware interface...</p>
-                                <p class="terminal-line" style="color: #00cc33;">[+] System ready. Welcome to TECHACK.</p>
-                                <div class="techack-hero-content" style="margin-top:1.5rem;">
-                                    <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
-                                    <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:3px;">// SECURITY HARDWARE</span>
-                                    <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
-                                    <p class="techack-subtitle">> I build pen-testing tools from scratch — custom PCBs, ESP32s, CC1101 modules, the whole deal. If you're into wireless security, this is for you.</p>
-                                </div>
-                                <p class="terminal-line" style="margin-top:1.5rem;"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
-                                <div class="techack-access-log">
-                                    <span>[${new Date().toISOString()}] CONNECTION ESTABLISHED</span>
-                                    <span>[SESSION] Secure tunnel active | AES-256-GCM</span>
-                                    <span>[STATUS] All systems operational</span>
-                                </div>
+                            <div class="techack-cap-card reveal">
+                                <i data-lucide="radio" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
+                                <h3>Sub-GHz Radio</h3>
+                                <p>The CC1101 module handles 433 MHz signals. You can pick up garage doors, weather stations, key fobs — anything on that frequency. Great for understanding how RF communication actually works.</p>
+                            </div>
+                            <div class="techack-cap-card reveal">
+                                <i data-lucide="bluetooth" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
+                                <h3>Bluetooth</h3>
+                                <p>BLE scanning and analysis. See what's broadcasting around you, check out device characteristics, that kind of thing. Useful for IoT security research.</p>
+                            </div>
+                            <div class="techack-cap-card reveal">
+                                <i data-lucide="usb" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
+                                <h3>USB HID</h3>
+                                <p>Some of the devices can act as a keyboard when you plug them in — like a Rubber Ducky. You can write scripts that type out commands automatically. Really cool for demos.</p>
+                            </div>
+                            <div class="techack-cap-card reveal">
+                                <i data-lucide="cpu" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
+                                <h3>Custom PCBs</h3>
+                                <p>I didn't just slap modules on a breadboard — I designed actual PCBs in KiCad, got them manufactured, and hand-soldered everything. These are real products, not weekend projects.</p>
+                            </div>
+                            <div class="techack-cap-card reveal">
+                                <i data-lucide="graduation-cap" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
+                                <h3>Learning Tool</h3>
+                                <p>Honestly, the best way to learn security is by doing it. These devices give you real hardware to experiment with instead of just watching YouTube tutorials about it.</p>
                             </div>
                         </div>
 
-                        <div class="techack-ascii-divider">────────────────────────────────────────────────────────────────</div>
-
-                        <div class="techack-features-grid">
-                            <div class="techack-feature-card reveal">
-                                <div class="techack-feature-icon"><i data-lucide="shield-check"></i></div>
-                                <h3>Pen-Testing Ready</h3>
-                                <p>WiFi sniffing, Bluetooth, sub-GHz — I crammed it all into something that fits in your pocket. Seriously.</p>
-                                <div class="techack-feature-tag">[MODULE::OFFENSIVE]</div>
-                            </div>
-                            <div class="techack-feature-card reveal">
-                                <div class="techack-feature-icon"><i data-lucide="wifi"></i></div>
-                                <h3>Wireless Analysis</h3>
-                                <p>Probe sniffing, PMKID capture, captive portals, AP scanning — it's all baked into the firmware I wrote.</p>
-                                <div class="techack-feature-tag">[MODULE::WIRELESS]</div>
-                            </div>
-                            <div class="techack-feature-card reveal">
-                                <div class="techack-feature-icon"><i data-lucide="cpu"></i></div>
-                                <h3>Custom Hardware</h3>
-                                <p>I designed every PCB myself — ESP32 and CC1101 based. No off-the-shelf stuff, this is built from the ground up.</p>
-                                <div class="techack-feature-tag">[MODULE::HARDWARE]</div>
-                            </div>
-                            <div class="techack-feature-card reveal">
-                                <div class="techack-feature-icon"><i data-lucide="lock"></i></div>
-                                <h3>Learn Security</h3>
-                                <p>If you wanna get into wireless protocols or ethical hacking, these are the kind of tools you actually learn on.</p>
-                                <div class="techack-feature-tag">[MODULE::LEARN]</div>
-                            </div>
+                        <div class="techack-note reveal">
+                            <i data-lucide="info" style="color: var(--color-techack); width: 20px; height: 20px; flex-shrink: 0;"></i>
+                            <p>Everything here is designed for <strong>ethical security research and education</strong>. Please use responsibly and only on networks/devices you own or have permission to test.</p>
                         </div>
 
-                        <div class="techack-ascii-divider">────────────────────────────────────────────────────────────────</div>
-
-                        <div class="techack-products-section reveal">
-                            <div class="techack-section-header">
-                                <span class="terminal-prompt">$</span>
-                                <h2>cat ./products/inventory.db</h2>
-                                <span class="techack-blink">█</span>
-                            </div>
-                            <p class="terminal-line" style="margin-bottom:1.5rem;font-size:0.75rem;">[+] Found ${products.length} device(s) in database. Displaying results...</p>
-                            <div class="product-grid" style="margin-top: 1rem;">
-                                ${products.map(p => Components.ProductCard(p)).join('')}
-                            </div>
+                        <h2 class="reveal" style="margin-top: 3rem;"><i data-lucide="shopping-bag" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techack);"></i>My Devices</h2>
+                        <p class="reveal" style="color: var(--text-secondary); margin-bottom: 2rem;">These are the tools I've built so far. Each one started as a personal project and turned into something I thought other people might want too.</p>
+                        <div class="product-grid">
+                            ${products.map(p => Components.ProductCard(p)).join('')}
                         </div>
 
-
+                        <div class="cta-section reveal" style="margin-top: 4rem;">
+                            <h2>Got Questions?</h2>
+                            <p>If you're not sure which device is right for you, or you want to know more about the tech behind them, just reach out. I'm always happy to nerd out about this stuff.</p>
+                            <a href="#admin" class="btn btn-primary" style="background: var(--color-techack); border-color: var(--color-techack);">Get in Touch</a>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1542,65 +1524,113 @@ const Router = {
         'techbox': () => {
             const products = Store.getProductsByCategory('techbox');
             return `
-                <div class="techbox-workshop">
-                    <div class="container" style="padding-top: 1rem; padding-bottom: 4rem;">
-                        <div class="division-header reveal">
+                <div class="techbox-workshop-v2">
+                    <div class="workshop-top-bar">
+                        <span><i data-lucide="hard-hat" style="width: 16px; height: 16px; vertical-align: middle;"></i> TechBox Workshop</span>
+                        <span>Safety First — Always Wear Eye Protection When Soldering</span>
+                    </div>
+                    <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+                        <div class="workshop-hero reveal">
                             <img src="images/techbox-logo.png" alt="TechBox Logo" class="division-logo" onerror="handleLogoError(this)">
-                            <span class="badge badge-techbox">STEM Workshop</span>
-                            <h1 style="color: var(--color-techbox);">TechBox</h1>
-                            <p>Hands-on electronics kits I put together to help kids and teens get a head start in engineering. Learn to solder, design PCBs, and program microcontrollers by actually building stuff.</p>
+                            <h1 style="color: var(--color-techbox); font-size: 3rem; margin: 0.5rem 0;">TechBox</h1>
+                            <p class="workshop-hero-desc">This is my STEM workshop — real electronics kits that teach you real skills. I designed every project here based on stuff I've actually built. No fake circuits or toy components. You're gonna solder, program, and build something you can actually use.</p>
                         </div>
 
-                        <div class="workshop-banner reveal">
-                            <div class="workshop-banner-icon"><i data-lucide="wrench"></i></div>
-                            <div>
-                                <h3>Welcome to the Workshop</h3>
-                                <p>Grab a soldering iron, pick a kit, and start building. Every project here teaches you something real.</p>
+                        <div class="workbench-section reveal">
+                            <div class="workbench-header">
+                                <i data-lucide="hammer" style="color: var(--color-techbox); width: 28px; height: 28px;"></i>
+                                <h2>The Workbench</h2>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Here's what you'll be working with in each kit. Real tools, real components, real engineering.</p>
+                            <div class="workbench-tools">
+                                <div class="tool-item">
+                                    <i data-lucide="flame" style="color: var(--color-techbox);"></i>
+                                    <span>Soldering Iron</span>
+                                </div>
+                                <div class="tool-item">
+                                    <i data-lucide="cpu" style="color: var(--color-techbox);"></i>
+                                    <span>Microcontrollers</span>
+                                </div>
+                                <div class="tool-item">
+                                    <i data-lucide="lightbulb" style="color: var(--color-techbox);"></i>
+                                    <span>LEDs & NeoPixels</span>
+                                </div>
+                                <div class="tool-item">
+                                    <i data-lucide="circuit-board" style="color: var(--color-techbox);"></i>
+                                    <span>Custom PCBs</span>
+                                </div>
+                                <div class="tool-item">
+                                    <i data-lucide="code" style="color: var(--color-techbox);"></i>
+                                    <span>Firmware</span>
+                                </div>
+                                <div class="tool-item">
+                                    <i data-lucide="box" style="color: var(--color-techbox);"></i>
+                                    <span>3D-Printed Cases</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="workshop-steps reveal">
-                            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--color-techbox);"><i data-lucide="clipboard-list" style="vertical-align: middle; margin-right: 0.5rem;"></i>How It Works</h2>
-                            <div class="workshop-steps-grid">
-                                <div class="workshop-step">
-                                    <div class="workshop-step-number">1</div>
-                                    <h3>Pick Your Kit</h3>
-                                    <p>Choose a project that matches your skill level — from beginner to advanced.</p>
+                        <div class="workshop-process reveal">
+                            <h2 style="text-align: center; margin-bottom: 0.5rem;"><i data-lucide="clipboard-list" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techbox);"></i>Workshop Process</h2>
+                            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Every kit follows the same hands-on approach.</p>
+                            <div class="process-timeline">
+                                <div class="process-step">
+                                    <div class="process-number">01</div>
+                                    <div class="process-content">
+                                        <h3>Unbox & Inventory</h3>
+                                        <p>Open your kit, lay out the components, and check everything against the parts list. Get familiar with what you're working with.</p>
+                                    </div>
                                 </div>
-                                <div class="workshop-step">
-                                    <div class="workshop-step-number">2</div>
-                                    <h3>Build It</h3>
-                                    <p>Follow the guide, solder the components, and assemble your project step by step.</p>
+                                <div class="process-step">
+                                    <div class="process-number">02</div>
+                                    <div class="process-content">
+                                        <h3>Solder & Assemble</h3>
+                                        <p>Follow the step-by-step guide. Place components, heat up the iron, and solder them to the PCB. Take your time — clean joints matter.</p>
+                                    </div>
                                 </div>
-                                <div class="workshop-step">
-                                    <div class="workshop-step-number">3</div>
-                                    <h3>Program It</h3>
-                                    <p>Flash the firmware, tweak the code, and make it yours.</p>
+                                <div class="process-step">
+                                    <div class="process-number">03</div>
+                                    <div class="process-content">
+                                        <h3>Flash & Program</h3>
+                                        <p>Connect to your computer, flash the firmware, and customize the code. This is where you make it yours.</p>
+                                    </div>
                                 </div>
-                                <div class="workshop-step">
-                                    <div class="workshop-step-number">4</div>
-                                    <h3>Show It Off</h3>
-                                    <p>You've got a finished project to demo — great for school, portfolios, or just flexing.</p>
+                                <div class="process-step">
+                                    <div class="process-number">04</div>
+                                    <div class="process-content">
+                                        <h3>Test & Show Off</h3>
+                                        <p>Power it up, test everything works, and show it off. You just built something real — put it in your portfolio.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="features-grid">
-                            ${Components.FeatureCard('book-open', 'Learn by Building', 'Every kit is a real project — you learn by making something that actually works.', 'color-techbox')}
-                            ${Components.FeatureCard('users', 'Made for Students', 'Whether you\'re just starting out or already tinkering, these kits meet you where you are.', 'color-techbox')}
-                            ${Components.FeatureCard('code', 'Real Components', 'Microcontrollers, LEDs, NFC chips, and custom PCBs — no toy parts.', 'color-techbox')}
-                            ${Components.FeatureCard('trophy', 'Build Your Portfolio', 'Finish a kit and you\'ve got a real project to show off — stuff that looks great for school or job applications.', 'color-techbox')}
+                        <div class="workshop-kits-header reveal">
+                            <h2><i data-lucide="package" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techbox);"></i>Available Kits</h2>
+                            <p>Pick a project, grab a kit, and start building.</p>
                         </div>
-
-                        <h2 class="reveal" style="margin-top: 4rem;"><i data-lucide="package" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techbox);"></i>TechBox Kits</h2>
-                        <div class="product-grid" style="margin-top: 2rem;">
+                        <div class="product-grid" style="margin-top: 1.5rem;">
                             ${products.map(p => Components.ProductCard(p)).join('')}
                         </div>
 
+                        <div class="workshop-skills reveal">
+                            <h2 style="text-align: center; margin-bottom: 2rem;">Skills You'll Learn</h2>
+                            <div class="skills-grid">
+                                <div class="skill-badge"><i data-lucide="zap" style="width: 16px; height: 16px;"></i> Soldering</div>
+                                <div class="skill-badge"><i data-lucide="cpu" style="width: 16px; height: 16px;"></i> PCB Design</div>
+                                <div class="skill-badge"><i data-lucide="code" style="width: 16px; height: 16px;"></i> Firmware Programming</div>
+                                <div class="skill-badge"><i data-lucide="settings" style="width: 16px; height: 16px;"></i> Electronics</div>
+                                <div class="skill-badge"><i data-lucide="box" style="width: 16px; height: 16px;"></i> 3D Printing</div>
+                                <div class="skill-badge"><i data-lucide="git-branch" style="width: 16px; height: 16px;"></i> Version Control</div>
+                                <div class="skill-badge"><i data-lucide="wrench" style="width: 16px; height: 16px;"></i> Hardware Debug</div>
+                                <div class="skill-badge"><i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Documentation</div>
+                            </div>
+                        </div>
+
                         <div class="cta-section reveal" style="margin-top: 4rem;">
-                            <h2>Student or Educator?</h2>
-                            <p>I offer group pricing for classrooms and STEM programs — reach out and let's work something out.</p>
-                            <a href="#admin" class="btn btn-primary">Contact Us</a>
+                            <h2>Schools & STEM Programs</h2>
+                            <p>I do group pricing for classrooms and after-school programs. If you're a teacher or run a STEM club, hit me up and we'll figure something out.</p>
+                            <a href="#admin" class="btn btn-primary" style="background: var(--color-techbox); border-color: var(--color-techbox);">Contact Me</a>
                         </div>
                     </div>
                 </div>
@@ -1611,48 +1641,72 @@ const Router = {
         'rithim': () => {
             const products = Store.getProductsByCategory('rithim');
             return `
-                <div class="rithim-brand">
-                    <div class="rithim-hero-section">
-                        <div class="container" style="text-align: center; padding: 6rem 1rem 4rem;">
-                            <img src="images/rithim-logo.png" alt="Rithim Logo" class="division-logo reveal" onerror="handleLogoError(this)">
-                            <h1 class="rithim-hero-title reveal">Rithim</h1>
-                            <p class="rithim-hero-tagline reveal">Comfort you can feel. Style you can wear anywhere.</p>
+                <div class="rithim-brand-v2">
+                    <div class="rithim-lifestyle-hero">
+                        <div class="container" style="text-align: center;">
+                            <img src="images/rithim-logo.png" alt="Rithim Logo" class="rithim-brand-logo reveal" onerror="handleLogoError(this)">
+                            <h1 class="rithim-brand-title reveal">Rithim</h1>
+                            <p class="rithim-brand-tagline reveal">wear what feels right.</p>
+                            <div class="rithim-hero-divider reveal"></div>
                         </div>
                     </div>
 
                     <div class="container" style="padding-bottom: 4rem;">
-                        <div class="rithim-vibe-section reveal">
-                            <div class="rithim-vibe-card">
-                                <i data-lucide="cloud" style="color: var(--color-rithim); width: 32px; height: 32px;"></i>
-                                <h3>Soft & Cozy</h3>
-                                <p>Cotton and cotton-blend fabrics that feel like a hug. Made for lounging, recovering, or just vibing.</p>
-                            </div>
-                            <div class="rithim-vibe-card">
-                                <i data-lucide="heart" style="color: var(--color-rithim); width: 32px; height: 32px;"></i>
-                                <h3>Made With Care</h3>
-                                <p>Every piece is designed for how it feels on you — relaxed fits, breathable materials, no fuss.</p>
-                            </div>
-                            <div class="rithim-vibe-card">
-                                <i data-lucide="sun" style="color: var(--color-rithim); width: 32px; height: 32px;"></i>
-                                <h3>Everyday Wear</h3>
-                                <p>From post-run cool-downs to lazy weekends — Rithim fits every moment of your day.</p>
+                        <div class="rithim-story-section reveal">
+                            <div class="rithim-story-text">
+                                <h2>The Story</h2>
+                                <p>I'm a long-distance runner. After a race or a hard training session, all I want is something soft to throw on — something that actually feels good on sore muscles. I couldn't find clothes that hit that sweet spot between comfort and style, so I just made my own.</p>
+                                <p>Rithim is what I wear when I'm done running. Soft cotton, relaxed fits, nothing complicated. Just really comfortable clothes you'll want to live in.</p>
+                                <span class="rithim-signature">— Ryan</span>
                             </div>
                         </div>
 
-                        <div class="rithim-quote reveal">
-                            <p>"I'm a long-distance runner, and after a hard session, all I want is something soft and comfortable to throw on. That's why I made Rithim."</p>
-                            <span>— Ryan</span>
+                        <div class="rithim-pillars reveal">
+                            <div class="rithim-pillar">
+                                <div class="rithim-pillar-icon">☁️</div>
+                                <h3>Cloud-Soft Fabrics</h3>
+                                <p>Premium cotton and cotton-blend materials that get softer with every wash. Seriously, you'll want to sleep in these.</p>
+                            </div>
+                            <div class="rithim-pillar">
+                                <div class="rithim-pillar-icon">🏃</div>
+                                <h3>Post-Run Ready</h3>
+                                <p>Designed for that moment after the run — when you need something loose, breathable, and cozy to cool down in.</p>
+                            </div>
+                            <div class="rithim-pillar">
+                                <div class="rithim-pillar-icon">✨</div>
+                                <h3>Clean & Simple</h3>
+                                <p>No loud graphics or over-the-top branding. Just clean designs with the Rithim logo. Wear it anywhere, anytime.</p>
+                            </div>
                         </div>
 
-                        <h2 class="reveal" style="margin-top: 4rem; text-align: center;">The Collection</h2>
-                        <div class="product-grid" style="margin-top: 2rem;">
-                            ${products.map(p => Components.ProductCard(p)).join('')}
+                        <div class="rithim-collection-header reveal">
+                            <span class="rithim-collection-label">The Collection</span>
+                            <h2>Pick Your Comfort</h2>
+                            <p>Tees, hoodies, and joggers — each one designed for maximum comfort. Available in multiple colors and sizes.</p>
+                        </div>
+                        <div class="rithim-lookbook-grid">
+                            ${products.map(p => '<div class="rithim-lookbook-item reveal">' +
+                                '<a href="#product/' + p.id + '" class="rithim-lookbook-image">' +
+                                    '<img src="' + p.image + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' +
+                                '</a>' +
+                                '<div class="rithim-lookbook-info">' +
+                                    '<h3>' + p.name + '</h3>' +
+                                    '<p>' + p.desc + '</p>' +
+                                    '<div class="rithim-lookbook-bottom">' +
+                                        '<span class="rithim-lookbook-price">$' + p.price.toFixed(2) + '</span>' +
+                                        '<div class="rithim-color-dots">' +
+                                            p.colors.map(c => '<span class="rithim-dot" style="background: ' + c + ';"></span>').join('') +
+                                        '</div>' +
+                                        '<button class="btn btn-primary add-to-cart-btn" data-product-id="' + p.id + '" style="background: var(--color-rithim); border-color: var(--color-rithim); border-radius: 50px; padding: 0.5rem 1.5rem; font-size: 0.85rem;">Add to Bag</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>').join('')}
                         </div>
 
-                        <div class="rithim-cta reveal">
-                            <h2>Your New Favorite Fit</h2>
-                            <p>Tees, hoodies, joggers — pick your comfort.</p>
-                            <a href="#checkout" class="btn btn-primary" style="background: var(--color-rithim); border-color: var(--color-rithim);">Shop Now</a>
+                        <div class="rithim-comfort-banner reveal">
+                            <h2>Comfort Isn't Optional</h2>
+                            <p>Life's too short for stiff clothes. Whether it's post-race recovery, a lazy Sunday, or just running errands — Rithim keeps you comfortable through all of it.</p>
+                            <a href="#checkout" class="btn btn-primary rithim-shop-btn">Shop the Collection</a>
                         </div>
                     </div>
                 </div>
@@ -1667,83 +1721,101 @@ const Router = {
         'studytech': () => {
             const products = Store.getProductsByCategory('studytech');
             return `
-                <div class="studytech-classroom">
+                <div class="studytech-classroom-v2">
+                    <div class="classroom-banner-bar">
+                        <span>📚 StudyTech — AI-Powered Learning</span>
+                    </div>
                     <div class="container" style="padding-top: 1rem; padding-bottom: 4rem;">
-                        <div class="classroom-header reveal">
-                            <div class="chalkboard">
-                                <div class="chalkboard-inner">
-                                    <img src="images/studytech-logo.png" alt="StudyTech Logo" class="division-logo" onerror="handleLogoError(this)">
-                                    <h1 class="chalk-text">StudyTech</h1>
-                                    <p class="chalk-subtitle">Your AI study buddy — like having a tutor that's always available.</p>
-                                    <div style="margin-top: 1.5rem;">
-                                        <a href="#studytech-lab" class="btn btn-primary" style="background: var(--color-studytech); border-color: var(--color-studytech);">
-                                            <i data-lucide="flask-conical"></i> Enter AI Lab (Beta)
-                                        </a>
-                                    </div>
+                        <div class="whiteboard reveal">
+                            <div class="whiteboard-inner">
+                                <div class="whiteboard-markers">
+                                    <span class="marker marker-red"></span>
+                                    <span class="marker marker-blue"></span>
+                                    <span class="marker marker-green"></span>
+                                    <span class="marker marker-black"></span>
+                                </div>
+                                <img src="images/studytech-logo.png" alt="StudyTech Logo" class="division-logo" onerror="handleLogoError(this)">
+                                <h1 class="whiteboard-title">StudyTech</h1>
+                                <p class="whiteboard-subtitle">Your personal AI tutor — always ready to help, never judges you for asking the same question twice.</p>
+                                <div style="margin-top: 1.5rem;">
+                                    <a href="#studytech-lab" class="btn btn-primary" style="background: var(--color-studytech); border-color: var(--color-studytech); border-radius: 8px;">
+                                        <i data-lucide="flask-conical"></i> Try the AI Lab (Beta)
+                                    </a>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="classroom-subjects reveal">
-                            <h2 style="text-align: center; margin-bottom: 2rem;"><i data-lucide="book-open" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-studytech);"></i>What You Get</h2>
-                            <div class="subject-cards">
-                                <div class="subject-card">
-                                    <i data-lucide="brain" style="color: var(--color-studytech); width: 28px; height: 28px;"></i>
-                                    <h3>AI-Powered Help</h3>
-                                    <p>Get explanations, practice problems, and study guidance from an AI tutor.</p>
+                        <div class="notebook-section reveal">
+                            <div class="notebook-header">
+                                <i data-lucide="pencil" style="color: var(--color-studytech); width: 24px; height: 24px;"></i>
+                                <h2>How StudyTech Helps You Learn</h2>
+                            </div>
+                            <div class="notebook-cards">
+                                <div class="notebook-card">
+                                    <div class="notebook-card-number">01</div>
+                                    <h3>Explains Stuff You Don't Get</h3>
+                                    <p>Stuck on a concept? Ask the AI and get a clear, simple explanation. It'll break things down until they click — no judgment, no rushing.</p>
                                 </div>
-                                <div class="subject-card">
-                                    <i data-lucide="bar-chart-3" style="color: var(--color-studytech); width: 28px; height: 28px;"></i>
-                                    <h3>Track Your Progress</h3>
-                                    <p>See how you're improving over time with simple progress reports.</p>
+                                <div class="notebook-card">
+                                    <div class="notebook-card-number">02</div>
+                                    <h3>Gives You Practice Problems</h3>
+                                    <p>The AI generates practice problems based on what you're studying. You can keep practicing until you feel confident, and it adjusts the difficulty as you improve.</p>
                                 </div>
-                                <div class="subject-card">
-                                    <i data-lucide="globe" style="color: var(--color-studytech); width: 28px; height: 28px;"></i>
-                                    <h3>Multiple Subjects</h3>
-                                    <p>Covers math, science, and other core school subjects.</p>
+                                <div class="notebook-card">
+                                    <div class="notebook-card-number">03</div>
+                                    <h3>Tracks Your Progress</h3>
+                                    <p>See which topics you're nailing and which ones need more work. The progress reports are simple and actually useful — not just random charts.</p>
                                 </div>
-                                <div class="subject-card">
-                                    <i data-lucide="zap" style="color: var(--color-studytech); width: 28px; height: 28px;"></i>
-                                    <h3>Instant Feedback</h3>
-                                    <p>Get real-time help and explanations as you work through problems.</p>
+                                <div class="notebook-card">
+                                    <div class="notebook-card-number">04</div>
+                                    <h3>Covers Core Subjects</h3>
+                                    <p>Math, science, and more. Whether you're prepping for a test or just trying to understand homework, StudyTech has you covered.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <h2 class="reveal" style="margin-top: 4rem; text-align: center;"><i data-lucide="graduation-cap" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-studytech);"></i>StudyTech Plans</h2>
-                        <div class="pricing-grid" style="margin-top: 2rem;">
-                            <div class="pricing-card reveal">
-                                <h3>Monthly</h3>
-                                <div class="price">$9.99<span>/mo</span></div>
-                                <ul class="pricing-features">
-                                    <li><i data-lucide="check"></i> AI tutoring sessions</li>
-                                    <li><i data-lucide="check"></i> Core subjects included</li>
-                                    <li><i data-lucide="check"></i> Progress tracking</li>
-                                    <li><i data-lucide="check"></i> Cancel anytime</li>
+                        <div class="classroom-bulletin reveal">
+                            <div class="bulletin-pin"></div>
+                            <h3>📌 Why I Built This</h3>
+                            <p>I wanted a study tool that actually felt helpful — not one that just throws information at you and hopes something sticks. StudyTech is the AI tutor I wished I had. It explains things in a way that makes sense, gives you practice when you need it, and doesn't make you feel dumb for not knowing something.</p>
+                        </div>
+
+                        <h2 class="reveal" style="margin-top: 4rem; text-align: center;"><i data-lucide="graduation-cap" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-studytech);"></i>Study Plans</h2>
+                        <p class="reveal" style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Pick the plan that works for you. All plans include full AI tutoring access.</p>
+                        <div class="classroom-pricing-grid">
+                            <div class="classroom-pricing-card reveal">
+                                <div class="classroom-pricing-tag">Monthly</div>
+                                <div class="classroom-pricing-price">$9.99<span>/mo</span></div>
+                                <ul>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> AI tutoring sessions</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> All core subjects</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Progress tracking</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Cancel anytime</li>
                                 </ul>
-                                <button class="btn btn-secondary add-to-cart-btn" data-product-id="10" style="width: 100%;">Subscribe Monthly</button>
+                                <button class="btn btn-secondary add-to-cart-btn" data-product-id="10" style="width: 100%; border-radius: 8px;">Get Started</button>
                             </div>
-                            <div class="pricing-card featured reveal">
-                                <h3>Annual</h3>
-                                <div class="price">$79.99<span>/yr</span></div>
-                                <ul class="pricing-features">
-                                    <li><i data-lucide="check"></i> Everything in Monthly</li>
-                                    <li><i data-lucide="check"></i> Progress reports</li>
-                                    <li><i data-lucide="check"></i> Priority support</li>
-                                    <li><i data-lucide="check"></i> Save $39.89/year</li>
+                            <div class="classroom-pricing-card classroom-pricing-featured reveal">
+                                <div class="classroom-pricing-badge">Best Value</div>
+                                <div class="classroom-pricing-tag">Annual</div>
+                                <div class="classroom-pricing-price">$79.99<span>/yr</span></div>
+                                <ul>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Everything in Monthly</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Detailed progress reports</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Priority support</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Save $39.89/year</li>
                                 </ul>
-                                <button class="btn btn-primary add-to-cart-btn" data-product-id="11" style="width: 100%;">Subscribe Annually</button>
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="11" style="width: 100%; background: var(--color-studytech); border-color: var(--color-studytech); border-radius: 8px;">Subscribe & Save</button>
                             </div>
-                            <div class="pricing-card reveal">
-                                <h3>School License</h3>
-                                <div class="price">$299.99<span>/yr</span></div>
-                                <ul class="pricing-features">
-                                    <li><i data-lucide="check"></i> Up to 30 students</li>
-                                    <li><i data-lucide="check"></i> Teacher dashboard</li>
-                                    <li><i data-lucide="check"></i> Class progress tracking</li>
-                                    <li><i data-lucide="check"></i> Email support</li>
+                            <div class="classroom-pricing-card reveal">
+                                <div class="classroom-pricing-tag">School License</div>
+                                <div class="classroom-pricing-price">$299.99<span>/yr</span></div>
+                                <ul>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Up to 30 students</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Teacher dashboard</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Class progress tracking</li>
+                                    <li><i data-lucide="check" style="width: 16px; height: 16px; color: var(--color-studytech);"></i> Email support</li>
                                 </ul>
-                                <button class="btn btn-secondary add-to-cart-btn" data-product-id="12" style="width: 100%;">Get School License</button>
+                                <button class="btn btn-secondary add-to-cart-btn" data-product-id="12" style="width: 100%; border-radius: 8px;">Get School License</button>
                             </div>
                         </div>
                     </div>
