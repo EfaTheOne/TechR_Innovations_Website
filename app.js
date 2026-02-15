@@ -1453,68 +1453,86 @@ const Router = {
         'techack': () => {
             const products = Store.getProductsByCategory('techack');
             return `
-                <div class="techack-page-v2">
-                    <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
-                        <div class="techack-hero-v2 reveal">
-                            <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
-                            <h1 style="color: var(--color-techack); font-size: 3rem; margin: 0.5rem 0;">Techack</h1>
-                            <p class="techack-hero-desc">So basically, I got really into cybersecurity and wanted my own pen-testing tools — but the ones out there were either way too expensive or didn't do what I wanted. So I just... built my own. Custom PCBs, ESP32 chips, CC1101 modules for sub-GHz, the works. These are the devices I actually use when I'm messing around with wireless security stuff.</p>
-                        </div>
+                <div class="techack-page">
+                    <div class="techack-scanlines"></div>
+                    <div class="techack-matrix-rain" id="techack-matrix"></div>
 
-                        <div class="techack-what-section reveal">
-                            <h2><i data-lucide="help-circle" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techack);"></i>Wait, what even is this?</h2>
-                            <p>Pen-testing = penetration testing. It's basically trying to hack into systems (with permission) to find security holes before the bad guys do. My Techack devices let you do stuff like scan WiFi networks, capture handshakes, test Bluetooth devices, and play around with sub-GHz radio signals. It's all for learning and research — not for doing anything sketchy.</p>
-                        </div>
+                    <div class="techack-boot-overlay" id="techack-boot">
+                        <div class="techack-boot-text" id="techack-boot-text"></div>
+                    </div>
 
-                        <div class="techack-capabilities-grid">
-                            <div class="techack-cap-card reveal">
-                                <i data-lucide="wifi" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
-                                <h3>WiFi Stuff</h3>
-                                <p>Probe request sniffing, deauth detection, PMKID capture, captive portals, AP scanning — pretty much everything you'd want for WiFi security testing. I wrote most of the firmware myself.</p>
+                    <div class="container" style="position:relative;z-index:2;padding-top:1rem;padding-bottom:4rem;">
+                        <div class="techack-terminal-header reveal">
+                            <div class="terminal-bar">
+                                <span class="terminal-dot" style="background:#ff5f56;"></span>
+                                <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                                <span class="terminal-dot" style="background:#27c93f;"></span>
+                                <span class="terminal-title">root@techack:~# </span>
                             </div>
-                            <div class="techack-cap-card reveal">
-                                <i data-lucide="radio" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
-                                <h3>Sub-GHz Radio</h3>
-                                <p>The CC1101 module handles 433 MHz signals. You can pick up garage doors, weather stations, key fobs — anything on that frequency. Great for understanding how RF communication actually works.</p>
-                            </div>
-                            <div class="techack-cap-card reveal">
-                                <i data-lucide="bluetooth" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
-                                <h3>Bluetooth</h3>
-                                <p>BLE scanning and analysis. See what's broadcasting around you, check out device characteristics, that kind of thing. Useful for IoT security research.</p>
-                            </div>
-                            <div class="techack-cap-card reveal">
-                                <i data-lucide="usb" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
-                                <h3>USB HID</h3>
-                                <p>Some of the devices can act as a keyboard when you plug them in — like a Rubber Ducky. You can write scripts that type out commands automatically. Really cool for demos.</p>
-                            </div>
-                            <div class="techack-cap-card reveal">
-                                <i data-lucide="cpu" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
-                                <h3>Custom PCBs</h3>
-                                <p>I didn't just slap modules on a breadboard — I designed actual PCBs in KiCad, got them manufactured, and hand-soldered everything. These are real products, not weekend projects.</p>
-                            </div>
-                            <div class="techack-cap-card reveal">
-                                <i data-lucide="graduation-cap" style="color: var(--color-techack); width: 32px; height: 32px;"></i>
-                                <h3>Learning Tool</h3>
-                                <p>Honestly, the best way to learn security is by doing it. These devices give you real hardware to experiment with instead of just watching YouTube tutorials about it.</p>
+                            <div class="terminal-body">
+                                <p class="terminal-line"><span class="terminal-prompt">$</span> sudo ./techack --init --mode=secure</p>
+                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Loading kernel modules...</p>
+                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Initializing hardware interface...</p>
+                                <p class="terminal-line" style="color: #00cc33;">[+] System ready. Welcome to TECHACK.</p>
+                                <div class="techack-hero-content" style="margin-top:1.5rem;">
+                                    <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
+                                    <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:3px;">// SECURITY HARDWARE</span>
+                                    <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
+                                    <p class="techack-subtitle">> I got into cybersecurity and wanted my own pen-testing tools — so I just built them. Custom PCBs, ESP32s, CC1101 for sub-GHz, the whole deal. These are the devices I actually use.</p>
+                                </div>
+                                <p class="terminal-line" style="margin-top:1.5rem;"><span class="terminal-prompt">$</span> ls ./capabilities<span class="terminal-cursor">█</span></p>
+                                <div class="techack-access-log">
+                                    <span>[${new Date().toISOString()}] CONNECTION ESTABLISHED</span>
+                                    <span>[SESSION] Secure tunnel active | AES-256-GCM</span>
+                                    <span>[STATUS] All systems operational</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="techack-note reveal">
-                            <i data-lucide="info" style="color: var(--color-techack); width: 20px; height: 20px; flex-shrink: 0;"></i>
-                            <p>Everything here is designed for <strong>ethical security research and education</strong>. Please use responsibly and only on networks/devices you own or have permission to test.</p>
+                        <div class="techack-ascii-divider">────────────────────────────────────────────────────────────────</div>
+
+                        <div class="techack-features-grid">
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="shield-check"></i></div>
+                                <h3>Pen-Testing Ready</h3>
+                                <p>WiFi sniffing, Bluetooth, sub-GHz — I crammed it all into something that fits in your pocket. Seriously.</p>
+                                <div class="techack-feature-tag">[MODULE::OFFENSIVE]</div>
+                            </div>
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="wifi"></i></div>
+                                <h3>Wireless Analysis</h3>
+                                <p>Probe sniffing, PMKID capture, captive portals, AP scanning — it's all baked into the firmware I wrote.</p>
+                                <div class="techack-feature-tag">[MODULE::WIRELESS]</div>
+                            </div>
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="cpu"></i></div>
+                                <h3>Custom Hardware</h3>
+                                <p>I designed every PCB myself in KiCad — ESP32 and CC1101 based. No off-the-shelf stuff, built from the ground up.</p>
+                                <div class="techack-feature-tag">[MODULE::HARDWARE]</div>
+                            </div>
+                            <div class="techack-feature-card reveal">
+                                <div class="techack-feature-icon"><i data-lucide="lock"></i></div>
+                                <h3>Learn Security</h3>
+                                <p>If you wanna get into wireless protocols or ethical hacking, these are the kind of tools you actually learn on — not just YouTube tutorials.</p>
+                                <div class="techack-feature-tag">[MODULE::LEARN]</div>
+                            </div>
                         </div>
 
-                        <h2 class="reveal" style="margin-top: 3rem;"><i data-lucide="shopping-bag" style="vertical-align: middle; margin-right: 0.5rem; color: var(--color-techack);"></i>My Devices</h2>
-                        <p class="reveal" style="color: var(--text-secondary); margin-bottom: 2rem;">These are the tools I've built so far. Each one started as a personal project and turned into something I thought other people might want too.</p>
-                        <div class="product-grid">
-                            ${products.map(p => Components.ProductCard(p)).join('')}
+                        <div class="techack-ascii-divider">────────────────────────────────────────────────────────────────</div>
+
+                        <div class="techack-products-section reveal">
+                            <div class="techack-section-header">
+                                <span class="terminal-prompt">$</span>
+                                <h2>cat ./products/inventory.db</h2>
+                                <span class="techack-blink">█</span>
+                            </div>
+                            <p class="terminal-line" style="margin-bottom:1.5rem;font-size:0.75rem;">[+] Found ${products.length} device(s) in database. Displaying results...</p>
+                            <div class="product-grid" style="margin-top: 1rem;">
+                                ${products.map(p => Components.ProductCard(p)).join('')}
+                            </div>
                         </div>
 
-                        <div class="cta-section reveal" style="margin-top: 4rem;">
-                            <h2>Got Questions?</h2>
-                            <p>If you're not sure which device is right for you, or you want to know more about the tech behind them, just reach out. I'm always happy to nerd out about this stuff.</p>
-                            <a href="#admin" class="btn btn-primary" style="background: var(--color-techack); border-color: var(--color-techack);">Get in Touch</a>
-                        </div>
+
                     </div>
                 </div>
             `;
