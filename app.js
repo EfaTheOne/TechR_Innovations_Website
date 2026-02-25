@@ -2813,7 +2813,7 @@ const Router = {
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <i data-lucide="globe" style="width: 20px; height: 20px; color: var(--accent);"></i>
-                            <span style="color: var(--text-secondary);">www.techr.com</span>
+                            <span style="color: var(--text-secondary);">www.techr.net</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <i data-lucide="github" style="width: 20px; height: 20px; color: var(--accent);"></i>
