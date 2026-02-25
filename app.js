@@ -677,8 +677,8 @@ const Admin = {
     filterPriceMax: '',
     siteSettings: {
         title: 'TechR Innovations',
-        description: 'Building hands-on security hardware, maker kits, apparel, and AI-powered learning tools.',
-        email: 'contact@techr.com'
+        description: 'Building hands-on security hardware, engineering maker kits, comfortable apparel, and AI-powered learning tools.',
+        email: 'ryanpegg2@gmail.com'
     },
     activeTab: 'overview',
     selectedProducts: [],
@@ -1392,7 +1392,7 @@ const Router = {
             </div>
 
             <div class="container" style="padding-bottom: 4rem;">
-                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">My Product Lines</h2>
+                <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">Product Lines</h2>
                 <div class="grid-3">
                     <a href="#studytech" class="card reveal" style="text-decoration: none;">
                         <div class="card-logo">
@@ -2774,7 +2774,7 @@ const Router = {
                 </d>
 
                 <div class="about-divisions-grid reveal">
-                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">My Product Lines</h2>
+                    <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">Product Lines</h2>
                     <div class="about-division-card" style="border-color: var(--color-studytech);">
                         <img src="images/studytech-logo.png" alt="StudyTech Logo" class="about-division-logo" onerror="handleLogoError(this, 'block')">
                         <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech); display: none;"></i>
