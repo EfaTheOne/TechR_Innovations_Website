@@ -4758,8 +4758,11 @@ label {
     transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
                 height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
                 border-color 0.4s ease,
+                border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                border-style 0.35s ease,
                 box-shadow 0.4s ease,
-                opacity 0.3s ease;
+                opacity 0.3s ease,
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: left, top;
     backdrop-filter: blur(1px);
 }
@@ -4780,8 +4783,11 @@ label {
     transition: width 0.15s ease,
                 height 0.15s ease,
                 background-color 0.4s ease,
+                border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
                 box-shadow 0.4s ease,
-                opacity 0.3s ease;
+                clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.3s ease,
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: left, top;
 }
 
@@ -4851,6 +4857,10 @@ body[data-page="dashboard"] {
     --cursor-color: #ff453a;
     --cursor-glow: rgba(255, 69, 58, 0.45);
 }
+body[data-page="success"] {
+    --cursor-color: #34c759;
+    --cursor-glow: rgba(52, 199, 89, 0.45);
+}
 
 /* Hide on touch/mobile – these devices don't have a mouse */
 @media (pointer: coarse) {
@@ -4858,4 +4868,174 @@ body[data-page="dashboard"] {
     .cursor-dot {
         display: none;
     }
+}
+
+/* ============================================================
+   Per-page cursor SHAPE themes
+   Each page gets a visually distinct cursor shape, not just colour
+   ============================================================ */
+
+/* STUDYTECH: Diamond — rotated rounded square (pencil / learning angle) */
+body[data-page="studytech"] .cursor-ring,
+body[data-page="studytech-lab"] .cursor-ring {
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+body[data-page="studytech"] .cursor-dot,
+body[data-page="studytech-lab"] .cursor-dot {
+    border-radius: 2px;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+body[data-page="studytech"].cursor-hovering .cursor-ring,
+body[data-page="studytech-lab"].cursor-hovering .cursor-ring {
+    width: 50px;
+    height: 50px;
+}
+body[data-page="studytech"].cursor-clicking .cursor-ring,
+body[data-page="studytech-lab"].cursor-clicking .cursor-ring {
+    width: 22px;
+    height: 22px;
+}
+
+/* TECHBOX: Capsule / pill — wide rounded rectangle + upward triangle dot (zap / gadget) */
+body[data-page="techbox"] .cursor-ring {
+    border-radius: 18px;
+    width: 52px;
+    height: 26px;
+}
+body[data-page="techbox"] .cursor-dot {
+    border-radius: 0;
+    width: 10px;
+    height: 9px;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow: none;
+}
+body[data-page="techbox"].cursor-hovering .cursor-ring {
+    width: 68px;
+    height: 40px;
+}
+body[data-page="techbox"].cursor-clicking .cursor-ring {
+    width: 38px;
+    height: 18px;
+}
+
+/* TECHACK: Terminal block — square dashed ring + blinking square dot */
+body[data-page="techack"] .cursor-ring {
+    border-radius: 0;
+    border-style: dashed;
+    width: 36px;
+    height: 36px;
+}
+body[data-page="techack"] .cursor-dot {
+    border-radius: 0;
+    width: 8px;
+    height: 8px;
+    animation: cursor-terminal-blink 1s step-end infinite;
+}
+@keyframes cursor-terminal-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+body[data-page="techack"].cursor-hovering .cursor-ring {
+    border-style: solid;
+    width: 54px;
+    height: 54px;
+}
+body[data-page="techack"].cursor-clicking .cursor-ring {
+    border-style: dashed;
+    width: 26px;
+    height: 26px;
+}
+
+/* RITHIM: Crosshair — large thin ring + cross/plus shaped dot (fashion / style) */
+body[data-page="rithim"] .cursor-ring {
+    border-width: 1px;
+    width: 50px;
+    height: 50px;
+}
+body[data-page="rithim"] .cursor-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 0;
+    clip-path: polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%,
+                       65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%,
+                       0% 35%, 35% 35%);
+    box-shadow: none;
+}
+body[data-page="rithim"].cursor-hovering .cursor-ring {
+    width: 68px;
+    height: 68px;
+}
+body[data-page="rithim"].cursor-clicking .cursor-ring {
+    width: 38px;
+    height: 38px;
+}
+
+/* ABOUT: Dotted ring + oversized dot (informational / soft) */
+body[data-page="about"] .cursor-ring {
+    border-style: dotted;
+    border-width: 3px;
+}
+body[data-page="about"] .cursor-dot {
+    width: 11px;
+    height: 11px;
+}
+
+/* CHECKOUT: Double ring (outline offset) + hollow ring dot (purchase / confirm) */
+body[data-page="checkout"] .cursor-ring {
+    outline: 1.5px solid var(--cursor-color);
+    outline-offset: 6px;
+}
+body[data-page="checkout"] .cursor-dot {
+    background: transparent;
+    border: 2px solid var(--cursor-color);
+    box-shadow: none;
+    width: 10px;
+    height: 10px;
+}
+
+/* SUCCESS: Double-border ring + pulsing dot (confirmation / done) */
+body[data-page="success"] .cursor-ring {
+    border-style: double;
+    border-width: 4px;
+}
+body[data-page="success"] .cursor-dot {
+    width: 9px;
+    height: 9px;
+    animation: cursor-success-pulse 1.5s ease-in-out infinite;
+}
+@keyframes cursor-success-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%       { transform: translate(-50%, -50%) scale(1.6); }
+}
+
+/* ADMIN / DASHBOARD: Sharp diamond — zero-radius rotated square (alert / danger) */
+body[data-page="admin"] .cursor-ring,
+body[data-page="dashboard"] .cursor-ring {
+    border-radius: 0;
+    width: 28px;
+    height: 28px;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-width: 3px;
+}
+body[data-page="admin"] .cursor-dot,
+body[data-page="dashboard"] .cursor-dot {
+    border-radius: 0;
+    width: 9px;
+    height: 9px;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+body[data-page="admin"].cursor-hovering .cursor-ring,
+body[data-page="dashboard"].cursor-hovering .cursor-ring {
+    width: 44px;
+    height: 44px;
+}
+body[data-page="admin"].cursor-clicking .cursor-ring,
+body[data-page="dashboard"].cursor-clicking .cursor-ring {
+    width: 20px;
+    height: 20px;
 }
