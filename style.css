@@ -4409,3 +4409,134 @@ label {
         padding: 2.5rem 1.5rem;
     }
 }
+
+/* ======================================================
+   CUSTOM CURSOR SYSTEM
+   Page-aware cursor with smooth animations and glow FX
+   ====================================================== */
+
+/* Hide default cursor everywhere except touch/coarse devices */
+@media (pointer: fine) {
+    *, *::before, *::after {
+        cursor: none !important;
+    }
+}
+
+/* Outer ring - lags behind cursor for a cool trailing effect */
+.cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--cursor-color, #2997ff);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--cursor-glow, rgba(41, 151, 255, 0.35)),
+                inset 0 0 6px var(--cursor-glow, rgba(41, 151, 255, 0.15));
+    transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.4s ease,
+                box-shadow 0.4s ease,
+                opacity 0.3s ease;
+    will-change: left, top;
+    backdrop-filter: blur(1px);
+}
+
+/* Inner dot - snaps to cursor position instantly */
+.cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    background: var(--cursor-color, #2997ff);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px var(--cursor-glow, rgba(41, 151, 255, 0.8));
+    transition: width 0.15s ease,
+                height 0.15s ease,
+                background-color 0.4s ease,
+                box-shadow 0.4s ease,
+                opacity 0.3s ease;
+    will-change: left, top;
+}
+
+/* === HOVER STATE: ring blooms, dot shrinks === */
+body.cursor-hovering .cursor-ring {
+    width: 56px;
+    height: 56px;
+    opacity: 0.5;
+    border-width: 1.5px;
+}
+body.cursor-hovering .cursor-dot {
+    width: 4px;
+    height: 4px;
+}
+
+/* === CLICK STATE: ring snaps in, dot pulses === */
+body.cursor-clicking .cursor-ring {
+    width: 28px;
+    height: 28px;
+    opacity: 1;
+}
+body.cursor-clicking .cursor-dot {
+    width: 11px;
+    height: 11px;
+}
+
+/* === IDLE STATE: fade out === */
+body.cursor-idle .cursor-ring,
+body.cursor-idle .cursor-dot {
+    opacity: 0;
+}
+
+/* ============================
+   Per-page cursor color themes
+   ============================ */
+body[data-page="/"] {
+    --cursor-color: #2997ff;
+    --cursor-glow: rgba(41, 151, 255, 0.45);
+}
+body[data-page="studytech"],
+body[data-page="studytech-lab"] {
+    --cursor-color: #5e5ce6;
+    --cursor-glow: rgba(94, 92, 230, 0.45);
+}
+body[data-page="techbox"] {
+    --cursor-color: #ff9f0a;
+    --cursor-glow: rgba(255, 159, 10, 0.45);
+}
+body[data-page="techack"] {
+    --cursor-color: #34c759;
+    --cursor-glow: rgba(52, 199, 89, 0.45);
+}
+body[data-page="rithim"] {
+    --cursor-color: #ff375f;
+    --cursor-glow: rgba(255, 55, 95, 0.45);
+}
+body[data-page="about"] {
+    --cursor-color: #2997ff;
+    --cursor-glow: rgba(41, 151, 255, 0.45);
+}
+body[data-page="checkout"] {
+    --cursor-color: #2997ff;
+    --cursor-glow: rgba(41, 151, 255, 0.45);
+}
+body[data-page="admin"],
+body[data-page="dashboard"] {
+    --cursor-color: #ff453a;
+    --cursor-glow: rgba(255, 69, 58, 0.45);
+}
+
+/* Hide on touch/mobile – these devices don't have a mouse */
+@media (pointer: coarse) {
+    .cursor-ring,
+    .cursor-dot {
+        display: none;
+    }
+}
