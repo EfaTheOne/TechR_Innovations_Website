@@ -1658,75 +1658,155 @@ const Router = {
         // RITHIM CLOTHING DIVISION
         'rithim': () => {
             const products = Store.getProductsByCategory('rithim');
+            const sizes = ['XS', 'S', 'M', 'L', 'XL'];
             return `
-                <div class="rithim-brand-v2">
-                    <div class="rithim-lifestyle-hero">
-                        <div class="container" style="text-align: center;">
-                            <img src="images/rithim-logo.png" alt="Rithim Logo" class="rithim-brand-logo reveal" onerror="handleLogoError(this)">
-                            <h1 class="rithim-brand-title reveal">Rithim</h1>
-                            <p class="rithim-brand-tagline reveal">wear what feels right.</p>
-                            <div class="rithim-hero-divider reveal"></div>
+                <div class="rithim-v3">
+
+                    <!-- ── HERO ── -->
+                    <section class="rithim-hero">
+                        <div class="rithim-hero-orbs" aria-hidden="true">
+                            <div class="rithim-orb rithim-orb-1"></div>
+                            <div class="rithim-orb rithim-orb-2"></div>
+                        </div>
+                        <div class="container rithim-hero-inner">
+                            <div class="reveal">
+                                <span class="rithim-eyebrow">SS '26 Collection</span>
+                            </div>
+                            <h1 class="rithim-hero-wordmark reveal">
+                                <span class="rithim-wordmark-main">rithim</span>
+                                <span class="rithim-wordmark-tagline">wear what feels right.</span>
+                            </h1>
+                            <p class="rithim-hero-desc reveal">
+                                Clothing born from the rhythm of running.<br>
+                                Soft, minimal, made for every moment after the race.
+                            </p>
+                            <div class="rithim-hero-ctas reveal">
+                                <a href="#rithim-collection" class="rithim-btn-primary">Shop the Drop</a>
+                                <a href="#about" class="rithim-btn-ghost">Our Story <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-left:4px;"></i></a>
+                            </div>
+                        </div>
+                        <div class="rithim-scroll-hint reveal" aria-hidden="true">
+                            <span class="rithim-scroll-label">scroll</span>
+                            <div class="rithim-scroll-bar"></div>
+                        </div>
+                    </section>
+
+                    <!-- ── MARQUEE ── -->
+                    <div class="rithim-marquee" aria-hidden="true">
+                        <div class="rithim-marquee-track">
+                            ${['RITHIM', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'EVERY STRIDE', 'FIND YOUR RHYTHM', 'RITHIM', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'EVERY STRIDE', 'FIND YOUR RHYTHM'].map(w => `<span class="rithim-marquee-word">${w}</span><span class="rithim-marquee-dot">✦</span>`).join('')}
                         </div>
                     </div>
 
-                    <div class="container" style="padding-bottom: 4rem;">
-                        <div class="rithim-story-section reveal">
-                            <div class="rithim-story-text">
-                                <h2>The Story</h2>
-                                <p>I'm a long-distance runner. After a race or a hard training session, all I want is something soft to throw on — something that actually feels good on sore muscles. I couldn't find clothes that hit that sweet spot between comfort and style, so I just made my own.</p>
-                                <p>Rithim is what I wear when I'm done running. Soft cotton, relaxed fits, nothing complicated. Just really comfortable clothes you'll want to live in.</p>
-                                <span class="rithim-signature">— Ryan</span>
+                    <!-- ── MANIFESTO ── -->
+                    <section class="rithim-manifesto">
+                        <div class="container">
+                            <div class="rithim-manifesto-grid reveal">
+                                <div class="rithim-manifesto-left">
+                                    <span class="rithim-section-label">The Manifesto</span>
+                                    <blockquote class="rithim-manifesto-quote">"Find your rhythm.<br>Live in it."</blockquote>
+                                    <p>I'm a long-distance runner. Every finish line ends the same way — exhausted, alive, and desperate for something soft to throw on. That feeling is Rithim.</p>
+                                    <p>Not a fashion brand. Not a sportswear brand. Just clothes built around the moments that matter most — when the run is done and real life continues.</p>
+                                    <span class="rithim-signature">— Ryan Pegg, Founder</span>
+                                </div>
+                                <div class="rithim-manifesto-pillars">
+                                    <div class="rithim-mpillar">
+                                        <span class="rithim-mpillar-num">01</span>
+                                        <h4>Cloud-Soft Fabric</h4>
+                                        <p>Premium cotton that gets softer with every wash. You'll want to sleep in these.</p>
+                                    </div>
+                                    <div class="rithim-mpillar">
+                                        <span class="rithim-mpillar-num">02</span>
+                                        <h4>Relaxed Fit</h4>
+                                        <p>Cut for freedom — whether you're cooling down after miles or just heading out.</p>
+                                    </div>
+                                    <div class="rithim-mpillar">
+                                        <span class="rithim-mpillar-num">03</span>
+                                        <h4>Clean Design</h4>
+                                        <p>No loud graphics. Just the Rithim mark, done right. Wear it anywhere.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </section>
 
-                        <div class="rithim-pillars reveal">
-                            <div class="rithim-pillar">
-                                <div class="rithim-pillar-icon">☁️</div>
-                                <h3>Cloud-Soft Fabrics</h3>
-                                <p>Premium cotton and cotton-blend materials that get softer with every wash. Seriously, you'll want to sleep in these.</p>
+                    <!-- ── COLLECTION ── -->
+                    <section class="rithim-collection" id="rithim-collection">
+                        <div class="container">
+                            <div class="rithim-collection-hd reveal">
+                                <span class="rithim-section-label">Spring / Summer '26</span>
+                                <h2>The Collection</h2>
+                                <p>Three essential pieces. Multiple colorways. Endless comfort.</p>
                             </div>
-                            <div class="rithim-pillar">
-                                <div class="rithim-pillar-icon">🏃</div>
-                                <h3>Post-Run Ready</h3>
-                                <p>Designed for that moment after the run — when you need something loose, breathable, and cozy to cool down in.</p>
-                            </div>
-                            <div class="rithim-pillar">
-                                <div class="rithim-pillar-icon">✨</div>
-                                <h3>Clean & Simple</h3>
-                                <p>No loud graphics or over-the-top branding. Just clean designs with the Rithim logo. Wear it anywhere, anytime.</p>
-                            </div>
-                        </div>
 
-                        <div class="rithim-collection-header reveal">
-                            <span class="rithim-collection-label">The Collection</span>
-                            <h2>Pick Your Comfort</h2>
-                            <p>Tees, hoodies, and joggers — each one designed for maximum comfort. Available in multiple colors and sizes.</p>
+                            <div class="rithim-product-grid">
+                                ${products.map((p, i) => `
+                                <div class="rithim-product-card reveal" style="transition-delay:${i * 0.08}s">
+                                    <div class="rithim-card-image-wrap">
+                                        <a href="#product/${p.id}" class="rithim-card-image-link" tabindex="-1" aria-hidden="true">
+                                            <img src="${p.image}" alt="${p.name}" class="rithim-card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                            <div class="rithim-card-img-fallback">
+                                                <i data-lucide="shirt" style="width:56px;height:56px;color:var(--color-rithim);opacity:0.35;"></i>
+                                            </div>
+                                        </a>
+                                        <div class="rithim-card-badge">New</div>
+                                        <button class="rithim-quick-add add-to-cart-btn" data-product-id="${p.id}" title="Quick add to bag">
+                                            <i data-lucide="shopping-bag" style="width:16px;height:16px;"></i>
+                                            <span>Add to Bag</span>
+                                        </button>
+                                    </div>
+                                    <div class="rithim-card-body">
+                                        <div class="rithim-card-top">
+                                            <a href="#product/${p.id}" class="rithim-card-name">${p.name}</a>
+                                            <span class="rithim-card-price">$${p.price.toFixed(2)}</span>
+                                        </div>
+                                        <p class="rithim-card-desc">${p.desc}</p>
+                                        <div class="rithim-card-swatches">
+                                            ${p.colors.map(c => `<span class="rithim-swatch" style="background:${c}" title="${c}"></span>`).join('')}
+                                        </div>
+                                        <div class="rithim-card-sizes">
+                                            ${sizes.map(s => `<span class="rithim-size">${s}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                                `).join('')}
+                            </div>
                         </div>
-                        <div class="rithim-lookbook-grid">
-                            ${products.map(p => '<div class="rithim-lookbook-item reveal">' +
-                                '<a href="#product/' + p.id + '" class="rithim-lookbook-image">' +
-                                    '<img src="' + p.image + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' +
-                                '</a>' +
-                                '<div class="rithim-lookbook-info">' +
-                                    '<h3>' + p.name + '</h3>' +
-                                    '<p>' + p.desc + '</p>' +
-                                    '<div class="rithim-lookbook-bottom">' +
-                                        '<span class="rithim-lookbook-price">$' + p.price.toFixed(2) + '</span>' +
-                                        '<div class="rithim-color-dots">' +
-                                            p.colors.map(c => '<span class="rithim-dot" style="background: ' + c + ';"></span>').join('') +
-                                        '</div>' +
-                                        '<button class="btn btn-primary add-to-cart-btn" data-product-id="' + p.id + '" style="background: var(--color-rithim); border-color: var(--color-rithim); border-radius: 50px; padding: 0.5rem 1.5rem; font-size: 0.85rem;">Add to Bag</button>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>').join('')}
-                        </div>
+                    </section>
 
-                        <div class="rithim-comfort-banner reveal">
-                            <h2>Comfort Isn't Optional</h2>
-                            <p>Life's too short for stiff clothes. Whether it's post-race recovery, a lazy Sunday, or just running errands — Rithim keeps you comfortable through all of it.</p>
-                            <a href="#checkout" class="btn btn-primary rithim-shop-btn">Shop the Collection</a>
+                    <!-- ── MOVEMENT ── -->
+                    <section class="rithim-movement">
+                        <div class="container">
+                            <div class="rithim-movement-inner reveal">
+                                <span class="rithim-section-label">The Movement</span>
+                                <h2 class="rithim-movement-title">Built for every stride forward.</h2>
+                                <p class="rithim-movement-copy">Rithim isn't just clothing — it's what you put on when you're out there living. On the track, on the trails, in the streets. Every piece moves with you, not against you.</p>
+                                <div class="rithim-stats-row">
+                                    <div class="rithim-stat">
+                                        <span class="rithim-stat-val">3</span>
+                                        <span class="rithim-stat-lbl">Signature Pieces</span>
+                                    </div>
+                                    <div class="rithim-stat-divider" aria-hidden="true"></div>
+                                    <div class="rithim-stat">
+                                        <span class="rithim-stat-val">5+</span>
+                                        <span class="rithim-stat-lbl">Colorways</span>
+                                    </div>
+                                    <div class="rithim-stat-divider" aria-hidden="true"></div>
+                                    <div class="rithim-stat">
+                                        <span class="rithim-stat-val">XS–XL</span>
+                                        <span class="rithim-stat-lbl">All Sizes</span>
+                                    </div>
+                                    <div class="rithim-stat-divider" aria-hidden="true"></div>
+                                    <div class="rithim-stat">
+                                        <span class="rithim-stat-val">100%</span>
+                                        <span class="rithim-stat-lbl">Comfort Guaranteed</span>
+                                    </div>
+                                </div>
+                                <a href="#rithim-collection" class="rithim-btn-primary" style="margin-top:2.5rem;display:inline-block;">Shop the Collection</a>
+                            </div>
                         </div>
-                    </div>
+                    </section>
+
                 </div>
             `;
         },
