@@ -4136,277 +4136,596 @@ label {
 
 
 /* ═══════════════════════════════════════════════
-   RITHIM v2 — COMFY CLOTHING BRAND THEME
+   RITHIM v3 — Premium Clothing Brand Theme
    ═══════════════════════════════════════════════ */
 
-.rithim-brand-v2 {
+/* ── Shared Utilities ── */
+.rithim-v3 {
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
-.rithim-lifestyle-hero {
-    background:
-        radial-gradient(ellipse at 30% 20%, rgba(255, 55, 95, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(255, 55, 95, 0.06) 0%, transparent 50%);
-    padding: 5rem 1rem 4rem;
-}
-
-.rithim-brand-logo {
-    width: 80px;
-    height: auto;
-    margin-bottom: 1rem;
-}
-
-.rithim-brand-title {
-    font-size: 5rem;
-    font-weight: 700;
+.rithim-section-label {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
     color: var(--color-rithim);
-    margin: 0;
-    letter-spacing: 8px;
-    font-family: 'Space Grotesk', sans-serif;
-    text-transform: lowercase;
-}
-
-.rithim-brand-tagline {
-    font-size: 1.3rem;
-    color: var(--text-secondary);
-    font-style: italic;
-    margin: 1rem auto 0;
-    max-width: 400px;
-    letter-spacing: 2px;
-}
-
-.rithim-hero-divider {
-    width: 60px;
-    height: 2px;
-    background: var(--color-rithim);
-    margin: 2rem auto 0;
-    opacity: 0.5;
-}
-
-.rithim-story-section {
-    padding: 3rem 0;
-}
-
-.rithim-story-text {
-    max-width: 650px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.rithim-story-text h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--color-rithim);
-}
-
-.rithim-story-text p {
-    color: var(--text-secondary);
-    line-height: 1.9;
-    margin-bottom: 1rem;
-    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
 }
 
 .rithim-signature {
     display: block;
-    margin-top: 0.5rem;
+    margin-top: 1.25rem;
     color: var(--color-rithim);
     font-weight: 600;
     font-size: 0.95rem;
     font-style: italic;
 }
 
-.rithim-pillars {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+/* ── Shared Buttons ── */
+.rithim-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2.25rem;
+    background: var(--color-rithim);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    text-decoration: none;
+    border: 2px solid var(--color-rithim);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+}
+.rithim-btn-primary:hover {
+    background: transparent;
+    color: var(--color-rithim);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255, 55, 95, 0.3);
+}
+
+.rithim-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2.25rem;
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    text-decoration: none;
+    border: 2px solid var(--border-glass);
+    transition: all 0.25s ease;
+    letter-spacing: 0.03em;
+}
+.rithim-btn-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+/* ── Hero ── */
+.rithim-hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 6rem 1rem 5rem;
+    overflow: hidden;
+}
+
+.rithim-hero-orbs {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.rithim-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+}
+.rithim-orb-1 {
+    width: 560px;
+    height: 560px;
+    background: var(--color-rithim);
+    top: -120px;
+    right: -100px;
+}
+.rithim-orb-2 {
+    width: 400px;
+    height: 400px;
+    background: #ff8fab;
+    bottom: -80px;
+    left: -80px;
+}
+
+.rithim-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+}
+
+.rithim-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--color-rithim);
+    font-weight: 600;
+    background: rgba(255, 55, 95, 0.08);
+    border: 1px solid rgba(255, 55, 95, 0.2);
+    border-radius: 50px;
+    padding: 0.35rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.rithim-hero-wordmark {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 1.5rem;
+    line-height: 1;
+}
+.rithim-wordmark-main {
+    font-size: clamp(4.5rem, 12vw, 9rem);
+    font-weight: 700;
+    color: var(--color-rithim);
+    font-family: 'Space Grotesk', sans-serif;
+    text-transform: lowercase;
+    letter-spacing: -0.02em;
+    line-height: 0.9;
+}
+.rithim-wordmark-tagline {
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    font-weight: 300;
+    color: var(--text-secondary);
+    font-style: italic;
+    letter-spacing: 0.12em;
+    margin-top: 1rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.rithim-hero-desc {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 480px;
+    margin-bottom: 2.5rem;
+}
+
+.rithim-hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.rithim-scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1;
+}
+.rithim-scroll-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+.rithim-scroll-bar {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--color-rithim), transparent);
+    animation: rithimScrollPulse 1.8s ease-in-out infinite;
+}
+@keyframes rithimScrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 0.8; transform: scaleY(1.15); }
+}
+
+/* ── Marquee ── */
+.rithim-marquee {
+    overflow: hidden;
+    border-top: 1px solid var(--border-glass);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 0.9rem 0;
+    background: rgba(255, 55, 95, 0.03);
+    user-select: none;
+}
+.rithim-marquee-track {
+    display: flex;
+    align-items: center;
     gap: 2rem;
-    margin: 1rem 0 3rem;
+    width: max-content;
+    animation: rithimMarquee 28s linear infinite;
+}
+.rithim-marquee-track:hover {
+    animation-play-state: paused;
+}
+@keyframes rithimMarquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+.rithim-marquee-word {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.rithim-marquee-dot {
+    font-size: 0.6rem;
+    color: var(--color-rithim);
+    flex-shrink: 0;
 }
 
-.rithim-pillar {
-    text-align: center;
-    padding: 2.5rem 1.5rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-glass);
-    border-radius: 24px;
-    transition: all 0.3s ease;
+/* ── Manifesto ── */
+.rithim-manifesto {
+    padding: 6rem 0;
+    border-bottom: 1px solid var(--border-glass);
+}
+.rithim-manifesto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
 }
 
-.rithim-pillar:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(255, 55, 95, 0.06);
-    border-color: rgba(255, 55, 95, 0.2);
-}
-
-.rithim-pillar-icon {
-    font-size: 2.5rem;
+.rithim-manifesto-left p {
+    color: var(--text-secondary);
+    line-height: 1.85;
+    font-size: 1rem;
     margin-bottom: 1rem;
 }
 
-.rithim-pillar h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.75rem;
+.rithim-manifesto-quote {
+    font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0 0 1.75rem;
+    border-left: 3px solid var(--color-rithim);
+    padding-left: 1.5rem;
 }
 
-.rithim-pillar p {
-    font-size: 0.9rem;
+.rithim-manifesto-pillars {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.rithim-mpillar {
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border-glass);
+    transition: all 0.25s ease;
+}
+.rithim-mpillar:first-child { padding-top: 0; }
+.rithim-mpillar:last-child { border-bottom: none; padding-bottom: 0; }
+.rithim-mpillar:hover { padding-left: 0.5rem; }
+
+.rithim-mpillar-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-rithim);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.rithim-mpillar h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    color: var(--text-primary);
+}
+.rithim-mpillar p {
+    font-size: 0.88rem;
     color: var(--text-secondary);
-    line-height: 1.7;
+    line-height: 1.6;
     margin: 0;
 }
 
-.rithim-collection-header {
+/* ── Collection ── */
+.rithim-collection {
+    padding: 5rem 0 6rem;
+}
+.rithim-collection-hd {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
-
-.rithim-collection-label {
-    display: inline-block;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--color-rithim);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+.rithim-collection-hd h2 {
+    font-size: 2.2rem;
+    margin: 0.25rem 0 0.5rem;
 }
-
-.rithim-collection-header h2 {
-    margin-bottom: 0.5rem;
-}
-
-.rithim-collection-header p {
+.rithim-collection-hd p {
     color: var(--text-secondary);
-    max-width: 500px;
-    margin: 0 auto;
+    font-size: 1rem;
 }
 
-.rithim-lookbook-grid {
+.rithim-product-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
 }
 
-.rithim-lookbook-item {
+.rithim-product-card {
     background: var(--bg-card);
     border: 1px solid var(--border-glass);
     border-radius: 20px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.rithim-product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(255, 55, 95, 0.1);
+    border-color: rgba(255, 55, 95, 0.25);
 }
 
-.rithim-lookbook-item:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(255, 55, 95, 0.06);
-    border-color: rgba(255, 55, 95, 0.2);
-}
-
-.rithim-lookbook-image {
-    display: block;
-    padding: 2rem;
-    background: rgba(255, 55, 95, 0.03);
-    text-align: center;
-}
-
-.rithim-lookbook-image img {
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-}
-
-.rithim-lookbook-item:hover .rithim-lookbook-image img {
-    transform: scale(1.05);
-}
-
-.rithim-lookbook-info {
-    padding: 1.5rem;
-}
-
-.rithim-lookbook-info h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-.rithim-lookbook-info p {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-.rithim-lookbook-bottom {
+.rithim-card-image-wrap {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 55, 95, 0.04);
+    aspect-ratio: 4 / 3;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    justify-content: center;
+}
+.rithim-card-image-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+}
+.rithim-card-img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+}
+.rithim-product-card:hover .rithim-card-img {
+    transform: scale(1.07);
+}
+.rithim-card-img-fallback {
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
 }
 
-.rithim-lookbook-price {
-    font-size: 1.25rem;
+.rithim-card-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background: var(--color-rithim);
+    border-radius: 50px;
+    padding: 0.25rem 0.75rem;
+}
+
+.rithim-quick-add {
+    position: absolute;
+    bottom: -3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--color-rithim);
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.25rem;
+    cursor: pointer;
+    transition: bottom 0.3s ease, box-shadow 0.25s ease;
+}
+.rithim-product-card:hover .rithim-quick-add {
+    bottom: 1rem;
+    box-shadow: 0 6px 20px rgba(255, 55, 95, 0.4);
+}
+
+.rithim-card-body {
+    padding: 1.4rem 1.5rem 1.75rem;
+}
+.rithim-card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+}
+.rithim-card-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    flex: 1;
+}
+.rithim-card-name:hover { color: var(--color-rithim); }
+
+.rithim-card-price {
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--color-rithim);
     font-family: 'Space Grotesk', sans-serif;
+    flex-shrink: 0;
+}
+.rithim-card-desc {
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin-bottom: 1rem;
 }
 
-.rithim-color-dots {
+.rithim-card-swatches {
     display: flex;
     gap: 6px;
-}
-
-.rithim-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid var(--border-glass);
-}
-
-.rithim-comfort-banner {
-    text-align: center;
-    margin-top: 4rem;
-    padding: 4rem 2rem;
-    background:
-        radial-gradient(ellipse at 50% 50%, rgba(255, 55, 95, 0.06) 0%, transparent 70%);
-    border: 1px solid rgba(255, 55, 95, 0.1);
-    border-radius: 28px;
-}
-
-.rithim-comfort-banner h2 {
-    font-size: 1.75rem;
     margin-bottom: 0.75rem;
 }
+.rithim-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border-glass);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.rithim-swatch:hover {
+    transform: scale(1.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
 
-.rithim-comfort-banner p {
+.rithim-card-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.rithim-size {
+    font-size: 0.7rem;
+    font-weight: 600;
     color: var(--text-secondary);
-    max-width: 550px;
-    margin: 0 auto 1.5rem;
-    line-height: 1.7;
+    border: 1px solid var(--border-glass);
+    border-radius: 6px;
+    padding: 0.2rem 0.55rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
+}
+.rithim-size:hover {
+    border-color: var(--color-rithim);
+    color: var(--color-rithim);
+    background: rgba(255, 55, 95, 0.06);
 }
 
-.rithim-shop-btn {
-    background: var(--color-rithim) !important;
-    border-color: var(--color-rithim) !important;
-    border-radius: 50px !important;
-    padding: 0.75rem 2.5rem !important;
-    font-size: 1rem !important;
+/* ── Movement Section ── */
+.rithim-movement {
+    padding: 6rem 0;
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 55, 95, 0.06) 0%, transparent 65%);
+    border-top: 1px solid var(--border-glass);
+}
+.rithim-movement-inner {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+.rithim-movement-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    margin: 0.5rem 0 1.25rem;
+    line-height: 1.15;
+}
+.rithim-movement-copy {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 560px;
+    margin: 0 auto 3rem;
 }
 
-@media (max-width: 768px) {
-    .rithim-pillars {
+.rithim-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bg-card);
+}
+.rithim-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1.75rem 2rem;
+    flex: 1;
+    min-width: 120px;
+}
+.rithim-stat-divider {
+    width: 1px;
+    height: 60px;
+    background: var(--border-glass);
+    flex-shrink: 0;
+}
+.rithim-stat-val {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-rithim);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1;
+}
+.rithim-stat-lbl {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .rithim-manifesto-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    .rithim-product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .rithim-hero {
+        padding: 7rem 1rem 4rem;
+        min-height: auto;
+    }
+    .rithim-hero-ctas {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .rithim-product-grid {
         grid-template-columns: 1fr;
     }
-
-    .rithim-lookbook-grid {
-        grid-template-columns: 1fr;
+    .rithim-stats-row {
+        flex-direction: column;
+        border-radius: 20px;
     }
-
-    .rithim-brand-title {
-        font-size: 3rem;
-        letter-spacing: 4px;
+    .rithim-stat-divider {
+        width: 60px;
+        height: 1px;
     }
-
-    .rithim-comfort-banner {
-        padding: 2.5rem 1.5rem;
+    .rithim-stat {
+        padding: 1.25rem 1.5rem;
+    }
+    .rithim-manifesto-quote {
+        font-size: 1.5rem;
+    }
+    .rithim-scroll-hint {
+        display: none;
     }
 }
 
