@@ -1667,21 +1667,21 @@ const Router = {
                         <div class="rithim-hero-orbs" aria-hidden="true">
                             <div class="rithim-orb rithim-orb-1"></div>
                             <div class="rithim-orb rithim-orb-2"></div>
+                            <div class="rithim-orb rithim-orb-3"></div>
                         </div>
-                        <div class="container rithim-hero-inner">
+                        <div class="rithim-hero-inner">
                             <div class="reveal">
-                                <span class="rithim-eyebrow">SS '26 Collection</span>
+                                <span class="rithim-eyebrow">SS '26 — New Collection</span>
                             </div>
                             <h1 class="rithim-hero-wordmark reveal">
                                 <span class="rithim-wordmark-main">rithim</span>
-                                <span class="rithim-wordmark-tagline">wear what feels right.</span>
                             </h1>
+                            <p class="rithim-hero-tagline reveal">wear what feels right.</p>
                             <p class="rithim-hero-desc reveal">
-                                Clothing born from the rhythm of running.<br>
-                                Soft, minimal, made for every moment after the race.
+                                Born from the rhythm of running. Designed for the life after the finish line.
                             </p>
                             <div class="rithim-hero-ctas reveal">
-                                <a href="#rithim-collection" class="rithim-btn-primary">Shop the Drop</a>
+                                <a href="#rithim-collection" class="rithim-btn-primary">Shop Now</a>
                                 <a href="#about" class="rithim-btn-ghost">Our Story <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-left:4px;"></i></a>
                             </div>
                         </div>
@@ -1694,37 +1694,51 @@ const Router = {
                     <!-- ── MARQUEE ── -->
                     <div class="rithim-marquee" aria-hidden="true">
                         <div class="rithim-marquee-track">
-                            ${['RITHIM', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'EVERY STRIDE', 'FIND YOUR RHYTHM', 'RITHIM', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'EVERY STRIDE', 'FIND YOUR RHYTHM'].map(w => `<span class="rithim-marquee-word">${w}</span><span class="rithim-marquee-dot">✦</span>`).join('')}
+                            ${['RITHIM', 'SS \'26', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'FIND YOUR RHYTHM', 'RITHIM', 'SS \'26', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'FIND YOUR RHYTHM'].map(w => `<span class="rithim-marquee-word">${w}</span><span class="rithim-marquee-dot">◆</span>`).join('')}
                         </div>
                     </div>
 
-                    <!-- ── MANIFESTO ── -->
-                    <section class="rithim-manifesto">
+                    <!-- ── EDITORIAL / LOOKBOOK ── -->
+                    <section class="rithim-editorial">
                         <div class="container">
-                            <div class="rithim-manifesto-grid reveal">
-                                <div class="rithim-manifesto-left">
-                                    <span class="rithim-section-label">The Manifesto</span>
-                                    <blockquote class="rithim-manifesto-quote">"Find your rhythm.<br>Live in it."</blockquote>
-                                    <p>I'm a long-distance runner. Every finish line ends the same way — exhausted, alive, and desperate for something soft to throw on. That feeling is Rithim.</p>
-                                    <p>Not a fashion brand. Not a sportswear brand. Just clothes built around the moments that matter most — when the run is done and real life continues.</p>
-                                    <span class="rithim-signature">— Ryan Pegg, Founder</span>
+                            <div class="rithim-editorial-grid reveal">
+                                <div class="rithim-editorial-text">
+                                    <span class="rithim-section-label">The Vision</span>
+                                    <h2 class="rithim-editorial-heading">Clothing that<br>moves with you.</h2>
+                                    <p class="rithim-editorial-body">Every piece is designed from the ground up — not for the track, but for everything after. Cloud-soft fabrics, relaxed cuts, and a design philosophy that says less is more.</p>
+                                    <a href="#rithim-collection" class="rithim-text-link">Explore the Collection <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:6px;"></i></a>
                                 </div>
-                                <div class="rithim-manifesto-pillars">
-                                    <div class="rithim-mpillar">
-                                        <span class="rithim-mpillar-num">01</span>
-                                        <h4>Cloud-Soft Fabric</h4>
-                                        <p>Premium cotton that gets softer with every wash. You'll want to sleep in these.</p>
+                                <div class="rithim-editorial-visual">
+                                    <div class="rithim-editorial-img-wrap">
+                                        <img src="images/rithim-tee.png" alt="Rithim Classic Tee" class="rithim-editorial-img" onerror="this.style.display='none';this.parentElement.classList.add('rithim-editorial-placeholder')">
                                     </div>
-                                    <div class="rithim-mpillar">
-                                        <span class="rithim-mpillar-num">02</span>
-                                        <h4>Relaxed Fit</h4>
-                                        <p>Cut for freedom — whether you're cooling down after miles or just heading out.</p>
-                                    </div>
-                                    <div class="rithim-mpillar">
-                                        <span class="rithim-mpillar-num">03</span>
-                                        <h4>Clean Design</h4>
-                                        <p>No loud graphics. Just the Rithim mark, done right. Wear it anywhere.</p>
-                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ── BRAND VALUES ── -->
+                    <section class="rithim-values">
+                        <div class="container">
+                            <div class="rithim-values-header reveal">
+                                <span class="rithim-section-label">Our Promise</span>
+                                <h2>Built different.</h2>
+                            </div>
+                            <div class="rithim-values-grid">
+                                <div class="rithim-value-card reveal">
+                                    <span class="rithim-value-num">01</span>
+                                    <h4>Cloud-Soft Fabric</h4>
+                                    <p>Premium cotton blends that get softer with every wash. Built for comfort you can feel instantly.</p>
+                                </div>
+                                <div class="rithim-value-card reveal">
+                                    <span class="rithim-value-num">02</span>
+                                    <h4>Relaxed Fit</h4>
+                                    <p>Cut for freedom — whether you're cooling down post-run or heading out for the day.</p>
+                                </div>
+                                <div class="rithim-value-card reveal">
+                                    <span class="rithim-value-num">03</span>
+                                    <h4>Clean Design</h4>
+                                    <p>No loud graphics. Just the Rithim mark, done right. Wear it anywhere, anytime.</p>
                                 </div>
                             </div>
                         </div>
@@ -1735,13 +1749,13 @@ const Router = {
                         <div class="container">
                             <div class="rithim-collection-hd reveal">
                                 <span class="rithim-section-label">Spring / Summer '26</span>
-                                <h2>The Collection</h2>
-                                <p>Three essential pieces. Multiple colorways. Endless comfort.</p>
+                                <h2>The Drop</h2>
+                                <p>Three essential silhouettes. Multiple colorways. Endless comfort.</p>
                             </div>
 
                             <div class="rithim-product-grid">
                                 ${products.map((p, i) => `
-                                <div class="rithim-product-card reveal" style="transition-delay:${i * 0.08}s">
+                                <div class="rithim-product-card reveal" style="transition-delay:${i * 0.1}s">
                                     <div class="rithim-card-image-wrap">
                                         <a href="#product/${p.id}" class="rithim-card-image-link" tabindex="-1" aria-hidden="true">
                                             <img src="${p.image}" alt="${p.name}" class="rithim-card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -1774,13 +1788,21 @@ const Router = {
                         </div>
                     </section>
 
-                    <!-- ── MOVEMENT ── -->
+                    <!-- ── MANIFESTO ── -->
+                    <section class="rithim-manifesto">
+                        <div class="container">
+                            <div class="rithim-manifesto-inner reveal">
+                                <blockquote class="rithim-manifesto-quote">"Find your rhythm. Live in it."</blockquote>
+                                <p class="rithim-manifesto-body">I'm a long-distance runner. Every finish line ends the same way — exhausted, alive, and desperate for something soft to throw on. That feeling is Rithim. Not a fashion brand. Not a sportswear brand. Just clothes built around the moments that matter most.</p>
+                                <span class="rithim-signature">— Ryan Pegg, Founder</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ── STATS / MOVEMENT ── -->
                     <section class="rithim-movement">
                         <div class="container">
                             <div class="rithim-movement-inner reveal">
-                                <span class="rithim-section-label">The Movement</span>
-                                <h2 class="rithim-movement-title">Built for every stride forward.</h2>
-                                <p class="rithim-movement-copy">Rithim isn't just clothing — it's what you put on when you're out there living. On the track, on the trails, in the streets. Every piece moves with you, not against you.</p>
                                 <div class="rithim-stats-row">
                                     <div class="rithim-stat">
                                         <span class="rithim-stat-val">3</span>
@@ -1802,7 +1824,7 @@ const Router = {
                                         <span class="rithim-stat-lbl">Comfort Guaranteed</span>
                                     </div>
                                 </div>
-                                <a href="#rithim-collection" class="rithim-btn-primary" style="margin-top:2.5rem;display:inline-block;">Shop the Collection</a>
+                                <a href="#rithim-collection" class="rithim-btn-primary" style="margin-top:3rem;display:inline-block;">Shop the Collection</a>
                             </div>
                         </div>
                     </section>
