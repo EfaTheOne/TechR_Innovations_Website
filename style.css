@@ -5028,6 +5028,29 @@ body[data-page="success"] {
    Each page gets a visually distinct cursor shape, not just colour
    ============================================================ */
 
+/* HOME: Squircle — rounded square ring + small rounded dot (tech / innovation) */
+body[data-page="/"] .cursor-ring {
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border-width: 1.5px;
+}
+body[data-page="/"] .cursor-dot {
+    border-radius: 3px;
+    width: 8px;
+    height: 8px;
+}
+body[data-page="/"].cursor-hovering .cursor-ring {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+}
+body[data-page="/"].cursor-clicking .cursor-ring {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+}
+
 /* STUDYTECH: Diamond — rotated rounded square (pencil / learning angle) */
 body[data-page="studytech"] .cursor-ring,
 body[data-page="studytech-lab"] .cursor-ring {
