@@ -4837,8 +4837,8 @@ body[data-page="techbox"] {
     --cursor-glow: rgba(255, 159, 10, 0.45);
 }
 body[data-page="techack"] {
-    --cursor-color: #34c759;
-    --cursor-glow: rgba(52, 199, 89, 0.45);
+    --cursor-color: #ffffff;
+    --cursor-glow: rgba(255, 255, 255, 0.45);
 }
 body[data-page="rithim"] {
     --cursor-color: #ff375f;
@@ -5038,4 +5038,158 @@ body[data-page="admin"].cursor-clicking .cursor-ring,
 body[data-page="dashboard"].cursor-clicking .cursor-ring {
     width: 20px;
     height: 20px;
+}
+
+/* ============================================================
+   Cursor FX Canvas — interactive background layer
+   ============================================================ */
+#cursor-fx-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.7;
+}
+@media (pointer: coarse) {
+    #cursor-fx-canvas { display: none; }
+}
+
+/* ============================================================
+   Enhanced per-page cursor INTERFACE themes
+   ============================================================ */
+
+/* TECHACK: Scanline overlay on ring + glitch micro-shift on click */
+body[data-page="techack"] .cursor-ring {
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.4),
+                inset 0 0 8px rgba(255, 255, 255, 0.15);
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.04) 2px,
+        rgba(255, 255, 255, 0.04) 4px
+    );
+}
+body[data-page="techack"] .cursor-dot {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.3);
+}
+body[data-page="techack"].cursor-clicking .cursor-ring {
+    animation: cursor-glitch 0.15s steps(2) 1;
+}
+body[data-page="techack"].cursor-hovering .cursor-ring {
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.08) 2px,
+        rgba(255, 255, 255, 0.08) 4px
+    );
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                inset 0 0 12px rgba(255, 255, 255, 0.2);
+}
+@keyframes cursor-glitch {
+    0%   { transform: translate(-50%, -50%) translate(2px, -1px); }
+    25%  { transform: translate(-50%, -50%) translate(-3px, 2px); }
+    50%  { transform: translate(-50%, -50%) translate(1px, 1px); }
+    75%  { transform: translate(-50%, -50%) translate(-2px, -2px); }
+    100% { transform: translate(-50%, -50%); }
+}
+
+/* STUDYTECH: Glow highlight aura around ring — pencil/highlighter feel */
+body[data-page="studytech"] .cursor-ring,
+body[data-page="studytech-lab"] .cursor-ring {
+    box-shadow: 0 0 16px rgba(94, 92, 230, 0.5),
+                0 0 40px rgba(94, 92, 230, 0.15),
+                inset 0 0 8px rgba(94, 92, 230, 0.2);
+}
+body[data-page="studytech"] .cursor-dot,
+body[data-page="studytech-lab"] .cursor-dot {
+    box-shadow: 0 0 10px rgba(94, 92, 230, 0.9),
+                0 0 24px rgba(94, 92, 230, 0.3);
+}
+body[data-page="studytech"].cursor-clicking .cursor-ring,
+body[data-page="studytech-lab"].cursor-clicking .cursor-ring {
+    animation: cursor-pencil-press 0.2s ease-out 1;
+}
+@keyframes cursor-pencil-press {
+    0%   { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+    50%  { transform: translate(-50%, -50%) rotate(45deg) scale(0.7); }
+    100% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+}
+
+/* TECHBOX: Pulsing electric glow — zap / circuit energy */
+body[data-page="techbox"] .cursor-ring {
+    box-shadow: 0 0 12px rgba(255, 159, 10, 0.5),
+                0 0 30px rgba(255, 159, 10, 0.15),
+                inset 0 0 6px rgba(255, 159, 10, 0.2);
+    animation: cursor-circuit-pulse 2s ease-in-out infinite;
+}
+body[data-page="techbox"] .cursor-dot {
+    box-shadow: none;
+    filter: drop-shadow(0 0 6px rgba(255, 159, 10, 0.9));
+}
+body[data-page="techbox"].cursor-clicking .cursor-ring {
+    animation: cursor-spark 0.2s ease-out 1;
+}
+@keyframes cursor-circuit-pulse {
+    0%, 100% { box-shadow: 0 0 12px rgba(255, 159, 10, 0.5), inset 0 0 6px rgba(255, 159, 10, 0.2); }
+    50%      { box-shadow: 0 0 18px rgba(255, 159, 10, 0.7), inset 0 0 10px rgba(255, 159, 10, 0.3); }
+}
+@keyframes cursor-spark {
+    0%   { transform: translate(-50%, -50%) scale(1); border-color: #ff9f0a; }
+    30%  { transform: translate(-50%, -50%) scale(1.4); border-color: #ffe066; }
+    100% { transform: translate(-50%, -50%) scale(1); border-color: #ff9f0a; }
+}
+
+/* RITHIM: Smooth ripple ring — fashion / elegance */
+body[data-page="rithim"] .cursor-ring {
+    box-shadow: 0 0 12px rgba(255, 55, 95, 0.4),
+                0 0 30px rgba(255, 55, 95, 0.1);
+}
+body[data-page="rithim"] .cursor-dot {
+    filter: drop-shadow(0 0 4px rgba(255, 55, 95, 0.8));
+}
+body[data-page="rithim"].cursor-clicking .cursor-ring {
+    animation: cursor-ripple 0.4s ease-out 1;
+}
+@keyframes cursor-ripple {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50%  { transform: translate(-50%, -50%) scale(1.5); opacity: 0.4; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* HOME: Magnetic pull effect on hover */
+body[data-page="/"].cursor-hovering .cursor-ring {
+    box-shadow: 0 0 20px rgba(41, 151, 255, 0.5),
+                0 0 40px rgba(41, 151, 255, 0.15);
+}
+body[data-page="/"].cursor-clicking .cursor-ring {
+    animation: cursor-tech-pulse 0.25s ease-out 1;
+}
+@keyframes cursor-tech-pulse {
+    0%   { transform: translate(-50%, -50%) scale(1); }
+    50%  { transform: translate(-50%, -50%) scale(0.6); box-shadow: 0 0 30px rgba(41, 151, 255, 0.8); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ABOUT: Gentle breathing animation */
+body[data-page="about"] .cursor-ring {
+    animation: cursor-breathe 3s ease-in-out infinite;
+}
+@keyframes cursor-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    50%      { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+/* CHECKOUT: Coin spin on click */
+body[data-page="checkout"].cursor-clicking .cursor-ring {
+    animation: cursor-coin-spin 0.3s ease-out 1;
+}
+@keyframes cursor-coin-spin {
+    0%   { transform: translate(-50%, -50%) rotateY(0deg); }
+    50%  { transform: translate(-50%, -50%) rotateY(180deg); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) rotateY(360deg); }
 }
