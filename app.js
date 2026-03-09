@@ -1788,17 +1788,6 @@ const Router = {
                         </div>
                     </section>
 
-                    <!-- ── MANIFESTO ── -->
-                    <section class="rithim-manifesto">
-                        <div class="container">
-                            <div class="rithim-manifesto-inner reveal">
-                                <blockquote class="rithim-manifesto-quote">"Find your rhythm. Live in it."</blockquote>
-                                <p class="rithim-manifesto-body">I'm a long-distance runner. Every finish line ends the same way — exhausted, alive, and desperate for something soft to throw on. That feeling is Rithim. Not a fashion brand. Not a sportswear brand. Just clothes built around the moments that matter most.</p>
-                                <span class="rithim-signature">— Ryan Pegg, Founder</span>
-                            </div>
-                        </div>
-                    </section>
-
                     <!-- ── STATS / MOVEMENT ── -->
                     <section class="rithim-movement">
                         <div class="container">
