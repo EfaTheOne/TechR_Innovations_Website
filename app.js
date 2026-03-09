@@ -3253,8 +3253,9 @@ const Router = {
             const inquiryCard = form.closest('.checkout-inquiry-card');
             if (inquiryCard) {
                 // Use textContent for safe text insertion in the copy handler
-                const escapedBody = emailBody.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-                const escapedSubject = emailSubject.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const escapedBody = escapeHtml(emailBody).replace(/\n/g, '<br>');
+                const escapedSubject = escapeHtml(emailSubject);
                 inquiryCard.innerHTML = `
                     <div style="text-align: center; margin-bottom: 1.5rem;">
                         <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #34c759, #30d158); margin-bottom: 0.75rem;">
@@ -3306,10 +3307,6 @@ const Router = {
                 // Re-render icons
                 if (window.lucide) lucide.createIcons();
 
-                // Store email data for copy buttons
-                const rawSubject = emailSubject;
-                const rawBody = emailBody;
-
                 // Add copy handlers
                 inquiryCard.addEventListener('click', (ev) => {
                     const copyBtn = ev.target.closest('.copy-btn, .copy-all-btn, .copy-email-addr-btn');
@@ -3322,14 +3319,14 @@ const Router = {
                     if (copyText) {
                         textToCopy = copyText;
                     } else if (target === 'email-subject') {
-                        textToCopy = rawSubject;
+                        textToCopy = emailSubject;
                     } else if (target === 'email-body') {
-                        textToCopy = rawBody;
+                        textToCopy = emailBody;
                     } else if (target === 'email-all') {
-                        textToCopy = `To: ${CONFIG.CONTACT_EMAIL}\nSubject: ${rawSubject}\n\n${rawBody}`;
+                        textToCopy = `To: ${CONFIG.CONTACT_EMAIL}\nSubject: ${emailSubject}\n\n${emailBody}`;
                     }
 
-                    if (textToCopy) {
+                    if (textToCopy && navigator.clipboard && navigator.clipboard.writeText) {
                         navigator.clipboard.writeText(textToCopy).then(() => {
                             Toast.success('Copied to clipboard!');
                             const icon = copyBtn.querySelector('i');
@@ -3343,16 +3340,29 @@ const Router = {
                             }
                         }).catch(() => {
                             // Fallback: select the text for manual copy
-                            const el = document.getElementById(target);
-                            if (el) {
-                                const range = document.createRange();
-                                range.selectNodeContents(el);
-                                const sel = window.getSelection();
-                                sel.removeAllRanges();
-                                sel.addRange(range);
-                                Toast.info('Text selected — press Ctrl+C / Cmd+C to copy');
+                            if (target) {
+                                const el = document.getElementById(target);
+                                if (el) {
+                                    const range = document.createRange();
+                                    range.selectNodeContents(el);
+                                    const sel = window.getSelection();
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
                             }
+                            Toast.info('Text selected — press Ctrl+C / Cmd+C to copy');
                         });
+                    } else if (textToCopy && target) {
+                        // Clipboard API not available — select text for manual copy
+                        const el = document.getElementById(target);
+                        if (el) {
+                            const range = document.createRange();
+                            range.selectNodeContents(el);
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        }
+                        Toast.info('Text selected — press Ctrl+C / Cmd+C to copy');
                     }
                 });
 
