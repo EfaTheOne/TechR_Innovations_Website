@@ -930,7 +930,7 @@ label {
 
 /* Checkout Container */
 .checkout-container {
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
 }
 
@@ -1466,36 +1466,150 @@ label {
     color: var(--success);
 }
 
-/* Stripe Payment Form Styling */
-#card-container {
-    margin-bottom: 1.5rem;
+/* Checkout Inquiry Form Styling */
+.checkout-order-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-#card-element {
+.checkout-order-table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--border-glass);
+    font-weight: 500;
+}
+
+.checkout-order-table tbody td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+}
+
+.checkout-order-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.checkout-table-wrapper {
+    overflow-x: auto;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+}
+
+.checkout-total-row {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border-glass);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkout-trust-card {
+    background: rgba(41, 151, 255, 0.04);
+    border: 1px solid rgba(41, 151, 255, 0.12);
+    padding: 1rem 1.5rem;
+}
+
+.checkout-inquiry-card {
+    border: 1px solid rgba(41, 151, 255, 0.15);
+    background: linear-gradient(180deg, rgba(41, 151, 255, 0.03) 0%, transparent 100%);
+}
+
+.checkout-inquiry-form .inquiry-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.checkout-inquiry-form .inquiry-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.checkout-inquiry-form .inquiry-field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.checkout-inquiry-form input,
+.checkout-inquiry-form textarea {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-glass);
-    padding: 1rem 1.25rem;
+    padding: 0.85rem 1rem;
     border-radius: 10px;
-    min-height: 44px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    outline: none;
 }
 
-#card-element:hover {
+.checkout-inquiry-form input:hover,
+.checkout-inquiry-form textarea:hover {
     border-color: rgba(255, 255, 255, 0.15);
 }
 
-#card-element.StripeElement--focus {
+.checkout-inquiry-form input:focus,
+.checkout-inquiry-form textarea:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.15);
 }
 
-#card-element.StripeElement--invalid {
-    border-color: var(--danger);
-    box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.15);
+.checkout-inquiry-form input::placeholder,
+.checkout-inquiry-form textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.5;
 }
 
-.checkout-payment-card {
-    border: 1px solid rgba(41, 151, 255, 0.15);
+.checkout-inquiry-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.checkout-submit-btn {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.checkout-email-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+}
+
+.checkout-email-link:hover {
+    opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+    .checkout-inquiry-form .inquiry-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-order-table thead th:nth-child(3),
+    .checkout-order-table tbody td:nth-child(3) {
+        display: none;
+    }
 }
 
 /* Skeleton Loading */
