@@ -2900,10 +2900,10 @@ const Router = {
                                 <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.25rem;">
                                     Or email us directly at
                                 </p>
-                                <a href="mailto:${CONFIG.CONTACT_EMAIL}" class="checkout-email-link">
+                                <span class="checkout-email-link" style="cursor: default;">
                                     <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
                                     ${CONFIG.CONTACT_EMAIL}
-                                </a>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -3015,12 +3015,12 @@ const Router = {
                 <div class="success-icon">
                     <i data-lucide="check"></i>
                 </div>
-                <h1>Inquiry Submitted!</h1>
+                <h1>Inquiry Ready!</h1>
                 <p style="font-size: 1.1rem; margin: 1.5rem 0;">
-                    Thank you for your interest! Please make sure to <strong>send the email</strong> that was opened in your email client to complete your inquiry.
+                    Thank you for your interest! Please <strong>paste and send the copied email</strong> to complete your inquiry.
                 </p>
                 <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 2rem;">
-                    You can also reach us directly at <a href="mailto:${CONFIG.CONTACT_EMAIL}" style="color: var(--accent);">${CONFIG.CONTACT_EMAIL}</a>
+                    Send your email to <span style="color: var(--accent); font-weight: 600;">${CONFIG.CONTACT_EMAIL}</span>
                 </p>
                 <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
                     <a href="#/" class="btn btn-primary">Return Home</a>
@@ -3237,28 +3237,138 @@ const Router = {
 
             PayButton.setLoading(submitBtn);
 
-            // Build order summary for mailto
+            // Build order summary
             const cartSummary = Store.cart.map(item =>
                 `- ${sanitize(item.name, 100)} (x${item.quantity || 1}) — $${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`
             ).join('\n');
             const total = Store.getCartTotal();
 
-            const subject = encodeURIComponent(`Purchase Inquiry from ${safeName}`);
-            const body = encodeURIComponent(
+            const emailSubject = `Purchase Inquiry from ${safeName}`;
+            const emailBody =
                 `Name: ${safeName}\nEmail: ${safeEmail}\n\n` +
                 (safeMessage ? `Message: ${safeMessage}\n\n` : '') +
-                `--- Order Details ---\n${cartSummary}\n\nTotal: $${total}`
-            );
+                `--- Order Details ---\n${cartSummary}\n\nTotal: $${total}`;
 
-            // Open mailto link
-            window.location.href = `mailto:${CONFIG.CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+            // Show copy-paste email instead of opening email app
+            const inquiryCard = form.closest('.checkout-inquiry-card');
+            if (inquiryCard) {
+                // Use textContent for safe text insertion in the copy handler
+                const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const escapedBody = escapeHtml(emailBody).replace(/\n/g, '<br>');
+                const escapedSubject = escapeHtml(emailSubject);
+                inquiryCard.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #34c759, #30d158); margin-bottom: 0.75rem;">
+                            <i data-lucide="check" style="width: 24px; height: 24px; color: white;"></i>
+                        </div>
+                        <h3 style="margin-bottom: 0.5rem;">Your Email is Ready!</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Copy the email below and send it to:</p>
+                        <div class="email-to-address" style="margin-top: 0.5rem;">
+                            <strong style="font-size: 1.1rem; color: var(--accent);">${CONFIG.CONTACT_EMAIL}</strong>
+                            <button class="copy-email-addr-btn" data-copy-text="${CONFIG.CONTACT_EMAIL}" title="Copy email address" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 0.25rem; vertical-align: middle;">
+                                <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
 
-            // Show success after short delay - remind user to send the email
-            setTimeout(() => {
-                Toast.success('Your email client should be open — please send the email to complete your inquiry!');
+                    <div class="email-preview-section">
+                        <div class="email-preview-header">
+                            <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 500;">Subject</span>
+                            <button class="copy-btn" data-copy-target="email-subject" title="Copy subject">
+                                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="email-preview-content" id="email-subject">${escapedSubject}</div>
+                    </div>
+
+                    <div class="email-preview-section" style="margin-top: 1rem;">
+                        <div class="email-preview-header">
+                            <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 500;">Email Body</span>
+                            <button class="copy-btn" data-copy-target="email-body" title="Copy email body">
+                                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="email-preview-content" id="email-body">${escapedBody}</div>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg checkout-submit-btn copy-all-btn" style="margin-top: 1.5rem;" data-copy-target="email-all">
+                        <i data-lucide="clipboard-copy" style="width: 18px; height: 18px;"></i>
+                        Copy Full Email
+                    </button>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                        <a href="#/" class="btn btn-secondary" style="flex: 1; text-align: center;">Return Home</a>
+                        <a href="#techack" class="btn btn-secondary" style="flex: 1; text-align: center;">Continue Shopping</a>
+                    </div>
+                `;
+
+                // Re-render icons
+                if (window.lucide) lucide.createIcons();
+
+                // Add copy handlers
+                inquiryCard.addEventListener('click', (ev) => {
+                    const copyBtn = ev.target.closest('.copy-btn, .copy-all-btn, .copy-email-addr-btn');
+                    if (!copyBtn) return;
+
+                    let textToCopy = '';
+                    const target = copyBtn.dataset.copyTarget;
+                    const copyText = copyBtn.dataset.copyText;
+
+                    if (copyText) {
+                        textToCopy = copyText;
+                    } else if (target === 'email-subject') {
+                        textToCopy = emailSubject;
+                    } else if (target === 'email-body') {
+                        textToCopy = emailBody;
+                    } else if (target === 'email-all') {
+                        textToCopy = `To: ${CONFIG.CONTACT_EMAIL}\nSubject: ${emailSubject}\n\n${emailBody}`;
+                    }
+
+                    if (textToCopy && navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            Toast.success('Copied to clipboard!');
+                            const icon = copyBtn.querySelector('i');
+                            if (icon) {
+                                icon.setAttribute('data-lucide', 'check');
+                                if (window.lucide) lucide.createIcons();
+                                setTimeout(() => {
+                                    icon.setAttribute('data-lucide', copyBtn.classList.contains('copy-all-btn') ? 'clipboard-copy' : 'copy');
+                                    if (window.lucide) lucide.createIcons();
+                                }, 2000);
+                            }
+                        }).catch(() => {
+                            // Fallback: select the text for manual copy
+                            if (target) {
+                                const el = document.getElementById(target);
+                                if (el) {
+                                    const range = document.createRange();
+                                    range.selectNodeContents(el);
+                                    const sel = window.getSelection();
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+                            }
+                            Toast.info('Text selected — press Ctrl+C / Cmd+C to copy');
+                        });
+                    } else if (textToCopy && target) {
+                        // Clipboard API not available — select text for manual copy
+                        const el = document.getElementById(target);
+                        if (el) {
+                            const range = document.createRange();
+                            range.selectNodeContents(el);
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        }
+                        Toast.info('Text selected — press Ctrl+C / Cmd+C to copy');
+                    }
+                });
+
+                Toast.success('Email ready! Copy and send it to complete your inquiry.');
                 Store.clearCart();
-                window.location.hash = '#success';
-            }, 1500);
+            }
         });
     }
 };
@@ -3476,6 +3586,18 @@ const CursorFX = {
                 radius: 6 + Math.random() * 6,
                 color: `rgba(41, 151, 255, `,
                 type: 'glow'
+            };
+        } else if (p === 'checkout') {
+            // Soft shimmer trail
+            const colors = ['41,151,255', '255,215,0', '255,255,255'];
+            trail = {
+                x: x + (Math.random() - 0.5) * 20,
+                y: y + (Math.random() - 0.5) * 20,
+                alpha: 0.4,
+                decay: 0.01,
+                radius: 2 + Math.random() * 3,
+                color: `rgba(${colors[Math.floor(Math.random() * colors.length)]}, `,
+                type: 'dot'
             };
         } else if (p === 'success') {
             // Sparkle
