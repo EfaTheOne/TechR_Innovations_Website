@@ -4693,7 +4693,7 @@ label {
 .rithim-card-price {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--color-rithim);
     font-family: 'Space Grotesk', sans-serif;
     flex-shrink: 0;
 }
