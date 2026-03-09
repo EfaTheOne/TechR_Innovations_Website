@@ -1471,9 +1471,9 @@ const Router = {
                             </div>
                             <div class="terminal-body">
                                 <p class="terminal-line"><span class="terminal-prompt">$</span> sudo ./techack --init --mode=secure</p>
-                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Loading kernel modules...</p>
-                                <p class="terminal-line" style="color: rgba(0,255,65,0.3);">[*] Initializing hardware interface...</p>
-                                <p class="terminal-line" style="color: #00cc33;">[+] System ready. Welcome to TECHACK.</p>
+                                <p class="terminal-line" style="color: rgba(255,255,255,0.3);">[*] Loading kernel modules...</p>
+                                <p class="terminal-line" style="color: rgba(255,255,255,0.3);">[*] Initializing hardware interface...</p>
+                                <p class="terminal-line" style="color: #e0e0e0;">[+] System ready. Welcome to TECHACK.</p>
                                 <div class="techack-hero-content" style="margin-top:1.5rem;">
                                     <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
                                     <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:3px;">// SECURITY HARDWARE</span>
@@ -2995,9 +2995,9 @@ const Router = {
             const drops = Array(columns).fill(1);
 
             const drawMatrix = () => {
-                ctx.fillStyle = 'rgba(3, 10, 6, 0.07)';
+                ctx.fillStyle = 'rgba(5, 5, 8, 0.07)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#00cc33';
+                ctx.fillStyle = '#e0e0e0';
                 ctx.font = fontSize + 'px Courier New';
                 ctx.globalAlpha = 0.06;
 
