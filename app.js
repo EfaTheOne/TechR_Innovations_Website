@@ -3307,6 +3307,8 @@ const CursorFX = {
     raf: null,
     maxParticles: 80,
     maxTrails: 25,
+    frameCount: 0,
+    ambientInterval: 7, // spawn ambient effect every N frames (~8-9 times/sec at 60fps)
 
     init() {
         if (window.matchMedia('(pointer: coarse)').matches) return;
@@ -3598,8 +3600,9 @@ const CursorFX = {
 
         ctx.clearRect(0, 0, CursorFX.canvas.width, CursorFX.canvas.height);
 
-        // Ambient effects
-        if (Math.random() < 0.15) CursorFX.spawnAmbientTechack();
+        // Ambient effects (deterministic frame-based interval)
+        CursorFX.frameCount++;
+        if (CursorFX.frameCount % CursorFX.ambientInterval === 0) CursorFX.spawnAmbientTechack();
 
         // Draw & update trails
         for (let i = CursorFX.trails.length - 1; i >= 0; i--) {
