@@ -10,9 +10,8 @@ const CONFIG = {
     SUPABASE_URL: 'https://vmgiylwrpknufdddwcbw.supabase.co',
     SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtZ2l5bHdycGtudWZkZGR3Y2J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MjI0NDEsImV4cCI6MjA4NTk5ODQ0MX0.oeRBTZszpvu263vr43LRYJ0nF1HsEJD8HeMnYv_6uew',
 
-    // STRIPE CONFIGURATION
-    // Replace with your Stripe Publishable Key (https://dashboard.stripe.com/apikeys)
-    STRIPE_PUBLISHABLE_KEY: 'pk_test_51MycO7Fe1hSNms1qzqy4TaiRu1XWGvKbHcdOXz0cnJgJTzpgf4hZaw86sEf1PMiSYe6X5FL9Pf7zRaz3e6oef8V000uVMlo2fe'
+    // CONTACT EMAIL for purchase inquiries
+    CONTACT_EMAIL: 'techrinnovation@gmail.com'
 };
 
 // --- TOAST NOTIFICATIONS ---
@@ -65,14 +64,14 @@ const PayButton = {
     setLoading: (btn) => {
         if (!btn) return;
         btn.disabled = true;
-        btn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Processing...';
+        btn.innerHTML = '<i data-lucide="loader-2" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"></i> Sending...';
         if (window.lucide) lucide.createIcons();
     },
 
-    setReady: (btn, amount) => {
+    setReady: (btn) => {
         if (!btn) return;
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="lock" style="width: 18px; height: 18px;"></i> Pay $${amount}`;
+        btn.innerHTML = `<i data-lucide="send" style="width: 18px; height: 18px;"></i> Submit Inquiry`;
         if (window.lucide) lucide.createIcons();
     }
 };
@@ -2757,67 +2756,156 @@ const Router = {
             }
 
             return `
-                <div class="container" style="padding-top: calc(var(--header-height) + 3rem);">
-                    <div class="checkout-container">
-                        <h2 class="reveal" style="margin-bottom: 0.5rem;">Secure Checkout</h2>
-                        <p class="reveal" style="color: var(--text-secondary); margin-bottom: 2rem;">${itemCount} item${itemCount > 1 ? 's' : ''} in your cart</p>
-
-                        <div class="checkout-steps reveal">
-                            <div class="checkout-step active">
-                                <span class="checkout-step-number">1</span>
-                                <span>Review</span>
+                <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
+                    <div class="checkout-container" style="max-width: 700px;">
+                        <div class="reveal" style="text-align: center; margin-bottom: 2.5rem;">
+                            <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #0077ed); margin-bottom: 1rem;">
+                                <i data-lucide="shield-check" style="width: 28px; height: 28px; color: white;"></i>
                             </div>
-                            <div class="checkout-step active">
-                                <span class="checkout-step-number">2</span>
-                                <span>Payment</span>
-                            </div>
-                            <div class="checkout-step">
-                                <span class="checkout-step-number">3</span>
-                                <span>Confirm</span>
-                            </div>
+                            <h2 style="margin-bottom: 0.5rem; font-size: 2rem;">Order Summary</h2>
+                            <p style="color: var(--text-secondary);">${itemCount} item${itemCount > 1 ? 's' : ''} in your cart</p>
                         </div>
 
-                        <div class="card reveal" style="margin-bottom: 2rem;">
+                        <!-- Order Summary Table -->
+                        <div class="card reveal" style="margin-bottom: 2rem; overflow: hidden;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                                 <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
                                     <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
-                                    Order Summary
+                                    Cart Items
                                 </h3>
                                 <button class="cart-clear-btn" data-action="clear-cart">
                                     <i data-lucide="trash" style="width: 14px; height: 14px;"></i>
                                     Clear Cart
                                 </button>
                             </div>
-                            ${Store.cart.map((item, i) => Components.CartItem(item, i)).join('')}
-                            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-size: 1.1rem; font-weight: 500;">Total</span>
-                                <span class="price" style="font-size: 1.5rem;">$${total}</span>
+
+                            <div class="checkout-table-wrapper">
+                                <table class="checkout-order-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left;">Product</th>
+                                            <th style="text-align: center;">Qty</th>
+                                            <th style="text-align: right;">Price</th>
+                                            <th style="text-align: right;">Subtotal</th>
+                                            <th style="width: 40px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${Store.cart.map(item => `
+                                            <tr>
+                                                <td>
+                                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                        <img src="${item.image}" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--bg-tertiary);" alt="${item.name}">
+                                                        <div>
+                                                            <strong style="font-size: 0.9rem;">${item.name}</strong>
+                                                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; text-transform: capitalize;">${item.category}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    <div class="qty-controls" style="display: inline-flex;">
+                                                        <button data-action="update-qty" data-cart-id="${item.cartId}" data-delta="-1" title="Decrease">−</button>
+                                                        <span>${item.quantity || 1}</span>
+                                                        <button data-action="update-qty" data-cart-id="${item.cartId}" data-delta="1" title="Increase">+</button>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align: right; color: var(--text-secondary);">$${parseFloat(item.price).toFixed(2)}</td>
+                                                <td style="text-align: right; font-weight: 600; color: var(--accent);">$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</td>
+                                                <td style="text-align: center;">
+                                                    <button class="remove-from-cart-btn" data-cart-id="${item.cartId}" title="Remove" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 0.25rem;">
+                                                        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="checkout-total-row">
+                                <span style="font-size: 1.1rem; font-weight: 600;">Total</span>
+                                <span class="price" style="font-size: 1.75rem; font-weight: 700;">$${total}</span>
                             </div>
                         </div>
 
-                        <div class="card reveal checkout-payment-card">
-                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
-                                Payment Details
-                            </h3>
-                            <div id="card-container">
-                                <div id="card-element"></div>
-                                <div id="card-errors" role="alert" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.75rem; min-height: 1.25rem;"></div>
-                            </div>
-                            <button id="pay-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 0.5rem;">
-                                <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
-                                Pay $${total}
-                            </button>
-                            <div style="text-align: center; margin-top: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
-                                <span style="font-size: 0.8rem; color: var(--text-secondary);">Payments secured by Stripe</span>
+                        <!-- Security & Trust Badge -->
+                        <div class="card reveal checkout-trust-card" style="margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; justify-content: center;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Secure Inquiry</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="lock" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Data Protected</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="mail-check" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Direct Response</span>
+                                </div>
                             </div>
                         </div>
 
-                        <details style="margin-top: 2rem;" class="reveal">
-                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 0.9rem;">Developer Console</summary>
-                            <pre id="debug-log" class="debug-log" style="margin-top: 1rem;">Awaiting payment initialization...</pre>
-                        </details>
+                        <!-- Purchase Inquiry Form -->
+                        <div class="card reveal checkout-inquiry-card">
+                            <div style="text-align: center; margin-bottom: 2rem;">
+                                <h3 style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <i data-lucide="mail" style="width: 22px; height: 22px; color: var(--accent);"></i>
+                                    Interested in Purchasing?
+                                </h3>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 450px; margin: 0 auto;">
+                                    Fill out the form below and we'll get back to you with purchasing details, pricing, and availability.
+                                </p>
+                            </div>
+
+                            <form id="inquiry-form" class="checkout-inquiry-form">
+                                <div class="inquiry-form-grid">
+                                    <div class="inquiry-field">
+                                        <label for="inquiry-name">
+                                            <i data-lucide="user" style="width: 14px; height: 14px;"></i>
+                                            Full Name <span style="color: var(--danger);">*</span>
+                                        </label>
+                                        <input type="text" id="inquiry-name" name="name" placeholder="John Doe" required autocomplete="name">
+                                    </div>
+                                    <div class="inquiry-field">
+                                        <label for="inquiry-email">
+                                            <i data-lucide="at-sign" style="width: 14px; height: 14px;"></i>
+                                            Email Address <span style="color: var(--danger);">*</span>
+                                        </label>
+                                        <input type="email" id="inquiry-email" name="email" placeholder="you@example.com" required autocomplete="email">
+                                    </div>
+                                </div>
+                                <div class="inquiry-field">
+                                    <label for="inquiry-message">
+                                        <i data-lucide="message-square" style="width: 14px; height: 14px;"></i>
+                                        Message <span style="color: var(--text-secondary); font-weight: 400;">(optional)</span>
+                                    </label>
+                                    <textarea id="inquiry-message" name="message" rows="3" placeholder="Any questions or special requests..."></textarea>
+                                </div>
+
+                                <div class="inquiry-order-ref" style="margin-top: 1rem;">
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                                        <i data-lucide="info" style="width: 12px; height: 12px; vertical-align: middle;"></i>
+                                        Your cart details (${itemCount} item${itemCount > 1 ? 's' : ''}, total: <strong>$${total}</strong>) will be included automatically.
+                                    </p>
+                                </div>
+
+                                <button type="submit" id="inquiry-btn" class="btn btn-primary btn-lg checkout-submit-btn">
+                                    <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                                    Submit Inquiry
+                                </button>
+                            </form>
+
+                            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-glass);">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.25rem;">
+                                    Or email us directly at
+                                </p>
+                                <a href="mailto:${CONFIG.CONTACT_EMAIL}" class="checkout-email-link">
+                                    <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                                    ${CONFIG.CONTACT_EMAIL}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2927,9 +3015,12 @@ const Router = {
                 <div class="success-icon">
                     <i data-lucide="check"></i>
                 </div>
-                <h1>Payment Successful!</h1>
+                <h1>Inquiry Submitted!</h1>
                 <p style="font-size: 1.1rem; margin: 1.5rem 0;">
-                    Thank you for your order. You will receive a confirmation email shortly.
+                    Thank you for your interest! We've received your inquiry and will get back to you at your email shortly.
+                </p>
+                <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                    You can also reach us directly at <a href="mailto:${CONFIG.CONTACT_EMAIL}" style="color: var(--accent);">${CONFIG.CONTACT_EMAIL}</a>
                 </p>
                 <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
                     <a href="#/" class="btn btn-primary">Return Home</a>
@@ -3120,102 +3211,49 @@ const Router = {
         window.location.hash = '#admin';
     },
 
-    initCheckout: async () => {
-        const cardContainer = document.getElementById('card-element');
-        const cardErrors = document.getElementById('card-errors');
-        const payBtn = document.getElementById('pay-btn');
+    initCheckout: () => {
+        const form = document.getElementById('inquiry-form');
+        const submitBtn = document.getElementById('inquiry-btn');
 
-        if (!cardContainer || !payBtn) return;
+        if (!form || !submitBtn) return;
 
-        if (!window.Stripe) {
-            logger.error("Stripe.js not loaded");
-            document.getElementById('card-container').innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>Payment SDK unavailable. Check your internet connection.</span></div>`;
-            if (window.lucide) lucide.createIcons();
-            return;
-        }
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-        if (!CONFIG.STRIPE_PUBLISHABLE_KEY || !CONFIG.STRIPE_PUBLISHABLE_KEY.startsWith('pk_')) {
-            logger.log("Demo mode: Stripe publishable key not configured");
-            document.getElementById('card-container').innerHTML = `
-                <div style="background: var(--bg-tertiary); border: 2px dashed var(--border-glass); border-radius: 8px; padding: 2rem; text-align: center;">
-                    <i data-lucide="credit-card" style="width: 32px; height: 32px; color: var(--text-secondary); margin-bottom: 1rem;"></i>
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
-                        Card input appears here once Stripe is configured.<br>
-                        <span style="font-size: 0.8rem;">Set your publishable key in app.js (STRIPE_PUBLISHABLE_KEY)</span>
-                    </p>
-                </div>
-            `;
-            if (window.lucide) lucide.createIcons();
+            const name = document.getElementById('inquiry-name').value.trim();
+            const email = document.getElementById('inquiry-email').value.trim();
+            const message = document.getElementById('inquiry-message').value.trim();
 
-            // Demo mode - simulate payment
-            payBtn.addEventListener('click', () => {
-                PayButton.setLoading(payBtn);
+            if (!name || !email) {
+                Toast.error('Please fill in your name and email address.');
+                return;
+            }
 
-                setTimeout(() => {
-                    logger.log("Demo payment simulated successfully");
-                    Toast.success("Payment successful! Thank you for your order.");
-                    Store.clearCart();
-                    window.location.hash = '#success';
-                }, 2000);
-            });
-            return;
-        }
+            PayButton.setLoading(submitBtn);
 
-        try {
-            logger.log("Initializing Stripe Payments...");
-            const stripe = window.Stripe(CONFIG.STRIPE_PUBLISHABLE_KEY);
-            const elements = stripe.elements();
+            // Build order summary for mailto
+            const cartSummary = Store.cart.map(item =>
+                `- ${item.name} (x${item.quantity || 1}) — $${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`
+            ).join('\n');
+            const total = Store.getCartTotal();
 
-            const style = {
-                base: {
-                    color: '#ffffff',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSmoothing: 'antialiased',
-                    fontSize: '16px',
-                    '::placeholder': { color: '#86868b' }
-                },
-                invalid: {
-                    color: '#ff453a',
-                    iconColor: '#ff453a'
-                }
-            };
+            const subject = encodeURIComponent(`Purchase Inquiry from ${name}`);
+            const body = encodeURIComponent(
+                `Name: ${name}\nEmail: ${email}\n\n` +
+                (message ? `Message: ${message}\n\n` : '') +
+                `--- Order Details ---\n${cartSummary}\n\nTotal: $${total}`
+            );
 
-            const card = elements.create('card', { style });
-            card.mount('#card-element');
-            logger.log("Stripe card element mounted successfully");
+            // Open mailto link
+            window.location.href = `mailto:${CONFIG.CONTACT_EMAIL}?subject=${subject}&body=${body}`;
 
-            card.on('change', (event) => {
-                if (cardErrors) {
-                    cardErrors.textContent = event.error ? event.error.message : '';
-                }
-            });
-
-            payBtn.addEventListener('click', async () => {
-                PayButton.setLoading(payBtn);
-
-                logger.log("Creating payment token...");
-                const { token, error } = await stripe.createToken(card);
-
-                if (error) {
-                    logger.error(error.message);
-                    if (cardErrors) cardErrors.textContent = error.message;
-                    PayButton.setReady(payBtn, Store.getCartTotal());
-                    Toast.error("Payment failed: " + error.message);
-                } else {
-                    logger.log(`Token received: ${token.id.substring(0, 20)}...`);
-                    Toast.success("Payment successful! Thank you for your order.");
-                    // In production, send token.id to your backend server to complete the charge
-                    // Example: await fetch('/api/charge', { method: 'POST', body: JSON.stringify({ token: token.id, amount: Math.round(total * 100) }) })
-                    // Note: Stripe expects amounts in the smallest currency unit (cents for USD)
-                    Store.clearCart();
-                    window.location.hash = '#success';
-                }
-            });
-        } catch (e) {
-            logger.error(`Stripe Exception: ${e.message}`);
-            document.getElementById('card-container').innerHTML = `<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i><span>${e.message}</span></div>`;
-            if (window.lucide) lucide.createIcons();
-        }
+            // Show success after short delay
+            setTimeout(() => {
+                Toast.success('Opening your email client... Your inquiry is ready to send!');
+                Store.clearCart();
+                window.location.hash = '#success';
+            }, 1500);
+        });
     }
 };
 window.Router = Router;
