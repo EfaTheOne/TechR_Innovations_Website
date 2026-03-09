@@ -3285,6 +3285,410 @@ const Cursor = {
         // product pages inherit the techack color since products are hardware-centric
         const page = hash.startsWith('product/') ? 'techack' : hash;
         document.body.dataset.page = page;
+        // Notify CursorFX of page change
+        if (typeof CursorFX !== 'undefined' && CursorFX.setPage) CursorFX.setPage(page);
+    }
+};
+
+/* ============================================================
+   CursorFX — per-page interactive background effects
+   Renders canvas-based particles, trails, and effects that
+   respond to cursor movement and clicks per page theme.
+   ============================================================ */
+const CursorFX = {
+    canvas: null,
+    ctx: null,
+    particles: [],
+    trails: [],
+    page: '/',
+    mouseX: -200,
+    mouseY: -200,
+    clicking: false,
+    raf: null,
+    maxParticles: 80,
+    maxTrails: 25,
+
+    init() {
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        CursorFX.canvas = document.getElementById('cursor-fx-canvas');
+        if (!CursorFX.canvas) return;
+        CursorFX.ctx = CursorFX.canvas.getContext('2d');
+        CursorFX.resize();
+        window.addEventListener('resize', CursorFX.resize, { passive: true });
+        document.addEventListener('mousemove', CursorFX.onMove, { passive: true });
+        document.addEventListener('mousedown', CursorFX.onClick, { passive: true });
+        document.addEventListener('mouseup', () => { CursorFX.clicking = false; }, { passive: true });
+        CursorFX.page = document.body.dataset.page || '/';
+        CursorFX.raf = requestAnimationFrame(CursorFX.loop);
+    },
+
+    resize() {
+        if (!CursorFX.canvas) return;
+        CursorFX.canvas.width = window.innerWidth;
+        CursorFX.canvas.height = window.innerHeight;
+    },
+
+    onMove(e) {
+        CursorFX.mouseX = e.clientX;
+        CursorFX.mouseY = e.clientY;
+        CursorFX.spawnTrail(e.clientX, e.clientY);
+    },
+
+    onClick(e) {
+        CursorFX.clicking = true;
+        CursorFX.spawnBurst(e.clientX, e.clientY);
+    },
+
+    setPage(page) {
+        CursorFX.page = page;
+        CursorFX.particles = [];
+        CursorFX.trails = [];
+    },
+
+    /* --- Trail spawning (per-page themed) --- */
+    spawnTrail(x, y) {
+        if (CursorFX.trails.length > CursorFX.maxTrails) return;
+        const p = CursorFX.page;
+        let trail = null;
+
+        if (p === 'techack') {
+            // Matrix-style character near cursor
+            const chars = '01アイウエオカキクケコサシスセソ>';
+            trail = {
+                x: x + (Math.random() - 0.5) * 60,
+                y: y + (Math.random() - 0.5) * 60,
+                char: chars[Math.floor(Math.random() * chars.length)],
+                alpha: 0.7 + Math.random() * 0.3,
+                decay: 0.015 + Math.random() * 0.01,
+                size: 10 + Math.random() * 6,
+                vy: 0.5 + Math.random() * 1.5,
+                type: 'char'
+            };
+        } else if (p === 'studytech' || p === 'studytech-lab') {
+            // Highlight / ink dot trail
+            trail = {
+                x: x,
+                y: y,
+                alpha: 0.35,
+                decay: 0.008,
+                radius: 3 + Math.random() * 4,
+                color: `rgba(94, 92, 230, `,
+                type: 'dot'
+            };
+        } else if (p === 'techbox') {
+            // Circuit node trail
+            trail = {
+                x: x + (Math.random() - 0.5) * 20,
+                y: y + (Math.random() - 0.5) * 20,
+                alpha: 0.6,
+                decay: 0.012,
+                radius: 1.5 + Math.random() * 2,
+                color: `rgba(255, 159, 10, `,
+                type: 'circuit'
+            };
+        } else if (p === 'rithim') {
+            // Color splash dot
+            const hue = 340 + Math.random() * 40; // pink-red range
+            trail = {
+                x: x + (Math.random() - 0.5) * 30,
+                y: y + (Math.random() - 0.5) * 30,
+                alpha: 0.4,
+                decay: 0.006,
+                radius: 2 + Math.random() * 5,
+                hue: hue,
+                type: 'splash'
+            };
+        } else if (p === '/') {
+            // Subtle tech particle
+            trail = {
+                x: x + (Math.random() - 0.5) * 40,
+                y: y + (Math.random() - 0.5) * 40,
+                alpha: 0.3,
+                decay: 0.01,
+                radius: 1 + Math.random() * 2,
+                color: `rgba(41, 151, 255, `,
+                type: 'dot'
+            };
+        } else if (p === 'about') {
+            // Soft glow dot
+            trail = {
+                x: x,
+                y: y,
+                alpha: 0.2,
+                decay: 0.005,
+                radius: 6 + Math.random() * 6,
+                color: `rgba(41, 151, 255, `,
+                type: 'glow'
+            };
+        } else if (p === 'success') {
+            // Sparkle
+            const colors = ['255,215,0', '52,199,89', '255,255,255'];
+            trail = {
+                x: x + (Math.random() - 0.5) * 30,
+                y: y + (Math.random() - 0.5) * 30,
+                alpha: 0.7,
+                decay: 0.015,
+                radius: 1.5 + Math.random() * 2,
+                color: `rgba(${colors[Math.floor(Math.random() * colors.length)]}, `,
+                type: 'dot'
+            };
+        }
+
+        if (trail) CursorFX.trails.push(trail);
+    },
+
+    /* --- Burst spawning on click (per-page themed) --- */
+    spawnBurst(x, y) {
+        const p = CursorFX.page;
+        const count = p === 'success' ? 24 : (p === 'techack' ? 16 : 12);
+
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.3;
+            const speed = 1.5 + Math.random() * 3;
+            let particle = null;
+
+            if (p === 'techack') {
+                // Glitch fragments
+                const chars = '!@#$%^&*01';
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed * 1.5,
+                    vy: Math.sin(angle) * speed * 1.5,
+                    alpha: 1,
+                    decay: 0.03 + Math.random() * 0.02,
+                    char: chars[Math.floor(Math.random() * chars.length)],
+                    size: 8 + Math.random() * 6,
+                    type: 'char'
+                };
+            } else if (p === 'studytech' || p === 'studytech-lab') {
+                // Ink splatter
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 0.6,
+                    decay: 0.02,
+                    radius: 2 + Math.random() * 4,
+                    color: `rgba(94, 92, 230, `,
+                    type: 'dot'
+                };
+            } else if (p === 'techbox') {
+                // Spark particles
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed * 1.2,
+                    vy: Math.sin(angle) * speed * 1.2,
+                    alpha: 1,
+                    decay: 0.04,
+                    radius: 1 + Math.random() * 2,
+                    color: Math.random() > 0.5 ? `rgba(255, 159, 10, ` : `rgba(255, 224, 102, `,
+                    type: 'dot'
+                };
+            } else if (p === 'rithim') {
+                // Fabric ripple
+                const hue = 330 + Math.random() * 50;
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed * 0.8,
+                    vy: Math.sin(angle) * speed * 0.8,
+                    alpha: 0.5,
+                    decay: 0.012,
+                    radius: 3 + Math.random() * 5,
+                    hue: hue,
+                    type: 'splash'
+                };
+            } else if (p === '/') {
+                // Tech ripple
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 0.5,
+                    decay: 0.02,
+                    radius: 1.5 + Math.random() * 2.5,
+                    color: `rgba(41, 151, 255, `,
+                    type: 'dot'
+                };
+            } else if (p === 'checkout') {
+                // Sparkle / coin effect
+                const colors = ['41,151,255', '255,215,0', '255,255,255'];
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed * 0.8,
+                    vy: Math.sin(angle) * speed * 0.8 - 1,
+                    alpha: 0.8,
+                    decay: 0.02,
+                    radius: 2 + Math.random() * 3,
+                    color: `rgba(${colors[Math.floor(Math.random() * colors.length)]}, `,
+                    type: 'dot'
+                };
+            } else if (p === 'success') {
+                // Confetti burst
+                const colors = ['255,215,0', '52,199,89', '94,92,230', '255,55,95', '41,151,255'];
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed * 1.5,
+                    vy: Math.sin(angle) * speed * 1.5 - 2,
+                    alpha: 1,
+                    decay: 0.015,
+                    w: 3 + Math.random() * 5,
+                    h: 2 + Math.random() * 3,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.2,
+                    color: `rgba(${colors[Math.floor(Math.random() * colors.length)]}, `,
+                    gravity: 0.08,
+                    type: 'confetti'
+                };
+            } else if (p === 'about') {
+                // Soft info rings
+                particle = {
+                    x: x, y: y,
+                    vx: 0, vy: 0,
+                    alpha: 0.4,
+                    decay: 0.008,
+                    radius: 5 + i * 3,
+                    color: `rgba(41, 151, 255, `,
+                    type: 'ring'
+                };
+            } else {
+                // Default particle
+                particle = {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 0.5,
+                    decay: 0.02,
+                    radius: 2,
+                    color: `rgba(255, 255, 255, `,
+                    type: 'dot'
+                };
+            }
+
+            if (particle && CursorFX.particles.length < CursorFX.maxParticles) {
+                CursorFX.particles.push(particle);
+            }
+        }
+    },
+
+    /* --- Techack ambient matrix rain columns near cursor --- */
+    spawnAmbientTechack() {
+        if (CursorFX.page !== 'techack') return;
+        if (CursorFX.particles.length > 40) return;
+        // Spawn a falling character column near the cursor
+        const chars = '01アイウエオカキクケコサシスセソタチツテト';
+        const col = CursorFX.mouseX + (Math.random() - 0.5) * 300;
+        CursorFX.particles.push({
+            x: col,
+            y: Math.random() * -20,
+            vx: 0,
+            vy: 1 + Math.random() * 2,
+            alpha: 0.3 + Math.random() * 0.4,
+            decay: 0.003,
+            char: chars[Math.floor(Math.random() * chars.length)],
+            size: 10 + Math.random() * 4,
+            type: 'char',
+            matrixCol: true
+        });
+    },
+
+    /* --- Main render loop --- */
+    loop() {
+        const ctx = CursorFX.ctx;
+        if (!ctx) { CursorFX.raf = requestAnimationFrame(CursorFX.loop); return; }
+
+        ctx.clearRect(0, 0, CursorFX.canvas.width, CursorFX.canvas.height);
+
+        // Ambient effects
+        if (Math.random() < 0.15) CursorFX.spawnAmbientTechack();
+
+        // Draw & update trails
+        for (let i = CursorFX.trails.length - 1; i >= 0; i--) {
+            const t = CursorFX.trails[i];
+            t.alpha -= t.decay;
+            if (t.alpha <= 0) { CursorFX.trails.splice(i, 1); continue; }
+
+            if (t.type === 'char') {
+                // Matrix character
+                t.y += t.vy;
+                ctx.font = `${t.size}px monospace`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${t.alpha})`;
+                ctx.fillText(t.char, t.x, t.y);
+            } else if (t.type === 'dot') {
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fillStyle = t.color + t.alpha + ')';
+                ctx.fill();
+            } else if (t.type === 'circuit') {
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fillStyle = t.color + t.alpha + ')';
+                ctx.fill();
+                // Draw connecting line to cursor
+                ctx.beginPath();
+                ctx.moveTo(t.x, t.y);
+                ctx.lineTo(CursorFX.mouseX, CursorFX.mouseY);
+                ctx.strokeStyle = t.color + (t.alpha * 0.3) + ')';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            } else if (t.type === 'splash') {
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${t.hue}, 85%, 60%, ${t.alpha})`;
+                ctx.fill();
+            } else if (t.type === 'glow') {
+                const grad = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, t.radius);
+                grad.addColorStop(0, t.color + t.alpha + ')');
+                grad.addColorStop(1, t.color + '0)');
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+            }
+        }
+
+        // Draw & update particles
+        for (let i = CursorFX.particles.length - 1; i >= 0; i--) {
+            const pt = CursorFX.particles[i];
+            pt.alpha -= pt.decay;
+            pt.x += (pt.vx || 0);
+            pt.y += (pt.vy || 0);
+            if (pt.gravity) pt.vy += pt.gravity;
+
+            if (pt.alpha <= 0) { CursorFX.particles.splice(i, 1); continue; }
+
+            if (pt.type === 'char') {
+                ctx.font = `${pt.size}px monospace`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${pt.alpha})`;
+                ctx.fillText(pt.char, pt.x, pt.y);
+            } else if (pt.type === 'dot') {
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+                ctx.fillStyle = pt.color + pt.alpha + ')';
+                ctx.fill();
+            } else if (pt.type === 'splash') {
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${pt.hue}, 85%, 60%, ${pt.alpha})`;
+                ctx.fill();
+            } else if (pt.type === 'confetti') {
+                ctx.save();
+                ctx.translate(pt.x, pt.y);
+                pt.rotation += pt.rotSpeed;
+                ctx.rotate(pt.rotation);
+                ctx.fillStyle = pt.color + pt.alpha + ')';
+                ctx.fillRect(-pt.w / 2, -pt.h / 2, pt.w, pt.h);
+                ctx.restore();
+            } else if (pt.type === 'ring') {
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = pt.color + pt.alpha + ')';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                pt.radius += 0.5;
+            }
+        }
+
+        CursorFX.raf = requestAnimationFrame(CursorFX.loop);
     }
 };
 
@@ -3294,6 +3698,7 @@ document.addEventListener('DOMContentLoaded', () => {
     AI.init();
     Router.init();
     Cursor.init();
+    CursorFX.init();
     Router.handleRoute();
     Store.updateCartUI();
     initRealtimeSync();
