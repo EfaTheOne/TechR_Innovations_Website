@@ -3017,7 +3017,7 @@ const Router = {
                 </div>
                 <h1>Inquiry Submitted!</h1>
                 <p style="font-size: 1.1rem; margin: 1.5rem 0;">
-                    Thank you for your interest! We've received your inquiry and will get back to you at your email shortly.
+                    Thank you for your interest! Please make sure to <strong>send the email</strong> that was opened in your email client to complete your inquiry.
                 </p>
                 <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 2rem;">
                     You can also reach us directly at <a href="mailto:${CONFIG.CONTACT_EMAIL}" style="color: var(--accent);">${CONFIG.CONTACT_EMAIL}</a>
@@ -3229,27 +3229,33 @@ const Router = {
                 return;
             }
 
+            // Sanitize inputs: strip control characters and limit length
+            const sanitize = (str, maxLen) => str.replace(/[\x00-\x1f\x7f]/g, '').substring(0, maxLen);
+            const safeName = sanitize(name, 100);
+            const safeEmail = sanitize(email, 254);
+            const safeMessage = sanitize(message, 1000);
+
             PayButton.setLoading(submitBtn);
 
             // Build order summary for mailto
             const cartSummary = Store.cart.map(item =>
-                `- ${item.name} (x${item.quantity || 1}) — $${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`
+                `- ${sanitize(item.name, 100)} (x${item.quantity || 1}) — $${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`
             ).join('\n');
             const total = Store.getCartTotal();
 
-            const subject = encodeURIComponent(`Purchase Inquiry from ${name}`);
+            const subject = encodeURIComponent(`Purchase Inquiry from ${safeName}`);
             const body = encodeURIComponent(
-                `Name: ${name}\nEmail: ${email}\n\n` +
-                (message ? `Message: ${message}\n\n` : '') +
+                `Name: ${safeName}\nEmail: ${safeEmail}\n\n` +
+                (safeMessage ? `Message: ${safeMessage}\n\n` : '') +
                 `--- Order Details ---\n${cartSummary}\n\nTotal: $${total}`
             );
 
             // Open mailto link
             window.location.href = `mailto:${CONFIG.CONTACT_EMAIL}?subject=${subject}&body=${body}`;
 
-            // Show success after short delay
+            // Show success after short delay - remind user to send the email
             setTimeout(() => {
-                Toast.success('Opening your email client... Your inquiry is ready to send!');
+                Toast.success('Your email client should be open — please send the email to complete your inquiry!');
                 Store.clearCart();
                 window.location.hash = '#success';
             }, 1500);
