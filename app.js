@@ -1717,7 +1717,7 @@ const Router = {
                                 Born from the rhythm of running. Designed for the life after the finish line.
                             </p>
                             <div class="rithim-hero-ctas reveal">
-                                <a href="#rithim-collection" class="rithim-btn-primary">Shop Now</a>
+                                <a href="javascript:void(0)" onclick="document.getElementById('rithim-collection')?.scrollIntoView({behavior:'smooth'})" class="rithim-btn-primary">Shop Now</a>
                                 <a href="#about" class="rithim-btn-ghost">Our Story <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-left:4px;"></i></a>
                             </div>
                         </div>
@@ -1742,7 +1742,7 @@ const Router = {
                                     <span class="rithim-section-label">The Vision</span>
                                     <h2 class="rithim-editorial-heading">Clothing that<br>moves with you.</h2>
                                     <p class="rithim-editorial-body">Every piece is designed from the ground up — not for the track, but for everything after. Cloud-soft fabrics, relaxed cuts, and a design philosophy that says less is more.</p>
-                                    <a href="#rithim-collection" class="rithim-text-link">Explore the Collection <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:6px;"></i></a>
+                                    <a href="javascript:void(0)" onclick="document.getElementById('rithim-collection')?.scrollIntoView({behavior:'smooth'})" class="rithim-text-link">Explore the Collection <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:6px;"></i></a>
                                 </div>
                                 <div class="rithim-editorial-visual">
                                     <div class="rithim-editorial-img-wrap">
@@ -1849,7 +1849,7 @@ const Router = {
                                         <span class="rithim-stat-lbl">Comfort Guaranteed</span>
                                     </div>
                                 </div>
-                                <a href="#rithim-collection" class="rithim-btn-primary" style="margin-top:3rem;display:inline-block;">Shop the Collection</a>
+                                <a href="javascript:void(0)" onclick="document.getElementById('rithim-collection')?.scrollIntoView({behavior:'smooth'})" class="rithim-btn-primary" style="margin-top:3rem;display:inline-block;">Shop the Collection</a>
                             </div>
                         </div>
                     </section>
