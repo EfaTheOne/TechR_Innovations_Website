@@ -186,24 +186,24 @@ function initRealtimeSync() {
 // simply replace the corresponding file in images/ (see images/README.md).
 const DEFAULT_PRODUCTS = [
     // Techack Products
-    { id: 1, name: "Techack1", price: 180, image: "images/techack1.png", images: ["images/techack1.png", "images/techack1-alt.png"], colors: ["#1a1a2e", "#16213e", "#0f3460"], category: "techack", desc: "My main pen-testing device — CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID all in one. Does probe request sniffing, auth floods, captive portals, PMKID capture, Pwnagotchi detection, card skimmer detection, and a bunch more." },
-    { id: 2, name: "Techack1MS", price: 50, image: "images/techack1ms.png", images: ["images/techack1ms.png"], colors: ["#2d3436", "#636e72"], category: "techack", desc: "A smaller, stripped-down version of the Techack1. Fewer features but still a solid starting point if you're just getting into security testing and wireless stuff." },
-    { id: 3, name: "TechackX1", price: 40, image: "images/techackx1.jpg", images: ["images/techackx1.jpg", "images/techackx1-logo.png"], colors: ["#0a3d62", "#1e3799"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display, MicroSD slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi analysis and network monitoring." },
+    { id: 1, name: "Techack1", price: 180, image: "images/techack1.png", images: ["images/techack1.png", "images/techack1-alt.png"], category: "techack", desc: "My main pen-testing device — CC1101 module (433 MHz), WiFi, Bluetooth, and USB HID all in one. Does probe request sniffing, auth floods, captive portals, PMKID capture, Pwnagotchi detection, card skimmer detection, and a bunch more." },
+    { id: 2, name: "Techack1MS", price: 50, image: "images/techack1ms.png", images: ["images/techack1ms.png"], category: "techack", desc: "A smaller, stripped-down version of the Techack1. Fewer features but still a solid starting point if you're just getting into security testing and wireless stuff." },
+    { id: 3, name: "TechackX1", price: 40, image: "images/techackx1.jpg", images: ["images/techackx1.jpg", "images/techackx1-logo.png"], category: "techack", desc: "ESP32 WROOM-based pen-testing tool with a 2.0\" IPS display, MicroSD slot, 2500mAh battery, and 6-button navigation. Runs Marauder-compatible firmware for WiFi analysis and network monitoring." },
 
     // TechBox Products
-    { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "images/techbox-macropad.png", images: ["images/techbox-macropad.png"], colors: ["#ff9f0a", "#e17055", "#fdcb6e"], category: "techbox", desc: "Build your own macropad — 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040. You'll learn PCB design, soldering, and firmware programming. 3D-printable case files included." },
-    { id: 5, name: "Automatic Plant Waterer", price: 49.99, image: "images/techprod.png", images: ["images/techprod.png"], colors: ["#2d3436", "#636e72"], category: "techbox", desc: "A fun intro to PCB design and embedded systems — build an automatic plant watering system with sensors and a microcontroller. Great first STEM project." },
-    { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "images/techbox-starter.png", images: ["images/techbox-starter.png"], colors: ["#ff9f0a", "#2d3436"], category: "techbox", desc: "Everything you need to get started — microcontroller, LEDs, resistors, and basic components. A solid first kit for anyone wanting to learn soldering and build their first circuits." },
+    { id: 4, name: "Tech_Pad Macropad Kit", price: 39.99, image: "images/techbox-macropad.png", images: ["images/techbox-macropad.png"], category: "techbox", desc: "Build your own macropad — 6 mechanical keys, 2 SK6812 MINI-E NeoPixels, and a Seeed XIAO RP2040. You'll learn PCB design, soldering, and firmware programming. 3D-printable case files included." },
+    { id: 5, name: "Automatic Plant Waterer", price: 49.99, image: "images/techprod.png", images: ["images/techprod.png"], category: "techbox", desc: "A fun intro to PCB design and embedded systems — build an automatic plant watering system with sensors and a microcontroller. Great first STEM project." },
+    { id: 6, name: "TechBox Starter Bundle", price: 59.99, image: "images/techbox-starter.png", images: ["images/techbox-starter.png"], category: "techbox", desc: "Everything you need to get started — microcontroller, LEDs, resistors, and basic components. A solid first kit for anyone wanting to learn soldering and build their first circuits." },
 
     // Rithim Products
-    { id: 7, name: "Rithim Classic Tee", price: 29.99, image: "images/rithim-classic-tee.png", images: ["images/rithim-classic-tee.png"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], category: "rithim", desc: "Soft cotton crew neck with the Rithim logo. Relaxed fit that feels great after a run or just hanging out. Comes in multiple colors and sizes." },
-    { id: 8, name: "Rithim Hoodie", price: 49.99, image: "images/rithim-hoodie.png", images: ["images/rithim-hoodie.png"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], category: "rithim", desc: "Cozy fleece hoodie with a kangaroo pocket and Rithim branding. Perfect for throwing on after a race or a long training session." },
-    { id: 9, name: "Rithim Joggers", price: 39.99, image: "images/rithim-joggers.png", images: ["images/rithim-joggers.png"], colors: ["#2d3436", "#636e72", "#b2bec3"], category: "rithim", desc: "Tapered joggers with elasticized cuffs and a drawstring waist. Cotton-polyester blend — super comfortable for recovery days or everyday wear." },
+    { id: 7, name: "Rithim Classic Tee", price: 29.99, image: "images/rithim-classic-tee.png", images: ["images/rithim-classic-tee.png"], colors: ["#ffffff", "#2d3436", "#ff375f", "#0984e3"], colorNames: {"#ffffff": "White", "#2d3436": "Charcoal", "#ff375f": "Red", "#0984e3": "Blue"}, colorImages: {"#ffffff": "images/rithim-classic-tee/white.png", "#2d3436": "images/rithim-classic-tee/charcoal.png", "#ff375f": "images/rithim-classic-tee/red.png", "#0984e3": "images/rithim-classic-tee/blue.png"}, category: "rithim", desc: "Soft cotton crew neck with the Rithim logo. Relaxed fit that feels great after a run or just hanging out. Comes in multiple colors and sizes." },
+    { id: 8, name: "Rithim Hoodie", price: 49.99, image: "images/rithim-hoodie.png", images: ["images/rithim-hoodie.png"], colors: ["#2d3436", "#dfe6e9", "#ff375f"], colorNames: {"#2d3436": "Charcoal", "#dfe6e9": "Light Grey", "#ff375f": "Red"}, colorImages: {"#2d3436": "images/rithim-classic-tee/charcoal-hoodie.png", "#dfe6e9": "images/rithim-classic-tee/light-grey-hoodie.png", "#ff375f": "images/rithim-classic-tee/red-hoodie.png"}, category: "rithim", desc: "Cozy fleece hoodie with a kangaroo pocket and Rithim branding. Perfect for throwing on after a race or a long training session." },
+    { id: 9, name: "Rithim Joggers", price: 39.99, image: "images/rithim-joggers.png", images: ["images/rithim-joggers.png"], colors: ["#2d3436", "#636e72", "#b2bec3"], colorNames: {"#2d3436": "Charcoal", "#636e72": "Grey", "#b2bec3": "Light Grey"}, colorImages: {"#2d3436": "images/rithim-classic-tee/charcoal-joggers.png", "#636e72": "images/rithim-classic-tee/grey-joggers.png", "#b2bec3": "images/rithim-classic-tee/light-grey-joggers.png"}, category: "rithim", desc: "Tapered joggers with elasticized cuffs and a drawstring waist. Cotton-polyester blend — super comfortable for recovery days or everyday wear." },
 
     // StudyTech Products
-    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 9.99, image: "images/studytech-monthly.png", images: ["images/studytech-monthly.png"], colors: ["#5e5ce6"], category: "studytech", desc: "AI-powered study assistant that helps with homework, explains concepts, and creates practice problems. Covers math, science, and more." },
-    { id: 11, name: "StudyTech AI Tutor - Annual", price: 79.99, image: "images/studytech-annual.png", images: ["images/studytech-annual.png"], colors: ["#5e5ce6", "#a29bfe"], category: "studytech", desc: "Full year of AI tutoring access with progress tracking and personalized study plans. Save compared to monthly billing." },
-    { id: 12, name: "StudyTech School License", price: 299.99, image: "images/studytech-school.png", images: ["images/studytech-school.png"], colors: ["#5e5ce6", "#2d3436"], category: "studytech", desc: "School license for up to 30 students with a teacher dashboard for tracking class progress and assigning AI-guided practice." }
+    { id: 10, name: "StudyTech AI Tutor - Monthly", price: 9.99, image: "images/studytech-monthly.png", images: ["images/studytech-monthly.png"], category: "studytech", desc: "AI-powered study assistant that helps with homework, explains concepts, and creates practice problems. Covers math, science, and more." },
+    { id: 11, name: "StudyTech AI Tutor - Annual", price: 79.99, image: "images/studytech-annual.png", images: ["images/studytech-annual.png"], category: "studytech", desc: "Full year of AI tutoring access with progress tracking and personalized study plans. Save compared to monthly billing." },
+    { id: 12, name: "StudyTech School License", price: 299.99, image: "images/studytech-school.png", images: ["images/studytech-school.png"], category: "studytech", desc: "School license for up to 30 students with a teacher dashboard for tracking class progress and assigning AI-guided practice." }
 ];
 
 // --- TIMEOUT HELPER ---
@@ -557,6 +557,43 @@ const Store = {
                     b.textContent = originalText;
                     b.classList.remove('btn-success');
                     b.classList.add('btn-secondary');
+                }, 1500);
+            });
+        }
+    },
+
+    addToCartWithOptions: (id, selectedColor, selectedSize) => {
+        const product = Store.products.find(p => matchId(p.id, id));
+        if (product) {
+            // For products with color/size, create separate cart entries per variant
+            const cartKey = `${id}-${selectedColor}-${selectedSize}`;
+            const existing = Store.cart.find(item => item.cartKey === cartKey);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                Store.cart.push({
+                    ...product,
+                    quantity: 1,
+                    cartId: Date.now() + Math.random(),
+                    cartKey,
+                    selectedColor: selectedColor || '',
+                    selectedSize: selectedSize || ''
+                });
+            }
+            Store.persist();
+            Store.updateCartUI();
+            const btns = document.querySelectorAll('button[data-product-id="' + id + '"]');
+            btns.forEach(b => {
+                const originalHTML = b.innerHTML;
+                b.innerHTML = '<i data-lucide="check" style="width:20px;height:20px;"></i> Added!';
+                b.classList.add('btn-success');
+                b.classList.remove('btn-secondary', 'btn-primary');
+                if (window.lucide) lucide.createIcons();
+                setTimeout(() => {
+                    b.innerHTML = originalHTML;
+                    b.classList.remove('btn-success');
+                    b.classList.add('btn-primary');
+                    if (window.lucide) lucide.createIcons();
                 }, 1500);
             });
         }
@@ -2643,6 +2680,8 @@ const Router = {
             const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
             const productColors = product.colors && product.colors.length > 0 ? product.colors : [];
             const categoryLabels = { techack: 'Techack Security', techbox: 'TechBox Education', rithim: 'Rithim Clothing', studytech: 'StudyTech AI' };
+            const getColorName = (color) => (product.colorNames && product.colorNames[color]) || color;
+            const getColorImg = (color) => (product.colorImages && product.colorImages[color]) || '';
 
             return `
                 <div class="container" style="padding-top: calc(var(--header-height) + 3rem); padding-bottom: 4rem;">
@@ -2684,12 +2723,23 @@ const Router = {
                             </div>
                             <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; color: var(--text-secondary);">${product.desc}</p>
 
-                            ${productColors.length > 0 ? `
+                            ${product.category === 'rithim' && productColors.length > 0 ? `
                                 <div class="product-detail-colors">
-                                    <label>Color</label>
+                                    <label>Color: <span id="selected-color-name" style="font-weight:600;">${getColorName(productColors[0])}</span></label>
                                     <div class="color-options">
                                         ${productColors.map((color, i) => `
-                                            <button class="color-swatch ${i === 0 ? 'active' : ''}" style="background: ${color};" title="${color}" data-color="${color}"></button>
+                                            <button class="color-swatch ${i === 0 ? 'active' : ''}" style="background: ${color};" title="${getColorName(color)}" data-color="${color}" data-color-name="${getColorName(color)}" data-color-img="${getColorImg(color)}"></button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${product.category === 'rithim' ? `
+                                <div class="product-detail-sizes" style="margin-bottom: 1.5rem;">
+                                    <label>Size: <span id="selected-size-name" style="font-weight:600;">M</span></label>
+                                    <div class="size-options" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                        ${['XS', 'S', 'M', 'L', 'XL'].map((s, i) => `
+                                            <button class="size-btn ${i === 2 ? 'active' : ''}" data-size="${s}">${s}</button>
                                         `).join('')}
                                     </div>
                                 </div>
@@ -2713,7 +2763,7 @@ const Router = {
                             </div>
 
                             <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
-                                <button class="btn btn-primary btn-lg add-to-cart-btn" data-product-id="${product.id}">
+                                <button class="btn btn-primary btn-lg add-to-cart-btn-detail" data-product-id="${product.id}">
                                     <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i> Add to Cart
                                 </button>
                                 <a href="#checkout" class="btn btn-secondary btn-lg">
@@ -2799,6 +2849,8 @@ const Router = {
                                                         <div>
                                                             <strong style="font-size: 0.9rem;">${item.name}</strong>
                                                             <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; text-transform: capitalize;">${item.category}</p>
+                                                            ${item.selectedColor ? `<p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Color: ${item.selectedColor}</p>` : ''}
+                                                            ${item.selectedSize ? `<p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Size: ${item.selectedSize}</p>` : ''}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -2875,6 +2927,31 @@ const Router = {
                                         <input type="email" id="inquiry-email" name="email" placeholder="you@example.com" required autocomplete="email">
                                     </div>
                                 </div>
+                                <div class="inquiry-form-grid">
+                                    <div class="inquiry-field">
+                                        <label for="inquiry-phone">
+                                            <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
+                                            Phone Number <span style="color: var(--text-secondary); font-weight: 400;">(optional)</span>
+                                        </label>
+                                        <input type="tel" id="inquiry-phone" name="phone" placeholder="+1 (555) 000-0000" autocomplete="tel">
+                                    </div>
+                                    <div class="inquiry-field">
+                                        <label for="inquiry-country">
+                                            <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+                                            Country / Region <span style="color: var(--text-secondary); font-weight: 400;">(optional)</span>
+                                        </label>
+                                        <input type="text" id="inquiry-country" name="country" placeholder="United States" autocomplete="country-name">
+                                    </div>
+                                </div>
+                                ${Store.cart.some(item => item.category === 'rithim' || item.category === 'techack' || item.category === 'techbox') ? `
+                                <div class="inquiry-field">
+                                    <label for="inquiry-address">
+                                        <i data-lucide="home" style="width: 14px; height: 14px;"></i>
+                                        Shipping Address <span style="color: var(--text-secondary); font-weight: 400;">(for physical items)</span>
+                                    </label>
+                                    <textarea id="inquiry-address" name="address" rows="2" placeholder="123 Main St, City, State, ZIP" autocomplete="street-address"></textarea>
+                                </div>
+                                ` : ''}
                                 <div class="inquiry-field">
                                     <label for="inquiry-message">
                                         <i data-lucide="message-square" style="width: 14px; height: 14px;"></i>
@@ -3222,6 +3299,9 @@ const Router = {
 
             const name = document.getElementById('inquiry-name').value.trim();
             const email = document.getElementById('inquiry-email').value.trim();
+            const phone = (document.getElementById('inquiry-phone')?.value || '').trim();
+            const country = (document.getElementById('inquiry-country')?.value || '').trim();
+            const address = (document.getElementById('inquiry-address')?.value || '').trim();
             const message = document.getElementById('inquiry-message').value.trim();
 
             if (!name || !email) {
@@ -3233,21 +3313,50 @@ const Router = {
             const sanitize = (str, maxLen) => str.replace(/[\x00-\x1f\x7f]/g, '').substring(0, maxLen);
             const safeName = sanitize(name, 100);
             const safeEmail = sanitize(email, 254);
+            const safePhone = sanitize(phone, 20);
+            const safeCountry = sanitize(country, 100);
+            const safeAddress = sanitize(address, 500);
             const safeMessage = sanitize(message, 1000);
 
             PayButton.setLoading(submitBtn);
 
-            // Build order summary
-            const cartSummary = Store.cart.map(item =>
-                `- ${sanitize(item.name, 100)} (x${item.quantity || 1}) — $${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`
-            ).join('\n');
+            // Build detailed order summary
+            const orderDate = new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' });
+            const cartLines = Store.cart.map(item => {
+                const lines = [];
+                lines.push(`  Product:   ${sanitize(item.name, 100)}`);
+                lines.push(`  Category:  ${item.category || 'N/A'}`);
+                if (item.selectedColor) lines.push(`  Color:     ${sanitize(item.selectedColor, 50)}`);
+                if (item.selectedSize)  lines.push(`  Size:      ${item.selectedSize}`);
+                lines.push(`  Quantity:  ${item.quantity || 1}`);
+                lines.push(`  Unit Price: $${parseFloat(item.price).toFixed(2)}`);
+                lines.push(`  Subtotal:  $${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`);
+                return lines.join('\n');
+            });
             const total = Store.getCartTotal();
 
-            const emailSubject = `Purchase Inquiry from ${safeName}`;
-            const emailBody =
-                `Name: ${safeName}\nEmail: ${safeEmail}\n\n` +
-                (safeMessage ? `Message: ${safeMessage}\n\n` : '') +
-                `--- Order Details ---\n${cartSummary}\n\nTotal: $${total}`;
+            const emailSubject = `Purchase Inquiry from ${safeName} — ${Store.cart.length} item${Store.cart.length > 1 ? 's' : ''} ($${total})`;
+            const emailBody = [
+                `════════════════════════════════`,
+                `      ORDER INQUIRY`,
+                `════════════════════════════════`,
+                `Date:    ${orderDate}`,
+                ``,
+                `── CUSTOMER INFO ──`,
+                `Name:    ${safeName}`,
+                `Email:   ${safeEmail}`,
+                safePhone   ? `Phone:   ${safePhone}`   : '',
+                safeCountry ? `Country: ${safeCountry}` : '',
+                safeAddress ? `Address: ${safeAddress}` : '',
+                ``,
+                safeMessage ? `── MESSAGE ──\n${safeMessage}\n` : '',
+                `── ORDER DETAILS ──`,
+                ...cartLines.map((cl, i) => `\n[Item ${i + 1}]\n${cl}`),
+                ``,
+                `────────────────────────────────`,
+                `ORDER TOTAL: $${total}`,
+                `════════════════════════════════`,
+            ].filter(l => l !== '').join('\n');
 
             // Show copy-paste email instead of opening email app
             const inquiryCard = form.closest('.checkout-inquiry-card');
@@ -4012,6 +4121,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Add to cart with color/size from product detail page
+        const addDetailBtn = e.target.closest('.add-to-cart-btn-detail');
+        if (addDetailBtn) {
+            const productId = addDetailBtn.dataset.productId;
+            if (productId) {
+                const activeColor = document.querySelector('.color-swatch.active');
+                const activeSize = document.querySelector('.size-btn.active');
+                const selectedColor = activeColor ? (activeColor.dataset.colorName || activeColor.dataset.color || '') : '';
+                const selectedSize = activeSize ? activeSize.dataset.size : '';
+                Store.addToCartWithOptions(productId, selectedColor, selectedSize);
+            }
+            return;
+        }
+
         // Remove from cart button
         const removeBtn = e.target.closest('.remove-from-cart-btn');
         if (removeBtn) {
@@ -4041,6 +4164,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (colorSwatch) {
             document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
             colorSwatch.classList.add('active');
+            // Update color label
+            const colorNameEl = document.getElementById('selected-color-name');
+            if (colorNameEl) colorNameEl.textContent = colorSwatch.dataset.colorName || colorSwatch.dataset.color;
+            // Update main product image if colorImage is set
+            const colorImg = colorSwatch.dataset.colorImg;
+            if (colorImg) {
+                const mainImg = document.getElementById('product-main-img');
+                if (mainImg) {
+                    mainImg.src = colorImg;
+                    // Update active thumbnail
+                    document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+                }
+            }
+            return;
+        }
+
+        // Size button click
+        const sizeBtn = e.target.closest('.size-btn');
+        if (sizeBtn) {
+            document.querySelectorAll('.size-btn').forEach(s => s.classList.remove('active'));
+            sizeBtn.classList.add('active');
+            const sizeNameEl = document.getElementById('selected-size-name');
+            if (sizeNameEl) sizeNameEl.textContent = sizeBtn.dataset.size;
             return;
         }
 
