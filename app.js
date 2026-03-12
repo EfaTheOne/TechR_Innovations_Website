@@ -4382,6 +4382,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('error', (e) => {
         if (!e.target || e.target.tagName !== 'IMG') return;
         // Logo image fallback (home page cards, division heroes, about page)
+        // About-page logos sit inside block-level cards; other logos sit inside flex containers
         if (e.target.classList.contains('logo-img')) {
             e.target.style.display = 'none';
             const fallback = e.target.nextElementSibling;
