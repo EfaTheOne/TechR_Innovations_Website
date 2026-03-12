@@ -1717,7 +1717,7 @@ const Router = {
                                 Born from the rhythm of running. Designed for the life after the finish line.
                             </p>
                             <div class="rithim-hero-ctas reveal">
-                                <a href="#" data-scroll-to="rithim-collection" class="rithim-btn-primary">Shop Now</a>
+                                <a href="#rithim" data-scroll-to="rithim-collection" class="rithim-btn-primary">Shop Now</a>
                                 <a href="#about" class="rithim-btn-ghost">Our Story <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-left:4px;"></i></a>
                             </div>
                         </div>
@@ -1742,11 +1742,11 @@ const Router = {
                                     <span class="rithim-section-label">The Vision</span>
                                     <h2 class="rithim-editorial-heading">Clothing that<br>moves with you.</h2>
                                     <p class="rithim-editorial-body">Every piece is designed from the ground up — not for the track, but for everything after. Cloud-soft fabrics, relaxed cuts, and a design philosophy that says less is more.</p>
-                                    <a href="#" data-scroll-to="rithim-collection" class="rithim-text-link">Explore the Collection <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:6px;"></i></a>
+                                    <a href="#rithim" data-scroll-to="rithim-collection" class="rithim-text-link">Explore the Collection <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:6px;"></i></a>
                                 </div>
                                 <div class="rithim-editorial-visual">
                                     <div class="rithim-editorial-img-wrap">
-                                        <img src="images/rithim-tee.png" alt="Rithim Classic Tee" class="rithim-editorial-img" onerror="this.style.display='none';this.parentElement.classList.add('rithim-editorial-placeholder')">
+                                        <img src="images/rithim-classic-tee.png" alt="Rithim Classic Tee" class="rithim-editorial-img">
                                     </div>
                                 </div>
                             </div>
@@ -1794,7 +1794,7 @@ const Router = {
                                 <div class="rithim-product-card reveal" style="transition-delay:${i * 0.1}s">
                                     <div class="rithim-card-image-wrap">
                                         <a href="#product/${p.id}" class="rithim-card-image-link" tabindex="-1" aria-hidden="true">
-                                            <img src="${p.image}" alt="${p.name}" class="rithim-card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                            <img src="${p.image}" alt="${p.name}" class="rithim-card-img">
                                             <div class="rithim-card-img-fallback">
                                                 <i data-lucide="shirt" style="width:56px;height:56px;color:var(--color-rithim);opacity:0.35;"></i>
                                             </div>
@@ -1849,7 +1849,7 @@ const Router = {
                                         <span class="rithim-stat-lbl">Comfort Guaranteed</span>
                                     </div>
                                 </div>
-                                <a href="#" data-scroll-to="rithim-collection" class="rithim-btn-primary" style="margin-top:3rem;display:inline-block;">Shop the Collection</a>
+                                <a href="#rithim" data-scroll-to="rithim-collection" class="rithim-btn-primary" style="margin-top:3rem;display:inline-block;">Shop the Collection</a>
                             </div>
                         </div>
                     </section>
@@ -4374,6 +4374,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // CSP-compliant image error handling (replaces inline onerror attributes)
+    document.addEventListener('error', (e) => {
+        if (e.target.tagName !== 'IMG') return;
+        // Rithim editorial image fallback
+        if (e.target.classList.contains('rithim-editorial-img')) {
+            e.target.style.display = 'none';
+            if (e.target.parentElement) e.target.parentElement.classList.add('rithim-editorial-placeholder');
+        }
+        // Rithim product card image fallback
+        if (e.target.classList.contains('rithim-card-img')) {
+            e.target.style.display = 'none';
+            const fallback = e.target.nextElementSibling;
+            if (fallback) fallback.style.display = 'flex';
+        }
+    }, true);
 
     console.log("[TechR] Application initialized");
 });
