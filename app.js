@@ -4377,7 +4377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // CSP-compliant image error handling (replaces inline onerror attributes)
     document.addEventListener('error', (e) => {
-        if (e.target.tagName !== 'IMG') return;
+        if (!e.target || e.target.tagName !== 'IMG') return;
         // Rithim editorial image fallback
         if (e.target.classList.contains('rithim-editorial-img')) {
             e.target.style.display = 'none';
