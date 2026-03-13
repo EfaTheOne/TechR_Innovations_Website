@@ -222,13 +222,6 @@ function matchId(a, b) {
     return String(a) === String(b);
 }
 
-// --- LOGO IMAGE FALLBACK ---
-function handleLogoError(img, fallbackDisplay) {
-    img.style.display = 'none';
-    const fallback = img.nextElementSibling;
-    if (fallback) fallback.style.display = fallbackDisplay || 'flex';
-}
-
 // --- AI LAB ENGINE ---
 const AI = {
     provider: 'openai',
@@ -1265,14 +1258,14 @@ const Components = {
     ProductCard: (p) => `
         <div class="product-card reveal">
             <a href="#product/${p.id}" style="text-decoration: none; color: inherit;">
-                <img src="${p.image}" class="product-img" alt="${p.name}" loading="lazy" style="object-fit: ${p.image_fit || DEFAULT_IMAGE_FIT};">
+                <img src="${p.image || ''}" class="product-img" alt="${p.name || 'Product'}" loading="lazy" style="object-fit: ${p.image_fit || DEFAULT_IMAGE_FIT};">
                 <div class="product-content">
-                    <h3>${p.name}</h3>
-                    <p class="product-desc">${p.desc}</p>
+                    <h3>${p.name || 'Product'}</h3>
+                    <p class="product-desc">${p.desc || ''}</p>
                 </div>
             </a>
             <div class="product-meta" style="padding: 0 1.5rem 1.5rem;">
-                <span class="price">$${p.price.toFixed(2)}</span>
+                <span class="price">$${(p.price != null ? p.price : 0).toFixed(2)}</span>
                 <button class="btn btn-secondary btn-sm add-to-cart-btn" data-product-id="${p.id}">
                     <i data-lucide="shopping-cart" style="width: 16px; height: 16px;"></i>
                     Add to Cart
@@ -1432,7 +1425,7 @@ const Router = {
                 <div class="grid-3">
                     <a href="#studytech" class="card reveal" style="text-decoration: none;">
                         <div class="card-logo">
-                            <img src="images/studytech-logo.png" alt="StudyTech Logo" onerror="handleLogoError(this, 'flex')">
+                            <img src="images/studytech-logo.png" alt="StudyTech Logo" class="logo-img">
                             <div class="card-icon" style="display: none; background: rgba(94, 92, 230, 0.1);">
                                 <i data-lucide="brain" style="color: var(--color-studytech);"></i>
                             </div>
@@ -1442,7 +1435,7 @@ const Router = {
                     </a>
                     <a href="#techbox" class="card reveal" style="text-decoration: none;">
                         <div class="card-logo">
-                            <img src="images/techbox-logo.png" alt="TechBox Logo" onerror="handleLogoError(this, 'flex')">
+                            <img src="images/techbox-logo.png" alt="TechBox Logo" class="logo-img">
                             <div class="card-icon" style="display: none; background: rgba(255, 159, 10, 0.1);">
                                 <i data-lucide="box" style="color: var(--color-techbox);"></i>
                             </div>
@@ -1452,7 +1445,7 @@ const Router = {
                     </a>
                     <a href="#techack" class="card reveal" style="text-decoration: none;">
                         <div class="card-logo">
-                            <img src="images/techack-logo.png" alt="Techack Logo" onerror="handleLogoError(this, 'flex')">
+                            <img src="images/techack-logo.png" alt="Techack Logo" class="logo-img">
                             <div class="card-icon" style="display: none; background: rgba(52, 199, 89, 0.1);">
                                 <i data-lucide="shield" style="color: var(--color-techack);"></i>
                             </div>
@@ -1465,7 +1458,7 @@ const Router = {
                 <div class="grid-3" style="margin-top: 2rem;">
                     <a href="#rithim" class="card reveal" style="text-decoration: none; grid-column: span 1;">
                         <div class="card-logo">
-                            <img src="images/rithim-logo.png" alt="Rithim Logo" onerror="handleLogoError(this, 'flex')">
+                            <img src="images/rithim-logo.png" alt="Rithim Logo" class="logo-img">
                             <div class="card-icon" style="display: none; background: rgba(255, 55, 95, 0.1);">
                                 <i data-lucide="shirt" style="color: var(--color-rithim);"></i>
                             </div>
@@ -1511,7 +1504,7 @@ const Router = {
                                 <p class="terminal-line" style="color: rgba(255,255,255,0.3);">[*] Initializing hardware interface...</p>
                                 <p class="terminal-line" style="color: #e0e0e0;">[+] System ready. Welcome to TECHACK.</p>
                                 <div class="techack-hero-content" style="margin-top:1.5rem;">
-                                    <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo" onerror="handleLogoError(this)">
+                                    <img src="images/techack-logo.png" alt="Techack Logo" class="division-logo logo-img">
                                     <span class="badge badge-techack" style="font-family:'Courier New',monospace;letter-spacing:3px;border-radius:3px;">// SECURITY HARDWARE</span>
                                     <h1 class="techack-glitch-text" data-text="TECHACK">TECHACK</h1>
                                     <p class="techack-subtitle">> I got into cybersecurity and wanted my own pen-testing tools — so I just built them. Custom PCBs, ESP32s, CC1101 for sub-GHz, the whole deal. These are the devices I actually use.</p>
@@ -1585,7 +1578,7 @@ const Router = {
                     </div>
                     <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
                         <div class="workshop-hero reveal">
-                            <img src="images/techbox-logo.png" alt="TechBox Logo" class="division-logo" onerror="handleLogoError(this)">
+                            <img src="images/techbox-logo.png" alt="TechBox Logo" class="division-logo logo-img">
                             <h1 style="color: var(--color-techbox); font-size: 3rem; margin: 0.5rem 0;">TechBox</h1>
                             <p class="workshop-hero-desc">This is my STEM workshop — real electronics kits that teach you real skills. I designed every project here based on stuff I've actually built. No fake circuits or toy components. You're gonna solder, program, and build something you can actually use.</p>
                         </div>
@@ -1794,7 +1787,7 @@ const Router = {
                                 <div class="rithim-product-card reveal" style="transition-delay:${i * 0.1}s">
                                     <div class="rithim-card-image-wrap">
                                         <a href="#product/${p.id}" class="rithim-card-image-link" tabindex="-1" aria-hidden="true">
-                                            <img src="${p.image}" alt="${p.name}" class="rithim-card-img">
+                                            <img src="${p.image || ''}" alt="${p.name || 'Product'}" class="rithim-card-img">
                                             <div class="rithim-card-img-fallback">
                                                 <i data-lucide="shirt" style="width:56px;height:56px;color:var(--color-rithim);opacity:0.35;"></i>
                                             </div>
@@ -1807,12 +1800,12 @@ const Router = {
                                     </div>
                                     <div class="rithim-card-body">
                                         <div class="rithim-card-top">
-                                            <a href="#product/${p.id}" class="rithim-card-name">${p.name}</a>
-                                            <span class="rithim-card-price">$${p.price.toFixed(2)}</span>
+                                            <a href="#product/${p.id}" class="rithim-card-name">${p.name || 'Product'}</a>
+                                            <span class="rithim-card-price">$${(p.price != null ? p.price : 0).toFixed(2)}</span>
                                         </div>
-                                        <p class="rithim-card-desc">${p.desc}</p>
+                                        <p class="rithim-card-desc">${p.desc || ''}</p>
                                         <div class="rithim-card-swatches">
-                                            ${p.colors.map(c => `<span class="rithim-swatch" style="background:${c}" title="${c}"></span>`).join('')}
+                                            ${(p.colors || []).map(c => `<span class="rithim-swatch" style="background:${c}" title="${c}"></span>`).join('')}
                                         </div>
                                         <div class="rithim-card-sizes">
                                             ${sizes.map(s => `<span class="rithim-size">${s}</span>`).join('')}
@@ -1879,7 +1872,7 @@ const Router = {
                                     <span class="marker marker-green"></span>
                                     <span class="marker marker-black"></span>
                                 </div>
-                                <img src="images/studytech-logo.png" alt="StudyTech Logo" class="division-logo" onerror="handleLogoError(this)">
+                                <img src="images/studytech-logo.png" alt="StudyTech Logo" class="division-logo logo-img">
                                 <h1 class="whiteboard-title">StudyTech</h1>
                                 <p class="whiteboard-subtitle">Your personal AI tutor — always ready to help, never judges you for asking the same question twice.</p>
                                 <div style="margin-top: 1.5rem;">
@@ -3032,25 +3025,25 @@ const Router = {
                 <div class="about-divisions-grid reveal">
                     <h2 style="grid-column: 1 / -1; margin-bottom: 1rem;">Product Lines</h2>
                     <div class="about-division-card" style="border-color: var(--color-studytech);">
-                        <img src="images/studytech-logo.png" alt="StudyTech Logo" class="about-division-logo" onerror="handleLogoError(this, 'block')">
+                        <img src="images/studytech-logo.png" alt="StudyTech Logo" class="about-division-logo logo-img">
                         <i data-lucide="brain" style="width: 32px; height: 32px; color: var(--color-studytech); display: none;"></i>
                         <h3 style="color: var(--color-studytech);">StudyTech</h3>
                         <p>An AI-powered study assistant I'm developing to help students learn, practice, and track their progress across core subjects.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-techbox);">
-                        <img src="images/techbox-logo.png" alt="TechBox Logo" class="about-division-logo" onerror="handleLogoError(this, 'block')">
+                        <img src="images/techbox-logo.png" alt="TechBox Logo" class="about-division-logo logo-img">
                         <i data-lucide="box" style="width: 32px; height: 32px; color: var(--color-techbox); display: none;"></i>
                         <h3 style="color: var(--color-techbox);">TechBox</h3>
                         <p>DIY electronics kits based on projects I've built — including the Tech_Pad macropad and NFC hacker card. Designed for learning PCB design, soldering, and microcontroller programming.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-techack);">
-                        <img src="images/techack-logo.png" alt="Techack Logo" class="about-division-logo" onerror="handleLogoError(this, 'block')">
+                        <img src="images/techack-logo.png" alt="Techack Logo" class="about-division-logo logo-img">
                         <i data-lucide="shield" style="width: 32px; height: 32px; color: var(--color-techack); display: none;"></i>
                         <h3 style="color: var(--color-techack);">Techack</h3>
                         <p>Portable pen-testing hardware I designed for wireless security research. The Techack1 features WiFi probe sniffing, PMKID capture, Bluetooth analysis, and sub-GHz capabilities.</p>
                     </div>
                     <div class="about-division-card" style="border-color: var(--color-rithim);">
-                        <img src="images/rithim-logo.png" alt="Rithim Logo" class="about-division-logo" onerror="handleLogoError(this, 'block')">
+                        <img src="images/rithim-logo.png" alt="Rithim Logo" class="about-division-logo logo-img">
                         <i data-lucide="shirt" style="width: 32px; height: 32px; color: var(--color-rithim); display: none;"></i>
                         <h3 style="color: var(--color-rithim);">Rithim</h3>
                         <p>My casual streetwear and apparel line. Tees, hoodies, and joggers with clean Rithim branding, designed for comfort and everyday wear.</p>
@@ -3127,8 +3120,18 @@ const Router = {
         // Scroll to top on route change
         window.scrollTo(0, 0);
 
-        // Render content
-        const content = await route();
+        // Render content — catch errors so the page never silently goes blank
+        let content;
+        try {
+            content = await route();
+        } catch (err) {
+            console.error('[TechR] Route render error:', err);
+            content = `
+                <div class="container" style="padding: 8rem 2rem; text-align: center;">
+                    <h2 style="color: var(--accent);">Something went wrong</h2>
+                    <p style="margin-top: 1rem;">This page couldn't load. Try refreshing or <a href="#/" style="color: var(--accent);">go home</a>.</p>
+                </div>`;
+        }
         app.innerHTML = content;
 
         // Initialize icons
@@ -4378,6 +4381,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // CSP-compliant image error handling (replaces inline onerror attributes)
     document.addEventListener('error', (e) => {
         if (!e.target || e.target.tagName !== 'IMG') return;
+        // Logo image fallback (home page cards, division heroes, about page)
+        // About-page logos sit inside block-level cards; other logos sit inside flex containers
+        if (e.target.classList.contains('logo-img')) {
+            e.target.style.display = 'none';
+            const fallback = e.target.nextElementSibling;
+            if (fallback) fallback.style.display = e.target.classList.contains('about-division-logo') ? 'block' : 'flex';
+        }
         // Rithim editorial image fallback
         if (e.target.classList.contains('rithim-editorial-img')) {
             e.target.style.display = 'none';
