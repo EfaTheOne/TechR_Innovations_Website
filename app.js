@@ -1700,14 +1700,14 @@ const Router = {
                         </div>
                         <div class="rithim-hero-inner">
                             <div class="reveal">
-                                <span class="rithim-eyebrow">SS '26 — Run Season</span>
+                                <span class="rithim-eyebrow">SS '26 — New Collection</span>
                             </div>
                             <h1 class="rithim-hero-wordmark reveal">
                                 <span class="rithim-wordmark-main">rithim</span>
                             </h1>
-                            <p class="rithim-hero-tagline reveal">run. rest. repeat.</p>
+                            <p class="rithim-hero-tagline reveal">wear what feels right.</p>
                             <p class="rithim-hero-desc reveal">
-                                Forged in every early morning, every finish line crossed, every mile that matters. Rithim is built for runners who live the rhythm.
+                                Born from the rhythm of running. Designed for the life after the finish line.
                             </p>
                             <div class="rithim-hero-ctas reveal">
                                 <a href="#rithim" data-scroll-to="rithim-collection" class="rithim-btn-primary">Shop Now</a>
@@ -1723,7 +1723,7 @@ const Router = {
                     <!-- ── MARQUEE ── -->
                     <div class="rithim-marquee" aria-hidden="true">
                         <div class="rithim-marquee-track">
-                            ${['RITHIM', 'SS \'26', 'RACE SEASON', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'EVERY MILE COUNTS', 'FIND YOUR RHYTHM', 'RITHIM', 'SS \'26', 'RACE SEASON', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'EVERY MILE COUNTS', 'FIND YOUR RHYTHM'].map(w => `<span class="rithim-marquee-word">${w}</span><span class="rithim-marquee-dot">◆</span>`).join('')}
+                            ${['RITHIM', 'SS \'26', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'FIND YOUR RHYTHM', 'RITHIM', 'SS \'26', 'WEAR WHAT FEELS RIGHT', 'POST-RUN COMFORT', 'CLEAN DESIGN', 'FIND YOUR RHYTHM'].map(w => `<span class="rithim-marquee-word">${w}</span><span class="rithim-marquee-dot">◆</span>`).join('')}
                         </div>
                     </div>
 
@@ -1741,38 +1741,6 @@ const Router = {
                                     <div class="rithim-editorial-img-wrap">
                                         <img src="images/rithim-classic-tee.png" alt="Rithim Classic Tee" class="rithim-editorial-img">
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- ── RACE ROUTE ── -->
-                    <section class="rithim-race-route">
-                        <div class="container">
-                            <div class="rithim-race-route-header reveal">
-                                <span class="rithim-section-label">The Course</span>
-                                <h2>Race Day Route</h2>
-                                <p>5K course — Liberty Park, Salt Lake City · Elevation: ~1,290m · Distance: 5.0 km</p>
-                            </div>
-                            <div class="rithim-gpx-map-wrap reveal">
-                                <div id="rithim-gpx-map" class="rithim-gpx-map" aria-label="Race route map"></div>
-                                <div class="rithim-gpx-loading" id="rithim-gpx-loading">
-                                    <span class="rithim-gpx-loading-dot"></span>
-                                    <span>Loading route...</span>
-                                </div>
-                            </div>
-                            <div class="rithim-gpx-stats reveal" id="rithim-gpx-stats" style="display:none;">
-                                <div class="rithim-gpx-stat">
-                                    <span class="rithim-gpx-stat-val" id="gpx-distance">—</span>
-                                    <span class="rithim-gpx-stat-lbl">Distance</span>
-                                </div>
-                                <div class="rithim-gpx-stat">
-                                    <span class="rithim-gpx-stat-val" id="gpx-elevation">—</span>
-                                    <span class="rithim-gpx-stat-lbl">Elevation Gain</span>
-                                </div>
-                                <div class="rithim-gpx-stat">
-                                    <span class="rithim-gpx-stat-val" id="gpx-points">—</span>
-                                    <span class="rithim-gpx-stat-lbl">Track Points</span>
                                 </div>
                             </div>
                         </div>
@@ -1845,39 +1813,6 @@ const Router = {
                                     </div>
                                 </div>
                                 `).join('')}
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- ── RACE COUNTDOWN ── -->
-                    <section class="rithim-countdown-section" id="rithim-countdown-section">
-                        <div class="container">
-                            <div class="rithim-countdown-inner reveal">
-                                <span class="rithim-section-label">Next Race</span>
-                                <h2 class="rithim-countdown-title">Race Day is Coming</h2>
-                                <p class="rithim-countdown-subtitle">Spring 5K · 7:00 AM Mountain Time</p>
-                                <div class="rithim-countdown" id="rithim-countdown">
-                                    <div class="rithim-cd-unit">
-                                        <span class="rithim-cd-val" id="cd-days">00</span>
-                                        <span class="rithim-cd-lbl">Days</span>
-                                    </div>
-                                    <div class="rithim-cd-sep">:</div>
-                                    <div class="rithim-cd-unit">
-                                        <span class="rithim-cd-val" id="cd-hours">00</span>
-                                        <span class="rithim-cd-lbl">Hours</span>
-                                    </div>
-                                    <div class="rithim-cd-sep">:</div>
-                                    <div class="rithim-cd-unit">
-                                        <span class="rithim-cd-val" id="cd-mins">00</span>
-                                        <span class="rithim-cd-lbl">Mins</span>
-                                    </div>
-                                    <div class="rithim-cd-sep">:</div>
-                                    <div class="rithim-cd-unit">
-                                        <span class="rithim-cd-val" id="cd-secs">00</span>
-                                        <span class="rithim-cd-lbl">Secs</span>
-                                    </div>
-                                </div>
-                                <p class="rithim-countdown-date-note" id="rithim-race-date-note"></p>
                             </div>
                         </div>
                     </section>
@@ -3219,11 +3154,6 @@ const Router = {
         if (hash === 'techack') {
             setTimeout(() => Router.initTechackEffects(), 50);
         }
-
-        // Initialize Rithim effects
-        if (hash === 'rithim') {
-            setTimeout(() => Router.initRithimEffects(), 100);
-        }
     },
 
     initTechackEffects: () => {
@@ -3317,164 +3247,6 @@ const Router = {
             };
             typeNextLine();
         }
-    },
-
-    initRithimEffects: () => {
-        // ── Race Day Countdown ──
-        // Set the race date: May 2, 2026 at 7:00 AM MDT (UTC-6)
-        // To change: update RACE_DATE to the ISO string of race day at 7:00 AM MDT
-        const RACE_DATE = new Date('2026-05-02T13:00:00Z'); // 7:00 AM MDT = UTC-6 => 13:00 UTC
-
-        const cdSection = document.getElementById('rithim-countdown-section');
-        const cdDays = document.getElementById('cd-days');
-        const cdHours = document.getElementById('cd-hours');
-        const cdMins = document.getElementById('cd-mins');
-        const cdSecs = document.getElementById('cd-secs');
-        const cdDateNote = document.getElementById('rithim-race-date-note');
-
-        // Show the race date in the note
-        if (cdDateNote) {
-            const dateStr = RACE_DATE.toLocaleDateString('en-US', { 
-                timeZone: 'America/Denver', 
-                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
-            });
-            cdDateNote.textContent = dateStr + ' · 7:00 AM MDT';
-        }
-
-        const padToTwoDigits = n => String(Math.floor(n)).padStart(2, '0');
-
-        const glitchAndHide = () => {
-            if (!cdSection) return;
-            cdSection.classList.add('rithim-glitching');
-            setTimeout(() => {
-                cdSection.classList.add('rithim-glitched-out');
-            }, 2400);
-        };
-
-        const tick = () => {
-            const now = new Date();
-            const diff = RACE_DATE - now;
-            if (diff <= 0) {
-                if (cdDays) cdDays.textContent = '00';
-                if (cdHours) cdHours.textContent = '00';
-                if (cdMins) cdMins.textContent = '00';
-                if (cdSecs) cdSecs.textContent = '00';
-                glitchAndHide();
-                return;
-            }
-            const totalSecs = diff / 1000;
-            const days = Math.floor(totalSecs / 86400);
-            const hours = Math.floor((totalSecs % 86400) / 3600);
-            const mins = Math.floor((totalSecs % 3600) / 60);
-            const secs = Math.floor(totalSecs % 60);
-            if (cdDays) cdDays.textContent = padToTwoDigits(days);
-            if (cdHours) cdHours.textContent = padToTwoDigits(hours);
-            if (cdMins) cdMins.textContent = padToTwoDigits(mins);
-            if (cdSecs) cdSecs.textContent = padToTwoDigits(secs);
-        };
-
-        tick();
-        const cdInterval = setInterval(tick, 1000);
-        const cleanupCd = () => { clearInterval(cdInterval); window.removeEventListener('hashchange', cleanupCd); };
-        window.addEventListener('hashchange', cleanupCd);
-
-        // ── GPX Map ──
-        const mapEl = document.getElementById('rithim-gpx-map');
-        const loadingEl = document.getElementById('rithim-gpx-loading');
-        const statsEl = document.getElementById('rithim-gpx-stats');
-
-        if (!mapEl || typeof L === 'undefined') return;
-
-        // Destroy any previous map instance
-        if (mapEl._leaflet_id) {
-            const existingMap = mapEl._leaflet_map;
-            if (existingMap) existingMap.remove();
-        }
-
-        const map = L.map(mapEl, { zoomControl: true, scrollWheelZoom: false, attributionControl: true });
-        mapEl._leaflet_map = map;
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19
-        }).addTo(map);
-
-        fetch('route.gpx')
-            .then(r => { if (!r.ok) throw new Error('GPX fetch failed'); return r.text(); })
-            .then(gpxText => {
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(gpxText, 'application/xml');
-                const trkpts = Array.from(xml.querySelectorAll('trkpt'));
-                if (!trkpts.length) throw new Error('No track points in GPX');
-
-                const latlngs = trkpts.map(pt => [
-                    parseFloat(pt.getAttribute('lat')),
-                    parseFloat(pt.getAttribute('lon'))
-                ]);
-                const elevations = trkpts.map(pt => {
-                    const el = pt.querySelector('ele');
-                    return el ? parseFloat(el.textContent) : 0;
-                });
-
-                // Draw route polyline
-                const polyline = L.polyline(latlngs, {
-                    color: '#ff375f',
-                    weight: 4,
-                    opacity: 0.9,
-                    lineJoin: 'round'
-                }).addTo(map);
-
-                // Start/end markers
-                L.circleMarker(latlngs[0], { radius: 8, color: '#ff375f', fillColor: '#fff', fillOpacity: 1, weight: 3 })
-                    .bindPopup('Start / Finish')
-                    .addTo(map);
-
-                map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
-
-                // Calculate distance using the Haversine formula (great-circle distance on a sphere)
-                const EARTH_RADIUS_METERS = 6371000; // mean radius of Earth in meters
-                let totalDist = 0;
-                for (let i = 1; i < latlngs.length; i++) {
-                    const phi1 = latlngs[i-1][0] * Math.PI / 180;
-                    const phi2 = latlngs[i][0] * Math.PI / 180;
-                    const dPhi = (latlngs[i][0] - latlngs[i-1][0]) * Math.PI / 180;
-                    const dLam = (latlngs[i][1] - latlngs[i-1][1]) * Math.PI / 180;
-                    // a = sin²(Δlat/2) + cos(lat1)·cos(lat2)·sin²(Δlon/2)
-                    const a = Math.sin(dPhi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dLam/2)**2;
-                    totalDist += EARTH_RADIUS_METERS * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                }
-
-                // Calculate elevation gain
-                let elevGain = 0;
-                for (let i = 1; i < elevations.length; i++) {
-                    const diff = elevations[i] - elevations[i-1];
-                    if (diff > 0) elevGain += diff;
-                }
-
-                // Show stats
-                const distEl = document.getElementById('gpx-distance');
-                const elevEl = document.getElementById('gpx-elevation');
-                const ptsEl = document.getElementById('gpx-points');
-                if (distEl) distEl.textContent = (totalDist / 1000).toFixed(2) + ' km';
-                if (elevEl) elevEl.textContent = Math.round(elevGain) + ' m';
-                if (ptsEl) ptsEl.textContent = trkpts.length;
-                if (statsEl) statsEl.style.display = 'flex';
-
-                if (loadingEl) loadingEl.style.display = 'none';
-            })
-            .catch(err => {
-                console.warn('[Rithim] GPX load error:', err);
-                if (loadingEl) {
-                    loadingEl.innerHTML = '<span>Route unavailable</span>';
-                }
-            });
-
-        // Clean up map on route change
-        const cleanupMap = () => {
-            map.remove();
-            window.removeEventListener('hashchange', cleanupMap);
-        };
-        window.addEventListener('hashchange', cleanupMap);
     },
 
     observeReveal: () => {
