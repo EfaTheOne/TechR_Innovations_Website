@@ -3341,7 +3341,7 @@ const Router = {
             cdDateNote.textContent = dateStr + ' · 7:00 AM MDT';
         }
 
-        const pad = n => String(Math.floor(n)).padStart(2, '0');
+        const padToTwoDigits = n => String(Math.floor(n)).padStart(2, '0');
 
         const glitchAndHide = () => {
             if (!cdSection) return;
@@ -3367,10 +3367,10 @@ const Router = {
             const hours = Math.floor((totalSecs % 86400) / 3600);
             const mins = Math.floor((totalSecs % 3600) / 60);
             const secs = Math.floor(totalSecs % 60);
-            if (cdDays) cdDays.textContent = pad(days);
-            if (cdHours) cdHours.textContent = pad(hours);
-            if (cdMins) cdMins.textContent = pad(mins);
-            if (cdSecs) cdSecs.textContent = pad(secs);
+            if (cdDays) cdDays.textContent = padToTwoDigits(days);
+            if (cdHours) cdHours.textContent = padToTwoDigits(hours);
+            if (cdMins) cdMins.textContent = padToTwoDigits(mins);
+            if (cdSecs) cdSecs.textContent = padToTwoDigits(secs);
         };
 
         tick();
@@ -3431,16 +3431,17 @@ const Router = {
 
                 map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
 
-                // Calculate distance (Haversine)
+                // Calculate distance using the Haversine formula (great-circle distance on a sphere)
+                const EARTH_RADIUS_METERS = 6371000; // mean radius of Earth in meters
                 let totalDist = 0;
                 for (let i = 1; i < latlngs.length; i++) {
-                    const R = 6371000;
                     const phi1 = latlngs[i-1][0] * Math.PI / 180;
                     const phi2 = latlngs[i][0] * Math.PI / 180;
                     const dPhi = (latlngs[i][0] - latlngs[i-1][0]) * Math.PI / 180;
                     const dLam = (latlngs[i][1] - latlngs[i-1][1]) * Math.PI / 180;
+                    // a = sin²(Δlat/2) + cos(lat1)·cos(lat2)·sin²(Δlon/2)
                     const a = Math.sin(dPhi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dLam/2)**2;
-                    totalDist += R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    totalDist += EARTH_RADIUS_METERS * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
                 }
 
                 // Calculate elevation gain
