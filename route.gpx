@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="TechR Innovations"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Rithim Spring 5K - Liberty Park Loop</name>
+    <desc>5K running race route around Liberty Park, Salt Lake City, UT</desc>
+    <author>
+      <name>TechR Innovations</name>
+    </author>
+  </metadata>
+  <trk>
+    <name>Liberty Park 5K Loop</name>
+    <type>running</type>
+    <trkseg>
+      <trkpt lat="40.7484" lon="-111.8786">
+        <ele>1295</ele>
+        <name>Start/Finish</name>
+      </trkpt>
+      <trkpt lat="40.7492" lon="-111.8780">
+        <ele>1296</ele>
+      </trkpt>
+      <trkpt lat="40.7505" lon="-111.8772">
+        <ele>1298</ele>
+      </trkpt>
+      <trkpt lat="40.7518" lon="-111.8768">
+        <ele>1300</ele>
+      </trkpt>
+      <trkpt lat="40.7528" lon="-111.8775">
+        <ele>1302</ele>
+      </trkpt>
+      <trkpt lat="40.7535" lon="-111.8790">
+        <ele>1305</ele>
+      </trkpt>
+      <trkpt lat="40.7538" lon="-111.8810">
+        <ele>1308</ele>
+      </trkpt>
+      <trkpt lat="40.7532" lon="-111.8830">
+        <ele>1306</ele>
+      </trkpt>
+      <trkpt lat="40.7520" lon="-111.8845">
+        <ele>1303</ele>
+      </trkpt>
+      <trkpt lat="40.7505" lon="-111.8852">
+        <ele>1300</ele>
+      </trkpt>
+      <trkpt lat="40.7490" lon="-111.8850">
+        <ele>1297</ele>
+      </trkpt>
+      <trkpt lat="40.7475" lon="-111.8842">
+        <ele>1294</ele>
+      </trkpt>
+      <trkpt lat="40.7462" lon="-111.8828">
+        <ele>1292</ele>
+      </trkpt>
+      <trkpt lat="40.7455" lon="-111.8810">
+        <ele>1290</ele>
+      </trkpt>
+      <trkpt lat="40.7452" lon="-111.8790">
+        <ele>1291</ele>
+      </trkpt>
+      <trkpt lat="40.7456" lon="-111.8770">
+        <ele>1293</ele>
+      </trkpt>
+      <trkpt lat="40.7465" lon="-111.8755">
+        <ele>1294</ele>
+      </trkpt>
+      <trkpt lat="40.7478" lon="-111.8748">
+        <ele>1295</ele>
+      </trkpt>
+      <trkpt lat="40.7484" lon="-111.8760">
+        <ele>1295</ele>
+      </trkpt>
+      <trkpt lat="40.7484" lon="-111.8786">
+        <ele>1295</ele>
+        <name>Start/Finish</name>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

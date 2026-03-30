@@ -10,7 +10,7 @@
 
   <!-- SECURITY: Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://avatars.githubusercontent.com data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co;">
+    content="default-src 'self'; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://avatars.githubusercontent.com data: blob: https://*.supabase.co https://*.tile.openstreetmap.org; connect-src 'self' https://*.supabase.co wss://*.supabase.co;">
 
   <!-- SECURITY: Referrer Policy & Color Theme -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -29,10 +29,16 @@
   <!-- DATABASE: Supabase JS Client (v2.39.0) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 
+  <!-- Leaflet JS -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
 
   <!-- Core Styles -->
   <link rel="stylesheet" href="style.css">
