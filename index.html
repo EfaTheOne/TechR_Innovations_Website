@@ -4,15 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TechR Innovations.</title>
-  <meta name="description"
-    content="TechR Innovations — founded by Ryan Pegg. Pen-testing hardware, DIY electronics kits, streetwear, and AI-powered learning tools. Designed and built from the ground up.">
+  <title>TechR Innovations - Coming Soon</title>
+  <meta name="description" content="TechR Innovations. Something amazing is in the works. Stay tuned.">
 
   <!-- SECURITY: Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://avatars.githubusercontent.com data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co;">
+    content="default-src 'self'; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:;">
 
-  <!-- SECURITY: Referrer Policy & Color Theme -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="theme-color" content="#050507">
 
@@ -23,15 +21,12 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
 
-  <!-- Icons: Lucide v0.469.0 (Pinned & Secured via SRI) -->
+  <!-- Icons: Lucide v0.469.0 -->
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 
-  <!-- DATABASE: Supabase JS Client (v2.39.0) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-
-  <!-- Favicon -->
+  <!-- Favicon / Logo -->
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
   <!-- Core Styles -->
@@ -39,87 +34,37 @@
 </head>
 
 <body>
-  <!-- Custom Cursor -->
-  <div class="cursor-ring" aria-hidden="true"></div>
-  <div class="cursor-dot" aria-hidden="true"></div>
-  <canvas id="cursor-fx-canvas" aria-hidden="true"></canvas>
-
   <!-- Background FX -->
   <div class="bg-noise"></div>
   <div class="bg-glow"></div>
 
-  <!-- Navigation -->
-  <header class="glass-panel header-fixed">
-    <div class="container header-content">
-      <a href="#/" class="logo">
-        <i data-lucide="shield"></i>
-        <span>TechR <span class="text-accent">Innovations</span></span>
-      </a>
-
-      <nav class="desktop-nav">
-        <a href="#studytech" class="nav-link"><i data-lucide="book-open"></i> StudyTech</a>
-        <a href="#techbox" class="nav-link"><i data-lucide="zap"></i> TechBox</a>
-        <a href="#techack" class="nav-link"><i data-lucide="terminal"></i> Techack</a>
-        <a href="#rithim" class="nav-link"><i data-lucide="shirt"></i> Rithim</a>
-        <a href="#about" class="nav-link"><i data-lucide="info"></i> About</a>
-      </nav>
-
-      <div class="header-actions">
-        <a href="#admin" class="admin-link">Staff Portal</a>
-        <a href="#checkout" class="cart-btn" id="cart-btn">
-          <i data-lucide="shopping-cart"></i>
-          <span class="cart-badge" id="cart-badge" style="display: none;">0</span>
-        </a>
-        <button class="mobile-menu-btn">
-          <i data-lucide="menu"></i>
-        </button>
+  <!-- Main Container -->
+  <main class="coming-soon-container">
+    <div class="glass-panel main-card">
+      <div class="logo-wrapper">
+        <img src="favicon.png" alt="TechR Innovations Logo" class="brand-logo">
       </div>
-    </div>
 
-    <!-- Mobile Dropdown -->
-    <div id="mobile-menu" class="mobile-nav glass-panel hidden">
-      <a href="#studytech" class="mobile-nav-link"><i data-lucide="book-open"></i> StudyTech</a>
-      <a href="#techbox" class="mobile-nav-link"><i data-lucide="zap"></i> TechBox</a>
-      <a href="#techack" class="mobile-nav-link"><i data-lucide="terminal"></i> Techack</a>
-      <a href="#rithim" class="mobile-nav-link"><i data-lucide="shirt"></i> Rithim</a>
-      <a href="#about" class="mobile-nav-link"><i data-lucide="info"></i> About</a>
-    </div>
-  </header>
+      <h1 class="brand-name">TechR <span class="text-accent">Innovations</span></h1>
+      <p class="tagline">Next-Generation Technology is on its way.</p>
 
-  <!-- Main Application Container -->
-  <main id="app">
-    <!-- Dynamic Content Injected Here by app.js -->
-    <div class="loader">
-      <div class="spinner"></div>
-      <p>Initializing TechR Core...</p>
+      <div class="divider"></div>
+
+      <p class="description">
+        We are crafting something revolutionary. Our new platform is coming soon. Stay connected and be the first to know when we launch.
+      </p>
+
+      <form class="notify-form" id="notify-form">
+        <div class="input-group">
+          <input type="email" id="email-input" placeholder="Enter your email address" required autocomplete="email">
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="bell"></i> Notify Me
+          </button>
+        </div>
+        <p class="form-feedback" id="form-feedback"></p>
+      </form>
     </div>
   </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-col">
-        <h3>TechR Innovations</h3>
-        <p>Founded by Ryan Pegg — teen engineer, runner and entrepreneur.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Our Businesses</h4>
-        <a href="#techack">Techack</a>
-        <a href="#techbox">TechBox</a>
-        <a href="#rithim">Rithim</a>
-        <a href="#studytech">StudyTech</a>
-      </div>
-      <div class="footer-col">
-        <h4>Internal</h4>
-        <a href="#admin">Employee Portal</a>
-        <a href="#about">About Us</a>
-        <a href="#/">Privacy Policy</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 TechR Innovations.</p>
-    </div>
-  </footer>
 
   <!-- Core Engine -->
   <script src="app.js"></script>
