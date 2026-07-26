@@ -136,5 +136,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Dynamic brand-aware cursor hover effects
+    document.querySelectorAll('.business-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const brand = card.getAttribute('data-brand');
+            let color = '#2997ff';
+            let glow = 'rgba(41, 151, 255, 0.35)';
+            let glowDot = 'rgba(41, 151, 255, 0.8)';
+
+            if (brand === 'techack') {
+                color = '#34c759';
+                glow = 'rgba(52, 199, 89, 0.35)';
+                glowDot = 'rgba(52, 199, 89, 0.8)';
+            } else if (brand === 'techbox') {
+                color = '#ff9f0a';
+                glow = 'rgba(255, 159, 10, 0.35)';
+                glowDot = 'rgba(255, 159, 10, 0.8)';
+            } else if (brand === 'studytech') {
+                color = '#5e5ce6';
+                glow = 'rgba(94, 92, 230, 0.35)';
+                glowDot = 'rgba(94, 92, 230, 0.8)';
+            } else if (brand === 'rithim') {
+                color = '#ff375f';
+                glow = 'rgba(255, 55, 95, 0.35)';
+                glowDot = 'rgba(255, 55, 95, 0.8)';
+            }
+
+            document.documentElement.style.setProperty('--cursor-color', color);
+            document.documentElement.style.setProperty('--cursor-glow', glow);
+            document.documentElement.style.setProperty('--cursor-glow-dot', glowDot);
+        });
+
+        card.addEventListener('mouseleave', () => {
+            document.documentElement.style.removeProperty('--cursor-color');
+            document.documentElement.style.removeProperty('--cursor-glow');
+            document.documentElement.style.removeProperty('--cursor-glow-dot');
+        });
+    });
+
     console.log('[TechR Innovations] Coming soon platform initialized.');
 });
