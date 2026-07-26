@@ -1,18 +1,32 @@
-// --- CUSTOM CURSOR ENGINE & PARTICLE SYSTEM ---
+// --- CUSTOM CURSOR ENGINE & PARTICLE SYSTEM (SPRING PHYSICS & MAGNETIC SNAP) ---
 const Cursor = {
     ring: null,
     dot: null,
     canvas: null,
     ctx: null,
+
+    // Coordinates & Kinetic Velocities
     x: -200,
     y: -200,
     ringX: -200,
     ringY: -200,
+    ringVx: 0,
+    ringVy: 0,
     prevX: -200,
     prevY: -200,
+
+    // Dynamic Dimensions (Supports magnetic stretching)
+    ringWidth: 38,
+    ringHeight: 38,
+    ringW: 38,
+    ringH: 38,
+    ringWv: 0,
+    ringHv: 0,
+
     idleTimer: null,
     raf: null,
     particles: [],
+    hoveredEl: null, // Tracks currently targeted snap element
 
     init: () => {
         // Skip on touch / coarse pointer devices
@@ -61,22 +75,20 @@ const Cursor = {
             Cursor.dot.style.top  = Cursor.y + 'px';
         }
 
-        // Spawn a stream of beautiful glowing particles
+        // Spawn high-end micro silver-dust particles
         const speed = Math.sqrt((Cursor.x - Cursor.prevX) ** 2 + (Cursor.y - Cursor.prevY) ** 2);
-        const spawnCount = Math.min(Math.floor(speed / 4) + 1, 6);
-
-        const activeColor = getComputedStyle(document.documentElement).getPropertyValue('--cursor-color').trim() || '#2997ff';
+        const spawnCount = Math.min(Math.floor(speed / 6) + 1, 4);
 
         for (let i = 0; i < spawnCount; i++) {
             Cursor.particles.push({
-                x: Cursor.x + (Math.random() - 0.5) * 6,
-                y: Cursor.y + (Math.random() - 0.5) * 6,
-                vx: (Math.random() - 0.5) * 2.5 - (Cursor.x - Cursor.prevX) * 0.1,
-                vy: (Math.random() - 0.5) * 2.5 - (Cursor.y - Cursor.prevY) * 0.1,
-                alpha: 1.0,
-                decay: 0.02 + Math.random() * 0.02,
-                size: 2.0 + Math.random() * 3.5,
-                color: activeColor
+                x: Cursor.x + (Math.random() - 0.5) * 8,
+                y: Cursor.y + (Math.random() - 0.5) * 8,
+                vx: (Math.random() - 0.5) * 1.5 - (Cursor.x - Cursor.prevX) * 0.05,
+                vy: (Math.random() - 0.5) * 1.5 - (Cursor.y - Cursor.prevY) * 0.05,
+                alpha: 0.7,
+                decay: 0.015 + Math.random() * 0.015,
+                size: 1.5 + Math.random() * 2.5,
+                color: 'rgba(255, 255, 255, 0.45)'
             });
         }
 
@@ -92,41 +104,79 @@ const Cursor = {
     },
 
     animate: () => {
-        // Smooth linear interpolation for trailing feel
-        const ease = 0.12;
-        Cursor.ringX += (Cursor.x - Cursor.ringX) * ease;
-        Cursor.ringY += (Cursor.y - Cursor.ringY) * ease;
+        // --- 1. MAGNETIC ATTRACTION LOGIC ---
+        let targetX = Cursor.x;
+        let targetY = Cursor.y;
+        let targetWidth = 38;
+        let targetHeight = 38;
+        let targetRadius = '50%';
 
-        // Position the cursor ring container
+        if (Cursor.hoveredEl) {
+            const rect = Cursor.hoveredEl.getBoundingClientRect();
+            // Magnetically snap ring to center of the hovered element
+            targetX = rect.left + rect.width / 2;
+            targetY = rect.top + rect.height / 2;
+            targetWidth = rect.width + 12;
+            targetHeight = rect.height + 12;
+
+            // Get computed border-radius of the targeted element to morph perfectly
+            const computedStyle = getComputedStyle(Cursor.hoveredEl);
+            targetRadius = computedStyle.borderRadius || '12px';
+        }
+
+        // --- 2. ADVANCED SPRING PHYSICS (Damped Harmonic Motion) ---
+        const stiffness = 0.16;
+        const damping = 0.62;
+
+        // Position Spring
+        const ax = (targetX - Cursor.ringX) * stiffness;
+        const ay = (targetY - Cursor.ringY) * stiffness;
+        Cursor.ringVx = (Cursor.ringVx + ax) * damping;
+        Cursor.ringVy = (Cursor.ringVy + ay) * damping;
+        Cursor.ringX += Cursor.ringVx;
+        Cursor.ringY += Cursor.ringVy;
+
+        // Dimension Spring (morphing size)
+        const aw = (targetWidth - Cursor.ringW) * stiffness;
+        const ah = (targetHeight - Cursor.ringH) * stiffness;
+        Cursor.ringWv = (Cursor.ringWv + aw) * damping;
+        Cursor.ringHv = (Cursor.ringHv + ah) * damping;
+        Cursor.ringW += Cursor.ringWv;
+        Cursor.ringH += Cursor.ringHv;
+
+        // Position and morph the cursor ring
         if (Cursor.ring) {
             Cursor.ring.style.left = Cursor.ringX + 'px';
             Cursor.ring.style.top  = Cursor.ringY + 'px';
+            Cursor.ring.style.width  = Cursor.ringW + 'px';
+            Cursor.ring.style.height = Cursor.ringH + 'px';
+            Cursor.ring.style.borderRadius = targetRadius;
 
-            // SATISFYING SQUISH & STRETCH physics based on movement velocity
-            const dx = Cursor.x - Cursor.ringX;
-            const dy = Cursor.y - Cursor.ringY;
-            const velocity = Math.sqrt(dx * dx + dy * dy);
+            // ELASTIC VELOCITY STRETCHING (only when not snapped to an element)
+            if (!Cursor.hoveredEl) {
+                const velocity = Math.sqrt(Cursor.ringVx * Cursor.ringVx + Cursor.ringVy * Cursor.ringVy);
+                const stretch = 1 + Math.min(velocity * 0.015, 1.25);
+                const squeeze = 1 - Math.min(velocity * 0.008, 0.4);
+                const angle = Math.atan2(Cursor.ringVy, Cursor.ringVx) * 180 / Math.PI;
 
-            const stretch = 1 + Math.min(velocity * 0.015, 1.3);
-            const squeeze = 1 - Math.min(velocity * 0.008, 0.45);
-            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-            // Apply stretching matrix
-            Cursor.ring.style.transform = `translate(-50%, -50%) rotate(${angle}deg) scale(${stretch}, ${squeeze})`;
+                Cursor.ring.style.transform = `translate(-50%, -50%) rotate(${angle}deg) scale(${stretch}, ${squeeze})`;
+            } else {
+                // Fixed orientation when snapped
+                Cursor.ring.style.transform = 'translate(-50%, -50%)';
+            }
         }
 
-        // Draw particle trail on the canvas
+        // --- 3. HIGH-END SILVER-MIST DRIFTING SYSTEM ---
         if (Cursor.ctx && Cursor.canvas) {
             Cursor.ctx.clearRect(0, 0, Cursor.canvas.width, Cursor.canvas.height);
             Cursor.ctx.save();
 
-            // Loop backwards to remove faded particles safely
             for (let i = Cursor.particles.length - 1; i >= 0; i--) {
                 const p = Cursor.particles[i];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vx *= 0.96; // apply air resistance / friction
-                p.vy *= 0.96;
+                p.vx *= 0.94; // slightly heavier resistance for elegant drag
+                p.vy *= 0.94;
                 p.alpha -= p.decay;
 
                 if (p.alpha <= 0) {
@@ -134,11 +184,11 @@ const Cursor = {
                     continue;
                 }
 
-                // Render beautiful stardust embers
+                // Render elegant low-opacity silver embers
                 Cursor.ctx.globalAlpha = p.alpha;
-                Cursor.ctx.shadowBlur = p.size * 2.5;
-                Cursor.ctx.shadowColor = p.color;
-                Cursor.ctx.fillStyle = p.color;
+                Cursor.ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+                Cursor.ctx.shadowBlur = p.size * 1.5;
+                Cursor.ctx.shadowColor = 'rgba(255, 255, 255, 0.15)';
                 Cursor.ctx.beginPath();
                 Cursor.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 Cursor.ctx.fill();
@@ -150,13 +200,28 @@ const Cursor = {
     },
 
     onHover: (e) => {
-        if (e.target.closest('a, button, [role="button"], input, textarea, select, label, .btn, .business-card')) {
+        const target = e.target;
+        if (!target) return;
+
+        // Check if cursor entered a snapping element
+        const snapEl = target.closest('.btn, input[type="email"], .card-icon, .brand-logo');
+        if (snapEl) {
+            Cursor.hoveredEl = snapEl;
+            document.body.classList.add('cursor-hovering');
+        } else if (target.closest('a, button, [role="button"], select, label, .business-card')) {
             document.body.classList.add('cursor-hovering');
         }
     },
 
     onUnhover: (e) => {
-        if (e.target.closest('a, button, [role="button"], input, textarea, select, label, .btn, .business-card')) {
+        const target = e.target;
+        if (!target) return;
+
+        const snapEl = target.closest('.btn, input[type="email"], .card-icon, .brand-logo');
+        if (snapEl === Cursor.hoveredEl) {
+            Cursor.hoveredEl = null;
+            document.body.classList.remove('cursor-hovering');
+        } else if (target.closest('a, button, [role="button"], select, label, .business-card')) {
             document.body.classList.remove('cursor-hovering');
         }
     },
@@ -225,25 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
-    // Dynamic brand-aware cursor hover effects (Unified Monochrome Modern Style)
-    document.querySelectorAll('.business-card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            const color = '#ffffff';
-            const glow = 'rgba(255, 255, 255, 0.15)';
-            const glowDot = 'rgba(255, 255, 255, 0.5)';
-
-            document.documentElement.style.setProperty('--cursor-color', color);
-            document.documentElement.style.setProperty('--cursor-glow', glow);
-            document.documentElement.style.setProperty('--cursor-glow-dot', glowDot);
-        });
-
-        card.addEventListener('mouseleave', () => {
-            document.documentElement.style.removeProperty('--cursor-color');
-            document.documentElement.style.removeProperty('--cursor-glow');
-            document.documentElement.style.removeProperty('--cursor-glow-dot');
-        });
-    });
 
     console.log('[TechR Innovations] Coming soon platform initialized.');
 });
