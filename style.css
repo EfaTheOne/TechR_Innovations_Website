@@ -77,14 +77,15 @@ body {
 }
 
 .glass-panel {
-    background: var(--bg-glass);
+    background: linear-gradient(135deg, rgba(15, 15, 22, 0.75) 0%, rgba(5, 5, 8, 0.95) 100%);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--border-glass);
-    border-radius: 24px;
-    padding: 3.5rem 2.5rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 4rem 3rem;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.12);
     text-align: center;
+    transition: all var(--transition-normal);
 }
 
 .logo-wrapper {
@@ -341,72 +342,77 @@ body.cursor-idle .cursor-dot {
 
 .ecosystem-header {
     text-align: center;
-    margin: 6rem 0 3rem;
+    margin: 6rem 0 3.5rem;
 }
 
 .ecosystem-header h2 {
     font-family: var(--font-heading);
-    font-size: 2.5rem;
+    font-size: 2.75rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .ecosystem-subtitle {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: var(--text-secondary);
     max-width: 600px;
     margin: 0 auto;
+    line-height: 1.6;
 }
 
 .ecosystem-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 2.25rem;
     width: 100%;
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
 }
 
 .business-card {
     position: relative;
-    background: var(--bg-glass);
+    background: linear-gradient(135deg, rgba(20, 20, 28, 0.7) 0%, rgba(8, 8, 12, 0.95) 100%);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--border-glass);
-    border-radius: 20px;
-    padding: 2.5rem;
-    transition: all var(--transition-normal);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     text-align: left;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    overflow: hidden;
 }
 
 .card-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    margin-bottom: 1.5rem;
-    transition: all var(--transition-normal);
+    color: var(--brand-accent, var(--text-primary));
+    margin-bottom: 1.75rem;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-icon i {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
 }
 
 .business-card h3 {
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 700;
     margin-bottom: 0.35rem;
     letter-spacing: -0.01em;
+    color: #fff;
 }
 
 .card-tagline {
@@ -414,13 +420,13 @@ body.cursor-idle .cursor-dot {
     font-weight: 600;
     margin-bottom: 1.25rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
 }
 
 .card-desc {
     font-size: 0.95rem;
     color: var(--text-secondary);
-    line-height: 1.65;
+    line-height: 1.7;
 }
 
 /* Brand Customization Colors & Hover FX */
@@ -428,77 +434,101 @@ body.cursor-idle .cursor-dot {
 /* Techack - Green */
 .techack-card {
     --brand-accent: #34c759;
-    --brand-glow: rgba(52, 199, 89, 0.15);
+    --brand-glow: rgba(52, 199, 89, 0.12);
 }
 .techack-card .card-tagline {
     color: var(--brand-accent);
 }
+.techack-card .card-icon {
+    color: var(--brand-accent);
+    background: rgba(52, 199, 89, 0.04);
+    border-color: rgba(52, 199, 89, 0.15);
+}
 .techack-card:hover {
-    border-color: rgba(52, 199, 89, 0.3);
-    box-shadow: 0 12px 30px rgba(52, 199, 89, 0.08);
-    transform: translateY(-4px);
+    border-color: rgba(52, 199, 89, 0.35);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    transform: translateY(-6px);
 }
 .techack-card:hover .card-icon {
-    background: rgba(52, 199, 89, 0.1);
+    background: rgba(52, 199, 89, 0.12);
     border-color: var(--brand-accent);
-    color: var(--brand-accent);
+    box-shadow: 0 0 20px rgba(52, 199, 89, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1) rotate(-3deg);
 }
 
 /* TechBox - Orange */
 .techbox-card {
     --brand-accent: #ff9f0a;
-    --brand-glow: rgba(255, 159, 10, 0.15);
+    --brand-glow: rgba(255, 159, 10, 0.12);
 }
 .techbox-card .card-tagline {
     color: var(--brand-accent);
 }
+.techbox-card .card-icon {
+    color: var(--brand-accent);
+    background: rgba(255, 159, 10, 0.04);
+    border-color: rgba(255, 159, 10, 0.15);
+}
 .techbox-card:hover {
-    border-color: rgba(255, 159, 10, 0.3);
-    box-shadow: 0 12px 30px rgba(255, 159, 10, 0.08);
-    transform: translateY(-4px);
+    border-color: rgba(255, 159, 10, 0.35);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    transform: translateY(-6px);
 }
 .techbox-card:hover .card-icon {
-    background: rgba(255, 159, 10, 0.1);
+    background: rgba(255, 159, 10, 0.12);
     border-color: var(--brand-accent);
-    color: var(--brand-accent);
+    box-shadow: 0 0 20px rgba(255, 159, 10, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1) rotate(-3deg);
 }
 
 /* StudyTech - Purple */
 .studytech-card {
     --brand-accent: #5e5ce6;
-    --brand-glow: rgba(94, 92, 230, 0.15);
+    --brand-glow: rgba(94, 92, 230, 0.12);
 }
 .studytech-card .card-tagline {
     color: var(--brand-accent);
 }
+.studytech-card .card-icon {
+    color: var(--brand-accent);
+    background: rgba(94, 92, 230, 0.04);
+    border-color: rgba(94, 92, 230, 0.15);
+}
 .studytech-card:hover {
-    border-color: rgba(94, 92, 230, 0.3);
-    box-shadow: 0 12px 30px rgba(94, 92, 230, 0.08);
-    transform: translateY(-4px);
+    border-color: rgba(94, 92, 230, 0.35);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    transform: translateY(-6px);
 }
 .studytech-card:hover .card-icon {
-    background: rgba(94, 92, 230, 0.1);
+    background: rgba(94, 92, 230, 0.12);
     border-color: var(--brand-accent);
-    color: var(--brand-accent);
+    box-shadow: 0 0 20px rgba(94, 92, 230, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1) rotate(-3deg);
 }
 
 /* Rithim - Pink */
 .rithim-card {
     --brand-accent: #ff375f;
-    --brand-glow: rgba(255, 55, 95, 0.15);
+    --brand-glow: rgba(255, 55, 95, 0.12);
 }
 .rithim-card .card-tagline {
     color: var(--brand-accent);
 }
+.rithim-card .card-icon {
+    color: var(--brand-accent);
+    background: rgba(255, 55, 95, 0.04);
+    border-color: rgba(255, 55, 95, 0.15);
+}
 .rithim-card:hover {
-    border-color: rgba(255, 55, 95, 0.3);
-    box-shadow: 0 12px 30px rgba(255, 55, 95, 0.08);
-    transform: translateY(-4px);
+    border-color: rgba(255, 55, 95, 0.35);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    transform: translateY(-6px);
 }
 .rithim-card:hover .card-icon {
-    background: rgba(255, 55, 95, 0.1);
+    background: rgba(255, 55, 95, 0.12);
     border-color: var(--brand-accent);
-    color: var(--brand-accent);
+    box-shadow: 0 0 20px rgba(255, 55, 95, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1) rotate(-3deg);
 }
 
 /* Responsive grid modifications */
