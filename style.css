@@ -3,22 +3,22 @@
 */
 
 :root {
-    --bg-primary: #050507;
-    --bg-secondary: #0a0a0c;
-    --bg-glass: rgba(15, 15, 20, 0.6);
-    --border-glass: rgba(255, 255, 255, 0.08);
-    --border-focus: rgba(41, 151, 255, 0.5);
+    --bg-primary: #08080a;
+    --bg-secondary: #0e0e12;
+    --bg-glass: rgba(18, 18, 24, 0.45);
+    --border-glass: rgba(255, 255, 255, 0.06);
+    --border-focus: rgba(255, 255, 255, 0.3);
 
     --text-primary: #ffffff;
-    --text-secondary: #86868b;
-    --text-accent: #2997ff;
-    --accent: #2997ff;
-    --accent-hover: #1a7fe0;
+    --text-secondary: #8e8e93;
+    --text-accent: #ffffff;
+    --accent: #ffffff;
+    --accent-hover: #e5e5e5;
 
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Space Grotesk', sans-serif;
 
-    --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -64,7 +64,7 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: -1;
-    background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(41, 151, 255, 0.12), transparent);
+    background: radial-gradient(ellipse 60% 40% at 50% 40%, rgba(255, 255, 255, 0.02), transparent);
 }
 
 /* --- COMING SOON LAYOUT --- */
@@ -157,7 +157,7 @@ input[type="email"] {
 
 input[type="email"]:focus {
     border-color: var(--border-focus);
-    box-shadow: 0 0 0 4px rgba(41, 151, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
 }
 
 .btn {
@@ -177,14 +177,14 @@ input[type="email"]:focus {
 }
 
 .btn-primary {
-    background: var(--accent);
-    color: #fff;
+    background: #ffffff;
+    color: #000000;
 }
 
 .btn-primary:hover {
-    background: var(--accent-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(41, 151, 255, 0.3);
+    background: #e5e5e5;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .form-feedback {
@@ -429,106 +429,39 @@ body.cursor-idle .cursor-dot {
     line-height: 1.7;
 }
 
-/* Brand Customization Colors & Hover FX */
+/* Brand Customization Colors & Hover FX (Unified Monochrome Modern Style) */
 
-/* Techack - Green */
-.techack-card {
-    --brand-accent: #34c759;
-    --brand-glow: rgba(52, 199, 89, 0.12);
-}
-.techack-card .card-tagline {
-    color: var(--brand-accent);
-}
-.techack-card .card-icon {
-    color: var(--brand-accent);
-    background: rgba(52, 199, 89, 0.04);
-    border-color: rgba(52, 199, 89, 0.15);
-}
-.techack-card:hover {
-    border-color: rgba(52, 199, 89, 0.35);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-    transform: translateY(-6px);
-}
-.techack-card:hover .card-icon {
-    background: rgba(52, 199, 89, 0.12);
-    border-color: var(--brand-accent);
-    box-shadow: 0 0 20px rgba(52, 199, 89, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    transform: scale(1.1) rotate(-3deg);
+.business-card {
+    --brand-accent: #ffffff;
+    --brand-glow: rgba(255, 255, 255, 0.03);
 }
 
-/* TechBox - Orange */
-.techbox-card {
-    --brand-accent: #ff9f0a;
-    --brand-glow: rgba(255, 159, 10, 0.12);
-}
-.techbox-card .card-tagline {
-    color: var(--brand-accent);
-}
-.techbox-card .card-icon {
-    color: var(--brand-accent);
-    background: rgba(255, 159, 10, 0.04);
-    border-color: rgba(255, 159, 10, 0.15);
-}
-.techbox-card:hover {
-    border-color: rgba(255, 159, 10, 0.35);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-    transform: translateY(-6px);
-}
-.techbox-card:hover .card-icon {
-    background: rgba(255, 159, 10, 0.12);
-    border-color: var(--brand-accent);
-    box-shadow: 0 0 20px rgba(255, 159, 10, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    transform: scale(1.1) rotate(-3deg);
+.business-card .card-tagline {
+    color: #8e8e93;
+    transition: color var(--transition-normal);
 }
 
-/* StudyTech - Purple */
-.studytech-card {
-    --brand-accent: #5e5ce6;
-    --brand-glow: rgba(94, 92, 230, 0.12);
-}
-.studytech-card .card-tagline {
-    color: var(--brand-accent);
-}
-.studytech-card .card-icon {
-    color: var(--brand-accent);
-    background: rgba(94, 92, 230, 0.04);
-    border-color: rgba(94, 92, 230, 0.15);
-}
-.studytech-card:hover {
-    border-color: rgba(94, 92, 230, 0.35);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-    transform: translateY(-6px);
-}
-.studytech-card:hover .card-icon {
-    background: rgba(94, 92, 230, 0.12);
-    border-color: var(--brand-accent);
-    box-shadow: 0 0 20px rgba(94, 92, 230, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    transform: scale(1.1) rotate(-3deg);
+.business-card .card-icon {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Rithim - Pink */
-.rithim-card {
-    --brand-accent: #ff375f;
-    --brand-glow: rgba(255, 55, 95, 0.12);
+.business-card:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    transform: translateY(-4px);
 }
-.rithim-card .card-tagline {
-    color: var(--brand-accent);
+
+.business-card:hover .card-tagline {
+    color: #ffffff;
 }
-.rithim-card .card-icon {
-    color: var(--brand-accent);
-    background: rgba(255, 55, 95, 0.04);
-    border-color: rgba(255, 55, 95, 0.15);
-}
-.rithim-card:hover {
-    border-color: rgba(255, 55, 95, 0.35);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--brand-glow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-    transform: translateY(-6px);
-}
-.rithim-card:hover .card-icon {
-    background: rgba(255, 55, 95, 0.12);
-    border-color: var(--brand-accent);
-    box-shadow: 0 0 20px rgba(255, 55, 95, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    transform: scale(1.1) rotate(-3deg);
+
+.business-card:hover .card-icon {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    transform: scale(1.06) rotate(-2deg);
 }
 
 /* Responsive grid modifications */
