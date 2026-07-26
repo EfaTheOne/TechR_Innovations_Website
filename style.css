@@ -36,8 +36,10 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
+    padding: 4rem 1rem;
 }
 
 /* Background Effects */
@@ -67,9 +69,9 @@ body {
 
 /* --- COMING SOON LAYOUT --- */
 .coming-soon-container {
-    padding: 2rem;
+    padding: 0;
     width: 100%;
-    max-width: 580px;
+    max-width: 900px;
     z-index: 10;
     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -239,5 +241,276 @@ input[type="email"]:focus {
 
     .btn {
         width: 100%;
+    }
+}
+
+/* ============================================================
+   CUSTOM CURSOR SYSTEM
+   Page-aware cursor with smooth animations and glow FX
+   ============================================================ */
+
+/* Hide default cursor everywhere except touch/coarse devices */
+@media (pointer: fine) {
+    *, *::before, *::after {
+        cursor: none !important;
+    }
+}
+
+/* Outer ring - lags behind cursor for a cool trailing effect */
+.cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--cursor-color, var(--accent));
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--cursor-glow, rgba(41, 151, 255, 0.35)),
+                inset 0 0 6px var(--cursor-glow, rgba(41, 151, 255, 0.15));
+    transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.3s ease,
+                border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                border-style 0.35s ease,
+                box-shadow 0.3s ease,
+                opacity 0.3s ease,
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: left, top;
+    backdrop-filter: blur(1px);
+}
+
+/* Inner dot - snaps to cursor position instantly */
+.cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    background: var(--cursor-color, var(--accent));
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px var(--cursor-glow-dot, rgba(41, 151, 255, 0.8));
+    transition: width 0.15s ease,
+                height 0.15s ease,
+                background-color 0.3s ease,
+                border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.3s ease,
+                clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.3s ease,
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: left, top;
+}
+
+/* === HOVER STATE: ring blooms, dot shrinks === */
+body.cursor-hovering .cursor-ring {
+    width: 56px;
+    height: 56px;
+    opacity: 0.5;
+    border-width: 1.5px;
+}
+body.cursor-hovering .cursor-dot {
+    width: 4px;
+    height: 4px;
+}
+
+/* === CLICK STATE: ring snaps in, dot pulses === */
+body.cursor-clicking .cursor-ring {
+    width: 28px;
+    height: 28px;
+    opacity: 1;
+}
+body.cursor-clicking .cursor-dot {
+    width: 11px;
+    height: 11px;
+}
+
+/* === IDLE STATE: fade out === */
+body.cursor-idle .cursor-ring,
+body.cursor-idle .cursor-dot {
+    opacity: 0;
+}
+
+/* ============================================================
+   ECOSYSTEM SHOWCASE (Business Cards)
+   ============================================================ */
+
+.ecosystem-header {
+    text-align: center;
+    margin: 6rem 0 3rem;
+}
+
+.ecosystem-header h2 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+}
+
+.ecosystem-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.ecosystem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    width: 100%;
+    margin-bottom: 4rem;
+}
+
+.business-card {
+    position: relative;
+    background: var(--bg-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    padding: 2.5rem;
+    transition: all var(--transition-normal);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    transition: all var(--transition-normal);
+}
+
+.card-icon i {
+    width: 24px;
+    height: 24px;
+}
+
+.business-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.01em;
+}
+
+.card-tagline {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.card-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+}
+
+/* Brand Customization Colors & Hover FX */
+
+/* Techack - Green */
+.techack-card {
+    --brand-accent: #34c759;
+    --brand-glow: rgba(52, 199, 89, 0.15);
+}
+.techack-card .card-tagline {
+    color: var(--brand-accent);
+}
+.techack-card:hover {
+    border-color: rgba(52, 199, 89, 0.3);
+    box-shadow: 0 12px 30px rgba(52, 199, 89, 0.08);
+    transform: translateY(-4px);
+}
+.techack-card:hover .card-icon {
+    background: rgba(52, 199, 89, 0.1);
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
+}
+
+/* TechBox - Orange */
+.techbox-card {
+    --brand-accent: #ff9f0a;
+    --brand-glow: rgba(255, 159, 10, 0.15);
+}
+.techbox-card .card-tagline {
+    color: var(--brand-accent);
+}
+.techbox-card:hover {
+    border-color: rgba(255, 159, 10, 0.3);
+    box-shadow: 0 12px 30px rgba(255, 159, 10, 0.08);
+    transform: translateY(-4px);
+}
+.techbox-card:hover .card-icon {
+    background: rgba(255, 159, 10, 0.1);
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
+}
+
+/* StudyTech - Purple */
+.studytech-card {
+    --brand-accent: #5e5ce6;
+    --brand-glow: rgba(94, 92, 230, 0.15);
+}
+.studytech-card .card-tagline {
+    color: var(--brand-accent);
+}
+.studytech-card:hover {
+    border-color: rgba(94, 92, 230, 0.3);
+    box-shadow: 0 12px 30px rgba(94, 92, 230, 0.08);
+    transform: translateY(-4px);
+}
+.studytech-card:hover .card-icon {
+    background: rgba(94, 92, 230, 0.1);
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
+}
+
+/* Rithim - Pink */
+.rithim-card {
+    --brand-accent: #ff375f;
+    --brand-glow: rgba(255, 55, 95, 0.15);
+}
+.rithim-card .card-tagline {
+    color: var(--brand-accent);
+}
+.rithim-card:hover {
+    border-color: rgba(255, 55, 95, 0.3);
+    box-shadow: 0 12px 30px rgba(255, 55, 95, 0.08);
+    transform: translateY(-4px);
+}
+.rithim-card:hover .card-icon {
+    background: rgba(255, 55, 95, 0.1);
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
+}
+
+/* Responsive grid modifications */
+@media (max-width: 768px) {
+    .ecosystem-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .ecosystem-header {
+        margin: 4rem 0 2rem;
+    }
+    .ecosystem-header h2 {
+        font-size: 2rem;
     }
 }
